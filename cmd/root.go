@@ -81,8 +81,9 @@ func initConfig() {
 
 		// Search config in home directory with name ".g3ops" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".g3ops.json")
-		cfgFile = filepath.Join(home, ".g3ops.json")
+		viper.SetConfigName(".g3ops")
+		viper.SetConfigType("json")
+		cfgFile = filepath.Join(home, ".g3ops")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -91,7 +92,11 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	} else {
+		fmt.Println(err)
 		fmt.Println("Creating config file:", cfgFile)
 		viper.SafeWriteConfigAs(cfgFile)
 	}
+
+	// contexts := viper.GetString("test")
+	// fmt.Println("contexts:", contexts)
 }

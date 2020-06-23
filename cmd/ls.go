@@ -33,11 +33,23 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := viper.ReadInConfig() // Find and read the config file
-		if err != nil {             // Handle errors reading the config file
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		// err := viper.ReadInConfig() // Find and read the config file
+		// if err != nil {             // Handle errors reading the config file
+		// 	panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		// }
+		viper.ReadInConfig()
+		
+		var contexts []G3opsContext
+		err := viper.UnmarshalKey("contexts", &contexts)
+		if err != nil {
+			fmt.Printf("unable to decode into struct, %v", err)
+			err = nil
 		}
-		fmt.Println("ls called")
+		for _, ctx := range contexts {
+			fmt.Println("  name:", ctx.Name)
+			fmt.Println("  url:", ctx.Url)
+			fmt.Println()
+		}
 	},
 }
 
