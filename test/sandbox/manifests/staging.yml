@@ -1,0 +1,7 @@
+deploy:
+  host: staging.sandbox.example.com
+services:
+  - name: ping
+    version: 1.3
+  - name: hello
+    version: 0.3.2

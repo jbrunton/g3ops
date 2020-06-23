@@ -1,0 +1,4 @@
+meta:
+  name: ping
+build:
+  version: 1.4
