@@ -7,7 +7,7 @@ import (
 )
 
 // GetCmd - g3ops context get
-var GetCmd = &cobra.Command{
+var getCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Prints the current g3ops context",
 	Long: `A longer description that spans multiple lines and likely contains examples
@@ -21,16 +21,16 @@ to quickly create a Cobra application.`,
 	},
 }
 
-// func init() {
-// 	contextCmd.AddCommand(getCmd)
+func init() {
+	//ContextCmd.AddCommand(getCmd)
 
-// 	// Here you will define your flags and configuration settings.
+	// Here you will define your flags and configuration settings.
 
-// 	// Cobra supports Persistent Flags which will work for this command
-// 	// and all subcommands, e.g.:
-// 	// lsCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// lsCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-// 	// Cobra supports local flags which will only run when this command
-// 	// is called directly, e.g.:
-// 	// lsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-// }
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// lsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}

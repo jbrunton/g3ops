@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
+package context
 
 import (
 	"fmt"
@@ -21,29 +21,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// addCmd represents the add command
-var addCmd = &cobra.Command{
-	Use:   "add <name> <url>",
-	Short: "Add a new g3ops context",
-	Long: `Adds a new g3ops context called <name> with the given url. Example:
+// ContextCmd represents the context command
+var ContextCmd = &cobra.Command{
+	Use:   "context",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
 
-  g3ops add my-context example.com/path/to/context`,
-	Args: cobra.ExactArgs(2),
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("adding", args[0], args[1])
+		fmt.Println("context called")
 	},
 }
 
 func init() {
-	contextCmd.AddCommand(addCmd)
+	ContextCmd.AddCommand(getCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// contextCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// contextCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
