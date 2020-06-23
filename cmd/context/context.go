@@ -18,6 +18,7 @@ package context
 import (
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -49,6 +50,15 @@ func loadContextManifest() (G3opsContext, error) {
 	err = yaml.Unmarshal(data, &ctx)
 	if err != nil {
 		panic(err)
+	}
+
+	for envName, env := range ctx.Environments {
+		path, err := filepath.Abs(env.Manifest)
+		if err != nil {
+			panic(err)
+		}
+		env.Manifest = path
+		ctx.Environments[envName] = env
 	}
 
 	return ctx, nil
