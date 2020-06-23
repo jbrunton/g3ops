@@ -3,10 +3,7 @@ package context
 import (
 	"fmt"
 
-	"io/ioutil"
-
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
 )
 
 // GetCmd - g3ops context get
@@ -20,14 +17,20 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		data, err := ioutil.ReadFile(".g3ops.yml")
+		ctx, err := loadContextManifest()
 		if err == nil {
-			//fmt.Println("Current context: " + string(context))
-			ctx := G3opsContext{}
-			yaml.Unmarshal(data, &ctx)
 			fmt.Println(ctx.Name)
 		} else {
 			fmt.Println("No current context found")
 		}
+		// data, err := ioutil.ReadFile(".g3ops.yml")
+		// if err == nil {
+		// 	//fmt.Println("Current context: " + string(context))
+		// 	ctx := G3opsContext{}
+		// 	yaml.Unmarshal(data, &ctx)
+		// 	fmt.Println(ctx.Name)
+		// } else {
+		// 	fmt.Println("No current context found")
+		// }
 	},
 }

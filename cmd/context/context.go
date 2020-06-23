@@ -17,8 +17,10 @@ package context
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 )
 
 // ContextCmd represents the context command
@@ -34,6 +36,22 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("context called")
 	},
+}
+
+func loadContextManifest() (G3opsContext, error) {
+	data, err := ioutil.ReadFile(".g3ops.yml")
+
+	if err != nil {
+		return G3opsContext{}, err
+	}
+
+	ctx := G3opsContext{}
+	err = yaml.Unmarshal(data, &ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	return ctx, nil
 }
 
 func init() {
