@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/jbrunton/g3ops/cmd/context"
 	"github.com/spf13/cobra"
 )
 
@@ -38,6 +39,7 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(contextCmd)
+	contextCmd.AddCommand(context.GetCmd)
 
 	// Here you will define your flags and configuration settings.
 
