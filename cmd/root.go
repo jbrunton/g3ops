@@ -17,8 +17,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+	"path/filepath"
+
+	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -57,7 +59,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.g3ops.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.g3ops.json)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -79,7 +81,8 @@ func initConfig() {
 
 		// Search config in home directory with name ".g3ops" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".g3ops")
+		viper.SetConfigName(".g3ops.json")
+		cfgFile = filepath.Join(home, ".g3ops.json")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -87,5 +90,8 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Println("Creating config file:", cfgFile)
+		viper.SafeWriteConfigAs(cfgFile)
 	}
 }
