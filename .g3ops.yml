@@ -1,0 +1,13 @@
+name: sandbox
+environments:
+  production:
+    manifest: ./test/sandbox/manifests/production.yml
+  staging:
+    manifest: ./test/sandbox/manifests/staging.yml
+
+services:
+  ping:
+    manifest: ./test/sandbox/services/ping/manifest.yml
+  hello:
+    manifest: ./test/sandbox/services/hello/manifest.yml
+  
