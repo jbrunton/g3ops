@@ -92,11 +92,12 @@ var buildCmd = &cobra.Command{
 
 		buildVersion := serviceManifest.Version
 		buildID := uuid.New().String()
+		buildSha := lib.CurrentSha()
 
 		envMap := map[string]string{
 			"BUILD_SERVICE": serviceName,
 			"BUILD_VERSION": buildVersion,
-			"BUILD_SHA":     "a1b2c3",
+			"BUILD_SHA":     buildSha,
 			"BUILD_ID":      buildID,
 		}
 
