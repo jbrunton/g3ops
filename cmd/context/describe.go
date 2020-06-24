@@ -3,6 +3,7 @@ package context
 import (
 	"fmt"
 
+	"github.com/jbrunton/g3ops/cmd/lib"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
@@ -22,7 +23,7 @@ to quickly create a Cobra application.`,
 		if err == nil {
 			out, err := yaml.Marshal(&ctx)
 			if err == nil {
-				fmt.Print(string(out))
+				lib.PrintYaml(string(out))
 			} else {
 				panic(err)
 			}
