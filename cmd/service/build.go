@@ -10,7 +10,7 @@ import (
 
 	"github.com/thoas/go-funk"
 
-	"github.com/jbrunton/g3ops/cmd/context"
+	"github.com/jbrunton/g3ops/lib"
 	"github.com/spf13/cobra"
 )
 
@@ -60,7 +60,7 @@ var buildCmd = &cobra.Command{
 			return errors.New("unexpected arguments, only service name expected")
 		}
 
-		ctx, err := context.LoadContextManifest()
+		ctx, err := lib.LoadContextManifest()
 		if err != nil {
 			panic(err)
 		}
@@ -76,7 +76,7 @@ var buildCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		serviceName := args[0]
 
-		ctx, err := context.LoadContextManifest()
+		ctx, err := lib.LoadContextManifest()
 		if err != nil {
 			panic(err)
 		}

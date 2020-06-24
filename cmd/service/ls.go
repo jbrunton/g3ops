@@ -6,7 +6,7 @@ import (
 
 	"path/filepath"
 
-	"github.com/jbrunton/g3ops/cmd/context"
+	"github.com/jbrunton/g3ops/lib"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
@@ -15,7 +15,7 @@ var lsCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "Lists services in the current context",
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx, err := context.LoadContextManifest()
+		ctx, err := lib.LoadContextManifest()
 		if err == nil {
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Name", "Manifest"})
