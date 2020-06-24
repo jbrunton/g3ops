@@ -21,4 +21,4 @@ ci:
         TAG: latest
       command: |
         docker-compose build $BUILD_SERVICE
-        docker-compose push $BUILD_SERVICE
+#        docker-compose push $BUILD_SERVICE

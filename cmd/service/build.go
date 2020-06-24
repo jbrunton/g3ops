@@ -11,17 +11,19 @@ import (
 	"github.com/thoas/go-funk"
 
 	"github.com/jbrunton/g3ops/lib"
+	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
 
 type command struct {
 	cmd  string
+	name string
 	args []string
 }
 
-func parseCommand(cmd string) (string, []string) {
+func parseCommand(cmd string) command {
 	components := strings.Split(cmd, " ")
-	return components[0], components[1:len(components)]
+	return command{cmd, components[0], components[1:len(components)]}
 	// var commands []command
 	// commands := funk.Map(strings.Split(input, "\n"), func(cmd string) command {
 	// 	components := strings.Split(cmd, " ")
@@ -30,8 +32,9 @@ func parseCommand(cmd string) (string, []string) {
 	// return commands
 }
 
-func execCommand(cmd string, args []string) {
-	process := exec.Command(cmd, args...)
+func execCommand(command command) {
+	fmt.Println("Running", aurora.Green(command.cmd).Bold(), "...")
+	process := exec.Command(command.name, command.args...)
 
 	stdout, err := process.StdoutPipe()
 	if err != nil {
@@ -43,7 +46,7 @@ func execCommand(cmd string, args []string) {
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		m := scanner.Text()
-		fmt.Println(m)
+		fmt.Println("  " + m)
 	}
 	process.Wait()
 }
@@ -83,8 +86,8 @@ var buildCmd = &cobra.Command{
 
 		os.Setenv("BUILD_SERVICE", serviceName)
 		funk.ForEach(strings.Split(ctx.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
-			buildCmd, buildArgs := parseCommand(os.ExpandEnv(cmd))
-			execCommand(buildCmd, buildArgs)
+			command := parseCommand(os.ExpandEnv(cmd))
+			execCommand(command)
 		})
 	},
 }
