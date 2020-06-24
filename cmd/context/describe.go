@@ -3,7 +3,7 @@ package context
 import (
 	"fmt"
 
-	"github.com/jbrunton/g3ops/cmd/lib"
+	"github.com/jbrunton/g3ops/lib"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
