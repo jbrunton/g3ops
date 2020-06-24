@@ -39,7 +39,8 @@ to quickly create a Cobra application.`,
 	},
 }
 
-func loadContextManifest() (G3opsContext, error) {
+// LoadContextManifest - finds and returns the G3opsContext
+func LoadContextManifest() (G3opsContext, error) {
 	data, err := ioutil.ReadFile(".g3ops.yml")
 
 	if err != nil {
@@ -59,6 +60,15 @@ func loadContextManifest() (G3opsContext, error) {
 		}
 		env.Manifest = path
 		ctx.Environments[envName] = env
+	}
+
+	for serviceName, service := range ctx.Services {
+		path, err := filepath.Abs(service.Manifest)
+		if err != nil {
+			panic(err)
+		}
+		service.Manifest = path
+		ctx.Services[serviceName] = service
 	}
 
 	return ctx, nil

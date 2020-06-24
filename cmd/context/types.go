@@ -6,4 +6,7 @@ type G3opsContext struct {
 	Environments map[string]struct {
 		Manifest string
 	}
+	Services map[string]struct {
+		Manifest string
+	}
 }
