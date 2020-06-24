@@ -67,22 +67,23 @@ func init() {
 
 	rootCmd.AddCommand(context.ContextCmd)
 	rootCmd.AddCommand(service.ServiceCmd)
-	cobra.AddTemplateFunc("StyleCommand", aurora.Green)
-	cobra.AddTemplateFunc("StyleOptions", aurora.Yellow)
-	rootCmd.SetUsageTemplate(`Usage:{{if .Runnable}}
+	cobra.AddTemplateFunc("Bold", aurora.Bold)
+	cobra.AddTemplateFunc("StyleCommand", func(s string) string { return aurora.Green(s).Bold().String() })
+	cobra.AddTemplateFunc("StyleOptions", func(s string) string { return aurora.Yellow(s).Bold().String() })
+	rootCmd.SetUsageTemplate(`{{Bold "Usage:"}}{{if .Runnable}}
   {{StyleCommand .UseLine}}{{end}}{{if .HasAvailableSubCommands}}
   {{StyleCommand .CommandPath}} {{StyleOptions "[command]"}}{{end}}{{if gt (len .Aliases) 0}}
-Aliases:
+{{Bold "Aliases:"}}
   {{.NameAndAliases}}{{end}}{{if .HasExample}}
-Examples:
+{{Bold "Examples:"}}
 {{.Example}}{{end}}{{if .HasAvailableSubCommands}}
-Available Commands:{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
-  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
-Flags:
+{{Bold "Available Commands:"}}{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
+  {{rpad .Name .NamePadding | StyleCommand}} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
+{{Bold "Flags:"}}
 {{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasAvailableInheritedFlags}}
-Global Flags:
+{{Bold "Global Flags:"}}
 {{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasHelpSubCommands}}
-Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
+{{Bold "Additional help topics:"}}{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
   {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
 Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}`)
 }
