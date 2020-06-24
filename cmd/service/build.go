@@ -4,14 +4,49 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
 
+	"github.com/thoas/go-funk"
+
 	"github.com/jbrunton/g3ops/cmd/context"
 	"github.com/spf13/cobra"
 )
+
+type command struct {
+	cmd  string
+	args []string
+}
+
+func parseCommand(cmd string) (string, []string) {
+	components := strings.Split(cmd, " ")
+	return components[0], components[1:len(components)]
+	// var commands []command
+	// commands := funk.Map(strings.Split(input, "\n"), func(cmd string) command {
+	// 	components := strings.Split(cmd, " ")
+	// 	return command{cmd: components[0], args: components[1:len(components)]}
+	// })
+	// return commands
+}
+
+func execCommand(cmd string, args []string) {
+	process := exec.Command(cmd, args...)
+
+	stdout, err := process.StdoutPipe()
+	if err != nil {
+		panic(err)
+	}
+	process.Start()
+
+	scanner := bufio.NewScanner(stdout)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		m := scanner.Text()
+		fmt.Println(m)
+	}
+	process.Wait()
+}
 
 var buildCmd = &cobra.Command{
 	Use:   "build <service>",
@@ -39,10 +74,6 @@ var buildCmd = &cobra.Command{
 		return errors.New("unknown service: " + args[0])
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		// ctx, err := context.LoadContextManifest()
-		// if err != nil {
-		// 	panic(err)
-		// }
 		serviceName := args[0]
 
 		ctx, err := context.LoadContextManifest()
@@ -50,28 +81,10 @@ var buildCmd = &cobra.Command{
 			panic(err)
 		}
 
-		//command := ctx.Ci.Defaults.Build.Command
-		//commandArgs := ctx.Ci.Defaults.Build.Args
-		//process := exec.Command("docker-compose", "build", "$BUILD_SERVICE")
-		//process := exec.Command("echo", "docker-compose build $BUILD_SERVICE")
 		os.Setenv("BUILD_SERVICE", serviceName)
-		//process := exec.Command("echo", os.ExpandEnv("$BUILD_SERVICE"))
-		process := exec.Command(
-			ctx.Ci.Defaults.Build.Command,
-			strings.Split(os.ExpandEnv(ctx.Ci.Defaults.Build.Args), " ")...)
-
-		stdout, err := process.StdoutPipe()
-		if err != nil {
-			log.Fatal(err)
-		}
-		process.Start()
-
-		scanner := bufio.NewScanner(stdout)
-		scanner.Split(bufio.ScanLines)
-		for scanner.Scan() {
-			m := scanner.Text()
-			fmt.Println(m)
-		}
-		process.Wait()
+		funk.ForEach(strings.Split(ctx.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
+			buildCmd, buildArgs := parseCommand(os.ExpandEnv(cmd))
+			execCommand(buildCmd, buildArgs)
+		})
 	},
 }
