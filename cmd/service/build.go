@@ -26,16 +26,16 @@ type command struct {
 func parseCommand(cmd string) command {
 	components := strings.Split(cmd, " ")
 	return command{strings.TrimSpace(cmd), components[0], components[1:len(components)]}
-	// var commands []command
-	// commands := funk.Map(strings.Split(input, "\n"), func(cmd string) command {
-	// 	components := strings.Split(cmd, " ")
-	// 	return command{cmd: components[0], args: components[1:len(components)]}
-	// })
-	// return commands
 }
 
-func execCommand(command command) {
+func execCommand(command command, dryRun bool) {
 	fmt.Println("Running", aurora.Green(command.cmd).Bold(), "...")
+	if dryRun {
+		fmt.Println(aurora.Yellow("--dry-run passed, skipping command. Would have run:"))
+		fmt.Println(aurora.Yellow("  " + command.cmd))
+		return
+	}
+
 	process := exec.Command(command.name, command.args...)
 
 	stdout, err := process.StdoutPipe()
@@ -88,6 +88,11 @@ var buildCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		serviceName := args[0]
+		var dryRun bool
+		dryRun, err := cmd.Flags().GetBool("dry-run")
+		if err != nil {
+			panic(err)
+		}
 
 		ctx, err := lib.LoadContextManifest()
 		if err != nil {
@@ -126,7 +131,7 @@ var buildCmd = &cobra.Command{
 		funk.ForEach(strings.Split(ctx.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
 			command := parseCommand(os.ExpandEnv(cmd))
 			if command.cmd != "" {
-				execCommand(command)
+				execCommand(command, dryRun)
 			}
 		})
 	},
