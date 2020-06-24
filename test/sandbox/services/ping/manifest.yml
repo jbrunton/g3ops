@@ -1,4 +1,2 @@
-meta:
-  name: ping
-build:
-  version: 1.4
+name: ping
+version: 1.4

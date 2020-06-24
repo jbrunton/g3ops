@@ -32,6 +32,7 @@ var ServiceCmd = &cobra.Command{
 func init() {
 	ServiceCmd.AddCommand(lsCmd)
 	ServiceCmd.AddCommand(buildCmd)
+	ServiceCmd.AddCommand(describeCmd)
 	//ContextCmd.AddCommand(describeCmd)
 
 	// Here you will define your flags and configuration settings.

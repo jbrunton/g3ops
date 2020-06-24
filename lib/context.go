@@ -21,7 +21,6 @@ type G3opsContext struct {
 			Build struct {
 				Env     map[string]string
 				Command string
-				Args    string
 			}
 		}
 	}

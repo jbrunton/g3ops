@@ -17,7 +17,7 @@ ci:
     build:
       env:
         # COMPOSE_FILE: $(pwd)/test/sandbox/docker-compose.yml
-        # TAG: $BUILD_VERSION-$BUILD_COMMIT-$BUILD_ID
+        # TAG: $BUILD_VERSION-$BUILD_SHA-$BUILD_ID
         TAG: latest
       command: |
         docker-compose build $BUILD_SERVICE
