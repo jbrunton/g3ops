@@ -1,9 +1,10 @@
 package service
 
 import (
-	"bytes"
+	"bufio"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -59,26 +60,18 @@ var buildCmd = &cobra.Command{
 			ctx.Ci.Defaults.Build.Command,
 			strings.Split(os.ExpandEnv(ctx.Ci.Defaults.Build.Args), " ")...)
 
-		// process.Env = append(
-		// 	os.Environ(),
-		// 	"BUILD_SERVICE="+serviceName,
-		// )
-
-		var out bytes.Buffer
-		process.Stdout = &out
-
-		var stderr bytes.Buffer
-		process.Stderr = &stderr
-
-		if err := process.Run(); err != nil {
-			fmt.Println("error running cmd")
-			fmt.Println(stderr.String())
-			fmt.Println(err)
-			return
+		stdout, err := process.StdoutPipe()
+		if err != nil {
+			log.Fatal(err)
 		}
+		process.Start()
 
-		fmt.Println(out.String())
-
-		//fmt.Println("Building service:", command)
+		scanner := bufio.NewScanner(stdout)
+		scanner.Split(bufio.ScanLines)
+		for scanner.Scan() {
+			m := scanner.Text()
+			fmt.Println(m)
+		}
+		process.Wait()
 	},
 }
