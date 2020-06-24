@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -24,7 +25,7 @@ type command struct {
 
 func parseCommand(cmd string) command {
 	components := strings.Split(cmd, " ")
-	return command{cmd, components[0], components[1:len(components)]}
+	return command{strings.TrimSpace(cmd), components[0], components[1:len(components)]}
 	// var commands []command
 	// commands := funk.Map(strings.Split(input, "\n"), func(cmd string) command {
 	// 	components := strings.Split(cmd, " ")
@@ -41,6 +42,10 @@ func execCommand(command command) {
 	if err != nil {
 		panic(err)
 	}
+
+	var stderr bytes.Buffer
+	process.Stderr = &stderr
+
 	process.Start()
 
 	scanner := bufio.NewScanner(stdout)
@@ -49,7 +54,11 @@ func execCommand(command command) {
 		m := scanner.Text()
 		fmt.Println("  " + m)
 	}
-	process.Wait()
+	err = process.Wait()
+	if err != nil {
+		fmt.Println(stderr.String())
+		panic(err)
+	}
 }
 
 var buildCmd = &cobra.Command{
@@ -106,15 +115,19 @@ var buildCmd = &cobra.Command{
 		funk.ForEach(envMap, func(envvar string, envval string) {
 			os.Setenv(envvar, envval)
 		})
-		funk.ForEach(ctx.Ci.Defaults.Build.Env, func(envvar string, envval string) {
-			envMap[envvar] = os.ExpandEnv(envval)
+		funk.ForEach(ctx.Ci.Defaults.Build.Env, func(envvar string, envtemplate string) {
+			envval := os.ExpandEnv(envtemplate)
+			envMap[envvar] = envval
+			os.Setenv(envvar, envval)
 		})
 		funk.ForEach(envMap, func(envvar string, envval string) {
 			fmt.Printf("  %s=%s\n", envvar, envval)
 		})
 		funk.ForEach(strings.Split(ctx.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
 			command := parseCommand(os.ExpandEnv(cmd))
-			execCommand(command)
+			if command.cmd != "" {
+				execCommand(command)
+			}
 		})
 	},
 }

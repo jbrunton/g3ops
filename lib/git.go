@@ -1,6 +1,9 @@
 package lib
 
-import "os/exec"
+import (
+	"os/exec"
+	"strings"
+)
 
 // CurrentSha - returns the short form version of git rev-parse HEAD
 func CurrentSha() string {
@@ -8,5 +11,5 @@ func CurrentSha() string {
 	if err != nil {
 		panic(err)
 	}
-	return string(out)
+	return strings.TrimSpace(string(out))
 }

@@ -3,11 +3,11 @@ version: '3.8'
 services:
 
   ping:
-    image: 'jbrunton/g3ops-sandbox-ping'
+    image: "jbrunton/g3ops-sandbox-ping:${TAG?}"
     build:
       context: ./test/sandbox/services/ping
   
   hello-world:
-    image: 'jbrunton/g3ops-sandbox-hello-world'
+    image: "jbrunton/g3ops-sandbox-hello-world:${TAG?}"
     build:
       context: ./test/sandbox/services/hello-world
