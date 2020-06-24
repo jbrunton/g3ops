@@ -1,4 +1,5 @@
 name: sandbox
+
 environments:
   production:
     manifest: ./test/sandbox/manifests/production.yml
@@ -10,4 +11,10 @@ services:
     manifest: ./test/sandbox/services/ping/manifest.yml
   hello:
     manifest: ./test/sandbox/services/hello/manifest.yml
-  
+
+ci:
+  defaults:
+    build:
+      env:
+        COMPOSE_FILE: docker-compose.yml
+      command: docker-compose build $BUILD_SERVICE
