@@ -10,6 +10,7 @@ import (
 
 	"github.com/thoas/go-funk"
 
+	"github.com/google/uuid"
 	"github.com/jbrunton/g3ops/lib"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
@@ -84,7 +85,32 @@ var buildCmd = &cobra.Command{
 			panic(err)
 		}
 
-		os.Setenv("BUILD_SERVICE", serviceName)
+		serviceManifest, err := lib.LoadServiceManifest(serviceName)
+		if err != nil {
+			panic(err)
+		}
+
+		buildVersion := serviceManifest.Version
+		buildID := uuid.New().String()
+
+		envMap := map[string]string{
+			"BUILD_SERVICE": serviceName,
+			"BUILD_VERSION": buildVersion,
+			"BUILD_SHA":     "a1b2c3",
+			"BUILD_ID":      buildID,
+		}
+
+		fmt.Println("Configuring environment for build:")
+
+		funk.ForEach(envMap, func(envvar string, envval string) {
+			os.Setenv(envvar, envval)
+		})
+		funk.ForEach(ctx.Ci.Defaults.Build.Env, func(envvar string, envval string) {
+			envMap[envvar] = os.ExpandEnv(envval)
+		})
+		funk.ForEach(envMap, func(envvar string, envval string) {
+			fmt.Printf("  %s=%s\n", envvar, envval)
+		})
 		funk.ForEach(strings.Split(ctx.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
 			command := parseCommand(os.ExpandEnv(cmd))
 			execCommand(command)
