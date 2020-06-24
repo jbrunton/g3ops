@@ -16,5 +16,8 @@ ci:
   defaults:
     build:
       env:
-        COMPOSE_FILE: docker-compose.yml
-      command: docker-compose build $BUILD_SERVICE
+        # COMPOSE_FILE: $(pwd)/test/sandbox/docker-compose.yml
+        # TAG: $BUILD_VERSION-$BUILD_COMMIT-$BUILD_ID
+        TAG: latest
+      command: docker-compose
+      args: build $BUILD_SERVICE

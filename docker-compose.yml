@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+
+  ping:
+    build:
+      context: ./test/sandbox/services/ping
+  
+  hello:
+    build:
+      context: ./test/sandbox/services/hello
