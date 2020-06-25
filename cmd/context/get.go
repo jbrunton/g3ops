@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jbrunton/g3ops/lib"
-	"github.com/spf13/cobra"
+	"github.com/jbrunton/cobra"
 )
 
 var getCmd = &cobra.Command{

@@ -15,7 +15,7 @@ import (
 	"github.com/jbrunton/g3ops/cmd/styles"
 	"github.com/jbrunton/g3ops/lib"
 	"github.com/logrusorgru/aurora"
-	"github.com/spf13/cobra"
+	"github.com/jbrunton/cobra"
 )
 
 type command struct {

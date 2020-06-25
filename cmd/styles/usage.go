@@ -1,11 +1,12 @@
 package styles
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
 
-	"github.com/spf13/cobra"
+	"github.com/jbrunton/cobra"
 )
 
 // ConfigureUsageTemplate - styles the usage template to include color
@@ -23,6 +24,22 @@ func ConfigureUsageTemplate(cmd *cobra.Command) {
 		return fmt.Sprintf(`{{Heading "%s"}}`, heading)
 	})
 	cmd.SetUsageTemplate(usageTemplate)
+}
+
+// ConfigureUnknownCommandErrorFunc - configures a new UnknownCommandErrorFunc with color styling
+func ConfigureUnknownCommandErrorFunc(cmd *cobra.Command) {
+	cmd.SuggestionsMinimumDistance = 2
+	cmd.SetUnknownCommandErrorFunc(func(c *cobra.Command, arg string) error {
+		errorMessage := StyleError(fmt.Sprintf("unknown command %q for %q", arg, c.CommandPath()))
+		suggestionsString := ""
+		if suggestions := c.SuggestionsFor(arg); len(suggestions) > 0 {
+			suggestionsString += "\n\nDid you mean this?\n"
+			for _, s := range suggestions {
+				suggestionsString += fmt.Sprintf(StyleCommand("\t%v\n").String(), s)
+			}
+		}
+		return errors.New(errorMessage + suggestionsString)
+	})
 }
 
 func init() {
