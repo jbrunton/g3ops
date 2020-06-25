@@ -18,14 +18,11 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"regexp"
-	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/jbrunton/g3ops/cmd/context"
 	"github.com/jbrunton/g3ops/cmd/service"
-	"github.com/logrusorgru/aurora"
 )
 
 var cfgFile string
@@ -69,34 +66,5 @@ func init() {
 
 	rootCmd.AddCommand(context.ContextCmd)
 	rootCmd.AddCommand(service.ServiceCmd)
-	cobra.AddTemplateFunc("Bold", aurora.Bold)
-	cobra.AddTemplateFunc("StyleCommand", func(s string) string { return aurora.Green(s).Bold().String() })
-	cobra.AddTemplateFunc("StyleOptions", func(s string) string { return aurora.Yellow(s).Bold().String() })
-	flagsRegex := regexp.MustCompile(`^\s+-\S,\s+--\S+|^\s+--\S+`)
-	cobra.AddTemplateFunc("StyleFlags", func(flagsUsage string) string {
-		var styledUsages []string
-		for _, flagUsage := range strings.Split(flagsUsage, "\n") {
-			styledUsage := flagsRegex.ReplaceAllStringFunc(flagUsage, func(flag string) string {
-				return aurora.Yellow(flag).Bold().String()
-			})
-			styledUsages = append(styledUsages, styledUsage)
-		}
-		return strings.Join(styledUsages, "\n")
-	})
-	rootCmd.SetUsageTemplate(`{{Bold "Usage:"}}{{if .Runnable}}
-  {{StyleCommand .UseLine}}{{end}}{{if .HasAvailableSubCommands}}
-  {{StyleCommand .CommandPath}} {{StyleOptions "[command]"}}{{end}}{{if gt (len .Aliases) 0}}
-{{Bold "Aliases:"}}
-  {{.NameAndAliases}}{{end}}{{if .HasExample}}
-{{Bold "Examples:"}}
-{{.Example}}{{end}}{{if .HasAvailableSubCommands}}
-{{Bold "Available Commands:"}}{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
-  {{rpad .Name .NamePadding | StyleCommand}} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
-{{Bold "Flags:"}}
-{{.LocalFlags.FlagUsages | trimTrailingWhitespaces | StyleFlags}}{{end}}{{if .HasAvailableInheritedFlags}}
-{{Bold "Global Flags:"}}
-{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces | StyleFlags}}{{end}}{{if .HasHelpSubCommands}}
-{{Bold "Additional help topics:"}}{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
-Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}`)
+	StyleUsage(rootCmd)
 }
