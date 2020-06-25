@@ -68,4 +68,5 @@ func init() {
 	rootCmd.AddCommand(context.ContextCmd)
 	rootCmd.AddCommand(service.ServiceCmd)
 	styles.ConfigureUsageTemplate(rootCmd)
+	styles.ConfigureUnknownCommandErrorFunc(rootCmd)
 }
