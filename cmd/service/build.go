@@ -12,10 +12,10 @@ import (
 	"github.com/thoas/go-funk"
 
 	"github.com/google/uuid"
+	"github.com/jbrunton/cobra"
 	"github.com/jbrunton/g3ops/cmd/styles"
 	"github.com/jbrunton/g3ops/lib"
 	"github.com/logrusorgru/aurora"
-	"github.com/jbrunton/cobra"
 )
 
 type command struct {
@@ -132,6 +132,12 @@ var buildCmd = &cobra.Command{
 		funk.ForEach(envMap, func(envvar string, envval string) {
 			fmt.Printf("  %s=%s\n", envvar, envval)
 		})
+
+		tag := os.Getenv("TAG")
+		if tag == "" {
+			panic("TAG must be set")
+		}
+
 		funk.ForEach(strings.Split(ctx.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
 			command := parseCommand(os.ExpandEnv(cmd))
 			if command.cmd != "" {
