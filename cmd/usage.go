@@ -10,14 +10,14 @@ import (
 	"github.com/logrusorgru/aurora"
 )
 
-var flagsRegex *regexp.Regexp
+var flagsRegex, argNameRegex *regexp.Regexp
 
 // StyleUsage - styles the usage template to include color
 func StyleUsage(cmd *cobra.Command) {
 	usageTemplate := cmd.UsageTemplate()
 	usageTemplate = strings.NewReplacer(
-		`{{.UseLine}}`, `{{StyleCommand .UseLine}}`,
-		`{{.CommandPath}}`, `{{StyleCommand .CommandPath}}`,
+		`{{.UseLine}}`, `{{StyleCommandUsage .UseLine}}`,
+		`{{.CommandPath}}`, `{{StyleCommandUsage .CommandPath}}`,
 		`[command]`, `{{StyleCommand "[command]"}}`,
 		`{{rpad .Name .NamePadding }}`, `{{rpad .Name .NamePadding | StyleCommand}}`,
 		`.FlagUsages |`, `.FlagUsages | StyleFlags |`,
@@ -37,6 +37,15 @@ func styleCommand(s string) aurora.Value {
 	return aurora.Green(s).Bold()
 }
 
+func styleCommandUsage(s string) string {
+	styledCommand := styleCommand(s).String()
+	styledCommand = strings.ReplaceAll(styledCommand, "[flags]", styleOptions("[flags]").String())
+	styledCommand = argNameRegex.ReplaceAllStringFunc(styledCommand, func(argName string) string {
+		return styleOptions(argName).String()
+	})
+	return styledCommand
+}
+
 func styleOptions(s string) aurora.Value {
 	return aurora.Yellow(s).Bold()
 }
@@ -53,9 +62,17 @@ func styleFlags(s string) string {
 }
 
 func init() {
+	// matches either of:
+	//   -h, --help
+	//       --help
 	flagsRegex = regexp.MustCompile(`^\s+-\S,\s+--\S+|^\s+--\S+`)
+
+	// matches: <my-arg>
+	argNameRegex = regexp.MustCompile(`<\S+>`)
+
 	cobra.AddTemplateFunc("Heading", styleHeading)
 	cobra.AddTemplateFunc("StyleCommand", styleCommand)
+	cobra.AddTemplateFunc("StyleCommandUsage", styleCommandUsage)
 	cobra.AddTemplateFunc("StyleOptions", styleOptions)
 	cobra.AddTemplateFunc("StyleFlags", styleFlags)
 }
