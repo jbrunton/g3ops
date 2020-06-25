@@ -23,6 +23,7 @@ import (
 
 	"github.com/jbrunton/g3ops/cmd/context"
 	"github.com/jbrunton/g3ops/cmd/service"
+	"github.com/jbrunton/g3ops/cmd/styles"
 )
 
 var cfgFile string
@@ -58,7 +59,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().Bool("dry-run", false, "Preview commands before executing")
+	rootCmd.PersistentFlags().Bool("dry-run", false, "Preview commands before executing, also --dry-run")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -66,4 +67,5 @@ func init() {
 
 	rootCmd.AddCommand(context.ContextCmd)
 	rootCmd.AddCommand(service.ServiceCmd)
+	styles.ConfigureUsageTemplate(rootCmd)
 }

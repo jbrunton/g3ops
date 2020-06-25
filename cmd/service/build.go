@@ -12,6 +12,7 @@ import (
 	"github.com/thoas/go-funk"
 
 	"github.com/google/uuid"
+	"github.com/jbrunton/g3ops/cmd/styles"
 	"github.com/jbrunton/g3ops/lib"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
@@ -66,11 +67,11 @@ var buildCmd = &cobra.Command{
 	Short: "Build the given service",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			return errors.New("requires the service name")
+			return errors.New(styles.StyleError("Argument <service> required"))
 		}
 
 		if len(args) > 1 {
-			return errors.New("unexpected arguments, only service name expected")
+			return errors.New(styles.StyleError("Unexpected arguments, only <service> expected"))
 		}
 
 		ctx, err := lib.LoadContextManifest()
@@ -78,13 +79,16 @@ var buildCmd = &cobra.Command{
 			panic(err)
 		}
 
+		var serviceNames []string
+
 		for serviceName := range ctx.Services {
 			if serviceName == args[0] {
 				return nil
 			}
+			serviceNames = append(serviceNames, serviceName)
 		}
 
-		return errors.New("unknown service: " + args[0])
+		return errors.New(styles.StyleError(`Unknown service "` + args[0] + `". Valid options: ` + styles.StyleEnumOptions(serviceNames) + "."))
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		serviceName := args[0]
