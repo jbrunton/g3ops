@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/spf13/cobra"
+	"github.com/jbrunton/cobra"
 )
 
 // ConfigureUsageTemplate - styles the usage template to include color

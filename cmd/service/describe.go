@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/jbrunton/g3ops/lib"
-	"github.com/spf13/cobra"
+	"github.com/jbrunton/cobra"
 	"gopkg.in/yaml.v2"
 )
 

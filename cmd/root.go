@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
+	"github.com/jbrunton/cobra"
 
 	"github.com/jbrunton/g3ops/cmd/context"
 	"github.com/jbrunton/g3ops/cmd/service"

@@ -18,7 +18,7 @@ package context
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
+	"github.com/jbrunton/cobra"
 )
 
 // ContextCmd represents the context command

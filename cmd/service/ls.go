@@ -8,7 +8,7 @@ import (
 
 	"github.com/jbrunton/g3ops/lib"
 	"github.com/olekukonko/tablewriter"
-	"github.com/spf13/cobra"
+	"github.com/jbrunton/cobra"
 )
 
 var lsCmd = &cobra.Command{
