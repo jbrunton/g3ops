@@ -23,6 +23,7 @@ import (
 
 	"github.com/jbrunton/g3ops/cmd/context"
 	"github.com/jbrunton/g3ops/cmd/service"
+	"github.com/jbrunton/g3ops/cmd/styles"
 )
 
 var cfgFile string
@@ -66,5 +67,5 @@ func init() {
 
 	rootCmd.AddCommand(context.ContextCmd)
 	rootCmd.AddCommand(service.ServiceCmd)
-	StyleUsage(rootCmd)
+	styles.ConfigureUsageTemplate(rootCmd)
 }

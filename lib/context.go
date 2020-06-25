@@ -60,3 +60,19 @@ func LoadContextManifest() (G3opsContext, error) {
 
 	return ctx, nil
 }
+
+// GetServiceNames - returns the list of services defined in the manifest
+// func GetServiceNames() []string {
+// 	ctx, err := LoadContextManifest()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	var serviceNames []string
+
+// 	for serviceName := range ctx.Services {
+// 		serviceNames = append(serviceNames, serviceName)
+// 	}
+
+// 	return serviceNames
+// }
