@@ -11,8 +11,8 @@ import (
 type G3opsBuild struct {
 	ID        string // e.g. 0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
 	Version   string // e.g. 0.2.22
-	BuildSha  string // git build sha, e.g. cc87c1c
-	ImageTag  string // specified by user, but could be based on version + id, e.g. 0.2.22-0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
+	BuildSha  string `yaml:"buildSha"` // git build sha, e.g. cc87c1c
+	ImageTag  string `yaml:"imageTag"` // specified by user, but could be based on version + id, e.g. 0.2.22-0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
 	Timestamp string // e.g. '2020-06-21T13:43:29.694Z'
 }
 
