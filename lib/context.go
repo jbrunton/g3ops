@@ -28,7 +28,7 @@ type G3opsContext struct {
 
 // LoadContextManifest - finds and returns the G3opsContext
 func LoadContextManifest() (G3opsContext, error) {
-	data, err := ioutil.ReadFile(".g3ops.yml")
+	data, err := ioutil.ReadFile(".g3ops/config.yml")
 
 	if err != nil {
 		return G3opsContext{}, err
