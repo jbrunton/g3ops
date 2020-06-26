@@ -1,5 +1,9 @@
 # G3Ops
 
+[![Build Status](https://github.com/jbrunton/g3ops/workflows/ci-build/badge.svg?branch=master)](https://github.com/jbrunton/g3ops/actions?query=branch%3Amaster+workflow%3Aci-build)
+[![Maintainability](https://api.codeclimate.com/v1/badges/2a4862e062bc388ef8a9/maintainability)](https://codeclimate.com/github/jbrunton/g3ops/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/2a4862e062bc388ef8a9/test_coverage)](https://codeclimate.com/github/jbrunton/g3ops/test_coverage)
+
 Go-powered Github GitOps. This is an opinionated cli for certain common GitOps tasks using Github Actions.
 
 I don't claim this will implement industry best practices, but it will make my life a lot easier.
