@@ -21,9 +21,25 @@ jobs:
       - name: build
         run: go build
 
-      - name: configure environment
-        run: echo "::set-env name=GITHUB_BRANCH::${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+      - name: inspect context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
+      # - name: configure environment for pull request
+      #   if: github.event_name === 'pull_request'
+      #   env:
+      #     HEAD_SHA: ${{ context.payload.pull_request.head.sha }}
+      #   run: |
+      #     echo "::set-env name=GIT_BRANCH::$GITHUB_HEAD_REF"
+      #     echo "::set-env name=GIT_COMMIT_SHA::$HEAD_SHA"
+
+      # - name: configure environment for push
+      #   if: github.event_name === 'push'
+      #   run: |
+      #     echo "::set-env name=GIT_BRANCH::${GITHUB_REF#refs/heads/}"
+      #     echo "::set-env name=GIT_COMMIT_SHA::$GITHUB_SHA"
+        
       - name: check env
         run: env
 
