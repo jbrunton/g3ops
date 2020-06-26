@@ -1,0 +1,6 @@
+builds:
+- id: 474f160d-2e37-457c-8973-c850a52b5d9d
+  version: 0.3.3
+  buildSha: 3ad924e
+  imageTag: 0.3.3-474f160d-2e37-457c-8973-c850a52b5d9d
+  timestamp: 2020-06-26T18:44:23.032309Z
