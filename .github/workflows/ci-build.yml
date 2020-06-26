@@ -21,6 +21,9 @@ jobs:
       - name: build
         run: go build
 
+      - name: configure environment
+        run: echo "::set-env name=GITHUB_BRANCH::${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+
       - name: check env
         run: env
 
