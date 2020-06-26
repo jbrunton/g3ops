@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Masterminds/semver"
 	"github.com/google/uuid"
 	"gopkg.in/yaml.v2"
 )
@@ -101,10 +102,17 @@ func LoadBuildCatalog(service string) G3opsBuildCatalog {
 
 func validateVersion(service string, version string) error {
 	catalog := LoadBuildCatalog(service)
+
+	_, err := semver.NewVersion(version)
+	if err != nil {
+		return fmt.Errorf("Invalid version name %q, must be a semantic version", version)
+	}
+
 	for _, build := range catalog.Builds {
 		if build.Version == version {
-			return fmt.Errorf("Build %q already exists", version)
+			return fmt.Errorf("Build already exists for version %q", version)
 		}
 	}
+
 	return nil
 }
