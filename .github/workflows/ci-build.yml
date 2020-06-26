@@ -21,27 +21,28 @@ jobs:
       - name: build
         run: go build
 
-      - name: inspect context
+      - name: configure environment for pull request
+        if: github.event_name === 'pull_request'
         env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+          HEAD_SHA: ${{ context.event.pull_request.head.sha }}
+        run: |
+          echo "::set-env name=GIT_BRANCH::$GITHUB_HEAD_REF"
+          echo "::set-env name=GIT_COMMIT_SHA::$HEAD_SHA"
 
-      # - name: configure environment for pull request
-      #   if: github.event_name === 'pull_request'
-      #   env:
-      #     HEAD_SHA: ${{ context.payload.pull_request.head.sha }}
-      #   run: |
-      #     echo "::set-env name=GIT_BRANCH::$GITHUB_HEAD_REF"
-      #     echo "::set-env name=GIT_COMMIT_SHA::$HEAD_SHA"
+      - name: configure environment for push
+        if: github.event_name === 'push'
+        run: |
+          echo "::set-env name=GIT_BRANCH::${GITHUB_REF#refs/heads/}"
+          echo "::set-env name=GIT_COMMIT_SHA::$GITHUB_SHA"
 
-      # - name: configure environment for push
-      #   if: github.event_name === 'push'
-      #   run: |
-      #     echo "::set-env name=GIT_BRANCH::${GITHUB_REF#refs/heads/}"
-      #     echo "::set-env name=GIT_COMMIT_SHA::$GITHUB_SHA"
-        
-      - name: check env
-        run: env
+      - name: prepare test reporter
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter before-build
 
       - name: test
-        run: go test ./...
+        run: go test -coverprofile c.out ./...
+
+      - name: upload coverage
+        run: ./cc-test-reporter after-build
