@@ -18,7 +18,7 @@ package service
 import (
 	"fmt"
 
-	"github.com/jbrunton/cobra"
+	"github.com/spf13/cobra"
 )
 
 // ServiceCmd represents the context command
