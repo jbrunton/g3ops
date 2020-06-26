@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/thoas/go-funk"
 
@@ -111,12 +112,14 @@ var buildCmd = &cobra.Command{
 		buildVersion := serviceManifest.Version
 		buildID := uuid.New().String()
 		buildSha := lib.CurrentSha()
+		buildTimestamp := time.Now().UTC()
 
 		envMap := map[string]string{
-			"BUILD_SERVICE": serviceName,
-			"BUILD_VERSION": buildVersion,
-			"BUILD_SHA":     buildSha,
-			"BUILD_ID":      buildID,
+			"BUILD_SERVICE":   serviceName,
+			"BUILD_VERSION":   buildVersion,
+			"BUILD_SHA":       buildSha,
+			"BUILD_ID":        buildID,
+			"BUILD_TIMESTAMP": buildTimestamp.String(),
 		}
 
 		fmt.Println("Configuring environment for build:")
@@ -144,5 +147,8 @@ var buildCmd = &cobra.Command{
 				execCommand(command, dryRun)
 			}
 		})
+
+		build := lib.G3opsBuild{ID: buildID, Version: buildVersion, BuildSha: buildSha, ImageTag: tag, Timestamp: buildTimestamp}
+		lib.SaveBuild(serviceName, build)
 	},
 }
