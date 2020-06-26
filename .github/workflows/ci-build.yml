@@ -24,7 +24,7 @@ jobs:
       - name: configure environment for pull request
         if: github.event_name === 'pull_request'
         env:
-          HEAD_SHA: ${{ context.event.pull_request.head.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           echo "::set-env name=GIT_BRANCH::$GITHUB_HEAD_REF"
           echo "::set-env name=GIT_COMMIT_SHA::$HEAD_SHA"
