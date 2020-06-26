@@ -7,7 +7,7 @@ services:
     build:
       context: ./test/sandbox/services/ping
   
-  hello-world:
-    image: "jbrunton/g3ops-sandbox-hello-world:${TAG?}"
-    build:
-      context: ./test/sandbox/services/hello-world
+  # hello-world:
+  #   image: "jbrunton/g3ops-sandbox-hello-world:${TAG?}"
+  #   build:
+  #     context: ./test/sandbox/services/hello-world

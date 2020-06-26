@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"github.com/jbrunton/cobra"
 	"gopkg.in/yaml.v2"
 )
 
@@ -26,9 +27,33 @@ type G3opsContext struct {
 	}
 }
 
+// G3opsCommandContext - current command context
+type G3opsCommandContext struct {
+	Context G3opsContext
+	DryRun  bool
+}
+
+// GetCommandContext - returns the current command context
+func GetCommandContext(cmd *cobra.Command) G3opsCommandContext {
+	dryRun, err := cmd.Flags().GetBool("dry-run")
+	if err != nil {
+		panic(err)
+	}
+
+	ctx, err := LoadContextManifest()
+	if err != nil {
+		panic(err)
+	}
+
+	return G3opsCommandContext{
+		Context: ctx,
+		DryRun:  dryRun,
+	}
+}
+
 // LoadContextManifest - finds and returns the G3opsContext
 func LoadContextManifest() (G3opsContext, error) {
-	data, err := ioutil.ReadFile(".g3ops.yml")
+	data, err := ioutil.ReadFile(".g3ops/config.yml")
 
 	if err != nil {
 		return G3opsContext{}, err

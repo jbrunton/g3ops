@@ -6,9 +6,9 @@ import (
 
 	"path/filepath"
 
+	"github.com/jbrunton/cobra"
 	"github.com/jbrunton/g3ops/lib"
 	"github.com/olekukonko/tablewriter"
-	"github.com/jbrunton/cobra"
 )
 
 var lsCmd = &cobra.Command{
@@ -32,7 +32,6 @@ var lsCmd = &cobra.Command{
 				table.Append([]string{serviceName, relPath})
 			}
 			table.Render() // Send output
-			fmt.Println("tablewriter.FgHiGreenColor:", tablewriter.FgHiGreenColor)
 		} else {
 			fmt.Println("No current context found")
 		}

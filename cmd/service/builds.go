@@ -2,15 +2,21 @@ package service
 
 import (
 	"errors"
+	"os"
 
 	"github.com/jbrunton/cobra"
 	"github.com/jbrunton/g3ops/cmd/styles"
 	"github.com/jbrunton/g3ops/lib"
+	"github.com/olekukonko/tablewriter"
 )
 
-var buildCmd = &cobra.Command{
-	Use:   "build <service>",
-	Short: "Build the given service",
+var buildsCmd = &cobra.Command{
+	Use: "builds",
+}
+
+var lsBuildsCmd = &cobra.Command{
+	Use:   "ls <service>",
+	Short: "Lists builds for the given service",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New(styles.StyleError("Argument <service> required"))
@@ -38,13 +44,22 @@ var buildCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		service := args[0]
-
-		serviceManifest, err := lib.LoadServiceManifest(service)
-		if err != nil {
-			panic(err)
+		catalog := lib.LoadBuildCatalog(service)
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"Version", "Build Time", "Build SHA", "Image", "ID"})
+		table.SetColumnColor(
+			tablewriter.Colors{tablewriter.FgGreenColor},
+			tablewriter.Colors{tablewriter.FgYellowColor},
+			tablewriter.Colors{tablewriter.FgYellowColor},
+			tablewriter.Colors{tablewriter.FgYellowColor},
+			tablewriter.Colors{tablewriter.FgYellowColor})
+		for _, build := range catalog.Builds {
+			table.Append([]string{build.Version, build.FormatTimestamp(), build.BuildSha, build.ImageTag, build.ID})
 		}
-
-		cmdCtx := lib.GetCommandContext(cmd)
-		lib.Build(service, serviceManifest.Version, &cmdCtx)
+		table.Render() // Send output
 	},
+}
+
+func init() {
+	buildsCmd.AddCommand(lsBuildsCmd)
 }
