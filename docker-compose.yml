@@ -7,9 +7,9 @@ services:
     build:
       context: ./test/sandbox/services/ping
   
-  hello-world:
-    image: "jbrunton/g3ops-sandbox-hello-world:${TAG?}"
+  hello:
+    image: "jbrunton/g3ops-sandbox-hello:${TAG?}"
     ports:
       - 3000:3000
     build:
-      context: ./test/sandbox/services/hello-world
+      context: ./test/sandbox/services/hello
