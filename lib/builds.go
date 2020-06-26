@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Masterminds/semver"
 	"github.com/google/uuid"
+	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v2"
 )
 
@@ -36,8 +38,54 @@ func getCatalogFileName(service string) string {
 
 const buildsDir = ".g3ops/builds"
 
-// CreateBuild - creates a new build with ID. Note that ImageTag will be empty at first.
-func CreateBuild(service string, version string) (G3opsBuild, error) {
+// Build - creates a build for the service and updates the catalog
+func Build(service string, version string, cmdCtx *G3opsCommandContext) {
+	build, err := createBuild(service, version)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	envMap := map[string]string{
+		"BUILD_SERVICE":        service,
+		"BUILD_VERSION":        build.Version,
+		"BUILD_SHA":            build.BuildSha,
+		"BUILD_ID":             build.ID,
+		"BUILD_TIMESTAMP":      build.FormatTimestamp(),
+		"BUILD_TIMESTAMP_UNIX": string(build.Timestamp.Unix()),
+	}
+
+	fmt.Println("Configuring environment for build:")
+
+	funk.ForEach(envMap, func(envvar string, envval string) {
+		os.Setenv(envvar, envval)
+	})
+	funk.ForEach(cmdCtx.Context.Ci.Defaults.Build.Env, func(envvar string, envtemplate string) {
+		envval := os.ExpandEnv(envtemplate)
+		envMap[envvar] = envval
+		os.Setenv(envvar, envval)
+	})
+	funk.ForEach(envMap, func(envvar string, envval string) {
+		fmt.Printf("  %s=%s\n", envvar, envval)
+	})
+
+	tag := os.Getenv("TAG")
+	if tag == "" {
+		panic("TAG must be set")
+	}
+	build.ImageTag = tag
+
+	funk.ForEach(strings.Split(cmdCtx.Context.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
+		command := parseCommand(os.ExpandEnv(cmd))
+		if command.cmd != "" {
+			execCommand(command, cmdCtx.DryRun)
+		}
+	})
+
+	saveBuild(service, build)
+}
+
+func createBuild(service string, version string) (G3opsBuild, error) {
 	err := validateVersion(service, version)
 	if err != nil {
 		return G3opsBuild{}, err
@@ -57,7 +105,7 @@ func CreateBuild(service string, version string) (G3opsBuild, error) {
 }
 
 // SaveBuild - saves a new build to the catalog for the given service
-func SaveBuild(service string, build G3opsBuild) {
+func saveBuild(service string, build G3opsBuild) {
 	catalog := LoadBuildCatalog(service)
 	catalog.Builds = append([]G3opsBuild{build}, catalog.Builds...)
 	fileName := getCatalogFileName(service)
