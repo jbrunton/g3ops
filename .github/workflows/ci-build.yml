@@ -22,7 +22,13 @@ jobs:
         run: go build
 
       - name: configure environment
-        run: echo "::set-env name=GITHUB_BRANCH::${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+        env:
+          REF: ${{ github.ref }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          echo "::set-env name=GIT_BRANCH::${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          echo "::set-env name=REF::$REF"
+          echo "::set-env name=EVENT_NAME::$EVENT_NAME"
 
       - name: check env
         run: env
