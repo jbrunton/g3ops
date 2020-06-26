@@ -6,7 +6,7 @@ import (
 
 	"path/filepath"
 
-	"github.com/jbrunton/cobra"
+	"github.com/spf13/cobra"
 	"github.com/jbrunton/g3ops/lib"
 	"github.com/olekukonko/tablewriter"
 )
