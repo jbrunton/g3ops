@@ -9,6 +9,7 @@ on:
       - master
 env:
   GOPATH: ${{ github.workspace }}
+  GO111MODULE: off
 
 jobs:
 
