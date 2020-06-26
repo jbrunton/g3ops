@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"os"
-	"time"
 
 	"github.com/jbrunton/cobra"
 	"github.com/jbrunton/g3ops/cmd/styles"
@@ -55,7 +54,7 @@ var lsBuildsCmd = &cobra.Command{
 			tablewriter.Colors{tablewriter.FgYellowColor},
 			tablewriter.Colors{tablewriter.FgYellowColor})
 		for _, build := range catalog.Builds {
-			table.Append([]string{build.Version, build.Timestamp.Format(time.RFC822), build.BuildSha, build.ImageTag, build.ID})
+			table.Append([]string{build.Version, build.FormatTimestamp(), build.BuildSha, build.ImageTag, build.ID})
 		}
 		table.Render() // Send output
 	},

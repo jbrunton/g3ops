@@ -8,11 +8,9 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 
 	"github.com/thoas/go-funk"
 
-	"github.com/google/uuid"
 	"github.com/jbrunton/cobra"
 	"github.com/jbrunton/g3ops/cmd/styles"
 	"github.com/jbrunton/g3ops/lib"
@@ -109,17 +107,19 @@ var buildCmd = &cobra.Command{
 			panic(err)
 		}
 
-		buildVersion := serviceManifest.Version
-		buildID := uuid.New().String()
-		buildSha := lib.CurrentSha()
-		buildTimestamp := time.Now().UTC()
+		build, err := lib.CreateBuild(serviceName, serviceManifest.Version)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
 		envMap := map[string]string{
-			"BUILD_SERVICE":   serviceName,
-			"BUILD_VERSION":   buildVersion,
-			"BUILD_SHA":       buildSha,
-			"BUILD_ID":        buildID,
-			"BUILD_TIMESTAMP": buildTimestamp.String(),
+			"BUILD_SERVICE":        serviceName,
+			"BUILD_VERSION":        build.Version,
+			"BUILD_SHA":            build.BuildSha,
+			"BUILD_ID":             build.ID,
+			"BUILD_TIMESTAMP":      build.FormatTimestamp(),
+			"BUILD_TIMESTAMP_UNIX": string(build.Timestamp.Unix()),
 		}
 
 		fmt.Println("Configuring environment for build:")
@@ -140,6 +140,7 @@ var buildCmd = &cobra.Command{
 		if tag == "" {
 			panic("TAG must be set")
 		}
+		build.ImageTag = tag
 
 		funk.ForEach(strings.Split(ctx.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
 			command := parseCommand(os.ExpandEnv(cmd))
@@ -148,7 +149,6 @@ var buildCmd = &cobra.Command{
 			}
 		})
 
-		build := lib.G3opsBuild{ID: buildID, Version: buildVersion, BuildSha: buildSha, ImageTag: tag, Timestamp: buildTimestamp}
 		lib.SaveBuild(serviceName, build)
 	},
 }

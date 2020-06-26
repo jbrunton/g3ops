@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"gopkg.in/yaml.v2"
 )
 
@@ -16,6 +17,11 @@ type G3opsBuild struct {
 	BuildSha  string    `yaml:"buildSha"` // git build sha, e.g. cc87c1c
 	ImageTag  string    `yaml:"imageTag"` // specified by user, but could be based on version + id, e.g. 0.2.22-0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
 	Timestamp time.Time // e.g. '2020-06-21T13:43:29.694Z'
+}
+
+// FormatTimestamp - human readable string
+func (b G3opsBuild) FormatTimestamp() string {
+	return b.Timestamp.Format(time.RFC822)
 }
 
 // G3opsBuildCatalog - represents a build catalog for a service
@@ -29,10 +35,30 @@ func getCatalogFileName(service string) string {
 
 const buildsDir = ".g3ops/builds"
 
+// CreateBuild - creates a new build with ID. Note that ImageTag will be empty at first.
+func CreateBuild(service string, version string) (G3opsBuild, error) {
+	err := validateVersion(service, version)
+	if err != nil {
+		return G3opsBuild{}, err
+	}
+
+	buildVersion := version
+	buildID := uuid.New().String()
+	buildSha := CurrentSha()
+	buildTimestamp := time.Now().UTC()
+
+	return G3opsBuild{
+		ID:        buildID,
+		Version:   buildVersion,
+		BuildSha:  buildSha,
+		Timestamp: buildTimestamp,
+	}, nil
+}
+
 // SaveBuild - saves a new build to the catalog for the given service
 func SaveBuild(service string, build G3opsBuild) {
 	catalog := LoadBuildCatalog(service)
-	catalog.Builds = append(catalog.Builds, build)
+	catalog.Builds = append([]G3opsBuild{build}, catalog.Builds...)
 	fileName := getCatalogFileName(service)
 	data, err := yaml.Marshal(&catalog)
 	if err != nil {
@@ -71,4 +97,14 @@ func LoadBuildCatalog(service string) G3opsBuildCatalog {
 	}
 
 	return catalog
+}
+
+func validateVersion(service string, version string) error {
+	catalog := LoadBuildCatalog(service)
+	for _, build := range catalog.Builds {
+		if build.Version == version {
+			return fmt.Errorf("Build %q already exists", version)
+		}
+	}
+	return nil
 }
