@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/jbrunton/cobra"
+	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
 

@@ -16,7 +16,7 @@ limitations under the License.
 package context
 
 import (
-	"github.com/jbrunton/cobra"
+	"github.com/spf13/cobra"
 )
 
 // ContextCmd represents the context command
