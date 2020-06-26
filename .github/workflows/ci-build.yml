@@ -22,7 +22,7 @@ jobs:
         run: go build
 
       - name: configure environment for pull request
-        if: github.event_name === 'pull_request'
+        if: github.event_name == 'pull_request'
         env:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
@@ -30,7 +30,7 @@ jobs:
           echo "::set-env name=GIT_COMMIT_SHA::$HEAD_SHA"
 
       - name: configure environment for push
-        if: github.event_name === 'push'
+        if: github.event_name == 'push'
         run: |
           echo "::set-env name=GIT_BRANCH::${GITHUB_REF#refs/heads/}"
           echo "::set-env name=GIT_COMMIT_SHA::$GITHUB_SHA"
