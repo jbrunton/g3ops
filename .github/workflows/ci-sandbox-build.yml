@@ -12,7 +12,7 @@ jobs:
 
   manifest_check:
     runs-on: ubuntu-latest
-    if: github.event.ref == format('refs/heads/{0}', 'master')
+    if: github.event_name == 'push'
     outputs:
       buildMatrix: ${{ steps.check.outputs.buildMatrix }}
       
@@ -30,8 +30,9 @@ jobs:
         run: g3ops set-outputs build-matrix
 
   build:
-    needs: manifest_check
     runs-on: ubuntu-latest
+    needs: manifest_check
+    if: ${{ needs.manifest_check.outputs.buildRequired == true }}
     strategy:
       matrix: ${{ fromJson(needs.manifest_check.outputs.buildMatrix) }}
     env:
