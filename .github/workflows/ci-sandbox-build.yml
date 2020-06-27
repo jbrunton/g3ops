@@ -3,16 +3,16 @@ name: ci-sandbox-build
 on:
   pull_request:
     branches:
-      - master
+      - list-240
   push:
     branches:
-      - master
+      - list-240
 
 jobs:
 
   manifest_check:
     runs-on: ubuntu-latest
-    if: github.event.ref == format('refs/heads/{0}', 'master')
+    if: github.event.ref == format('refs/heads/{0}', 'list-240')
     outputs:
       buildMatrix: ${{ steps.check.outputs.buildMatrix }}
       
