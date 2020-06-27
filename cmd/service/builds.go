@@ -4,10 +4,10 @@ import (
 	"errors"
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/jbrunton/g3ops/cmd/styles"
 	"github.com/jbrunton/g3ops/lib"
 	"github.com/olekukonko/tablewriter"
+	"github.com/spf13/cobra"
 )
 
 var buildsCmd = &cobra.Command{
@@ -26,14 +26,14 @@ var lsBuildsCmd = &cobra.Command{
 			return errors.New(styles.StyleError("Unexpected arguments, only <service> expected"))
 		}
 
-		config, err := lib.LoadContextConfig()
+		context, err := lib.GetCommandContext(cmd)
 		if err != nil {
 			panic(err)
 		}
 
 		var serviceNames []string
 
-		for serviceName := range config.Services {
+		for serviceName := range context.Config.Services {
 			if serviceName == args[0] {
 				return nil
 			}

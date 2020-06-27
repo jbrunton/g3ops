@@ -13,13 +13,8 @@ type G3opsService struct {
 }
 
 // LoadServiceManifest - finds and returns the G3opsService for the given service
-func LoadServiceManifest(name string) (G3opsService, error) {
-	config, err := LoadContextConfig()
-	if err != nil {
-		panic(err)
-	}
-
-	serviceContext := config.Services[name]
+func (context *G3opsCommandContext) LoadServiceManifest(name string) (G3opsService, error) {
+	serviceContext := context.Config.Services[name]
 
 	data, err := ioutil.ReadFile(serviceContext.Manifest)
 

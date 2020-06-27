@@ -44,26 +44,34 @@ type G3opsCommandContext struct {
 }
 
 // GetCommandContext - returns the current command context
-func GetCommandContext(cmd *cobra.Command) G3opsCommandContext {
+func GetCommandContext(cmd *cobra.Command) (G3opsCommandContext, error) {
 	dryRun, err := cmd.Flags().GetBool("dry-run")
 	if err != nil {
 		panic(err)
 	}
 
-	config, err := LoadContextConfig()
+	configPath, err := cmd.Flags().GetString("config")
 	if err != nil {
 		panic(err)
+	}
+
+	config, err := LoadContextConfig(configPath)
+	if err != nil {
+		return G3opsCommandContext{}, err
 	}
 
 	return G3opsCommandContext{
 		Config: config,
 		DryRun: dryRun,
-	}
+	}, nil
 }
 
 // LoadContextConfig - finds and returns the G3opsConfig
-func LoadContextConfig() (G3opsConfig, error) {
-	data, err := ioutil.ReadFile(".g3ops/config.yml")
+func LoadContextConfig(path string) (G3opsConfig, error) {
+	if path == "" {
+		path = ".g3ops/config.yml"
+	}
+	data, err := ioutil.ReadFile(path)
 
 	if err != nil {
 		return G3opsConfig{}, err

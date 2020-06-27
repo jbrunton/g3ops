@@ -26,7 +26,7 @@ var ContextCmd = &cobra.Command{
 }
 
 func init() {
-	ContextCmd.AddCommand(getCmd)
+	ContextCmd.AddCommand(newContextGetCmd())
 	ContextCmd.AddCommand(describeCmd)
 
 	// Here you will define your flags and configuration settings.
