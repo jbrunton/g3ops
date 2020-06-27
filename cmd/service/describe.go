@@ -11,7 +11,7 @@ var describeCmd = &cobra.Command{
 	Use:   "describe",
 	Short: "Prints the current g3ops context",
 	Run: func(cmd *cobra.Command, args []string) {
-		context, err := lib.GetCommandContext(cmd)
+		context, err := lib.GetContext(cmd)
 		if err != nil {
 			panic(err)
 		}

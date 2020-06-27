@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
 
@@ -37,35 +36,6 @@ type g3opsBuildConfig struct {
 	Command string
 }
 
-// G3opsCommandContext - current command context
-type G3opsCommandContext struct {
-	Config G3opsConfig
-	DryRun bool
-}
-
-// GetCommandContext - returns the current command context
-func GetCommandContext(cmd *cobra.Command) (G3opsCommandContext, error) {
-	dryRun, err := cmd.Flags().GetBool("dry-run")
-	if err != nil {
-		panic(err)
-	}
-
-	configPath, err := cmd.Flags().GetString("config")
-	if err != nil {
-		panic(err)
-	}
-
-	config, err := LoadContextConfig(configPath)
-	if err != nil {
-		return G3opsCommandContext{}, err
-	}
-
-	return G3opsCommandContext{
-		Config: config,
-		DryRun: dryRun,
-	}, nil
-}
-
 // LoadContextConfig - finds and returns the G3opsConfig
 func LoadContextConfig(path string) (G3opsConfig, error) {
 	if path == "" {
@@ -78,6 +48,12 @@ func LoadContextConfig(path string) (G3opsConfig, error) {
 	}
 
 	return parseConfig(data)
+}
+
+// G3opsService - type of current g3ops context
+type G3opsService struct {
+	Name    string
+	Version string
 }
 
 func parseConfig(input []byte) (G3opsConfig, error) {

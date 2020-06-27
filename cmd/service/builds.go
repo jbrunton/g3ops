@@ -26,7 +26,7 @@ var lsBuildsCmd = &cobra.Command{
 			return errors.New(styles.StyleError("Unexpected arguments, only <service> expected"))
 		}
 
-		context, err := lib.GetCommandContext(cmd)
+		context, err := lib.GetContext(cmd)
 		if err != nil {
 			panic(err)
 		}

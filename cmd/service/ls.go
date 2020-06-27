@@ -15,7 +15,7 @@ var lsCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "Lists services in the current context",
 	Run: func(cmd *cobra.Command, args []string) {
-		context, err := lib.GetCommandContext(cmd)
+		context, err := lib.GetContext(cmd)
 		if err != nil {
 			panic(err)
 		}
