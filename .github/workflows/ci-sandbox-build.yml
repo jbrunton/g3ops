@@ -8,6 +8,9 @@ on:
     branches:
       - master
 
+env:
+  TARGET_BRANCH: master
+
 jobs:
 
   manifest_check:
@@ -15,6 +18,7 @@ jobs:
     if: github.event_name == 'push'
     outputs:
       buildMatrix: ${{ steps.check.outputs.buildMatrix }}
+      buildRequired: ${{ steps.check.outputs.buildRequired }}
       
     steps:
       - uses: actions/checkout@v2
@@ -41,6 +45,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.G3OPS_ADMIN_ACCESS_TOKEN }}
+
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.14.4'
@@ -50,3 +57,12 @@ jobs:
 
       - name: build
         run: g3ops service build ${{ matrix.service }}
+
+      - name: 'commit'
+        run: |
+          git config --global user.email "jbrunton-ci-minion@outlook.com"
+          git config --global user.name "jbrunton-ci-minion"
+          
+          g3ops commit build ${{ matrix.service }}
+          
+          git push origin HEAD:$TARGET_BRANCH

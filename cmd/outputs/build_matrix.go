@@ -43,6 +43,8 @@ func newBuildMatrixCmd() *cobra.Command {
 			fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildMatrix::%s\n", json)
 			if len(buildTasks) > 0 {
 				fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildRequired::1\n")
+			} else {
+				fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildRequired::0\n")
 			}
 		},
 	}

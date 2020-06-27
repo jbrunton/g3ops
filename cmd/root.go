@@ -21,6 +21,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/jbrunton/g3ops/cmd/commit"
 	"github.com/jbrunton/g3ops/cmd/context"
 	"github.com/jbrunton/g3ops/cmd/outputs"
 	"github.com/jbrunton/g3ops/cmd/service"
@@ -80,4 +81,5 @@ func init() {
 	rootCmd.AddCommand(context.ContextCmd)
 	rootCmd.AddCommand(service.ServiceCmd)
 	rootCmd.AddCommand(outputs.OutputsCmd)
+	rootCmd.AddCommand(commit.CommitCmd)
 }

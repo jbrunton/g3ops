@@ -75,7 +75,7 @@ func Build(service string, version string, context *G3opsContext) {
 	}
 	build.ImageTag = tag
 
-	execCommands(context.Config.Ci.Defaults.Build.Command, context)
+	ExecCommands(context.Config.Ci.Defaults.Build.Command, context)
 
 	saveBuild(service, build, context)
 }
