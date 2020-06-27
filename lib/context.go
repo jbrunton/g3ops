@@ -8,8 +8,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// G3opsContext - type of current g3ops context
-type G3opsContext struct {
+// G3opsConfig - type of current g3ops context
+type G3opsConfig struct {
 	Name         string
 	Environments map[string]struct {
 		Manifest string
@@ -29,8 +29,8 @@ type G3opsContext struct {
 
 // G3opsCommandContext - current command context
 type G3opsCommandContext struct {
-	Context G3opsContext
-	DryRun  bool
+	Config G3opsConfig
+	DryRun bool
 }
 
 // GetCommandContext - returns the current command context
@@ -40,64 +40,48 @@ func GetCommandContext(cmd *cobra.Command) G3opsCommandContext {
 		panic(err)
 	}
 
-	ctx, err := LoadContextManifest()
+	config, err := LoadContextConfig()
 	if err != nil {
 		panic(err)
 	}
 
 	return G3opsCommandContext{
-		Context: ctx,
-		DryRun:  dryRun,
+		Config: config,
+		DryRun: dryRun,
 	}
 }
 
-// LoadContextManifest - finds and returns the G3opsContext
-func LoadContextManifest() (G3opsContext, error) {
+// LoadContextConfig - finds and returns the G3opsConfig
+func LoadContextConfig() (G3opsConfig, error) {
 	data, err := ioutil.ReadFile(".g3ops/config.yml")
 
 	if err != nil {
-		return G3opsContext{}, err
+		return G3opsConfig{}, err
 	}
 
-	ctx := G3opsContext{}
-	err = yaml.Unmarshal(data, &ctx)
+	config := G3opsConfig{}
+	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		panic(err)
 	}
 
-	for envName, env := range ctx.Environments {
+	for envName, env := range config.Environments {
 		path, err := filepath.Abs(env.Manifest)
 		if err != nil {
 			panic(err)
 		}
 		env.Manifest = path
-		ctx.Environments[envName] = env
+		config.Environments[envName] = env
 	}
 
-	for serviceName, service := range ctx.Services {
+	for serviceName, service := range config.Services {
 		path, err := filepath.Abs(service.Manifest)
 		if err != nil {
 			panic(err)
 		}
 		service.Manifest = path
-		ctx.Services[serviceName] = service
+		config.Services[serviceName] = service
 	}
 
-	return ctx, nil
+	return config, nil
 }
-
-// GetServiceNames - returns the list of services defined in the manifest
-// func GetServiceNames() []string {
-// 	ctx, err := LoadContextManifest()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	var serviceNames []string
-
-// 	for serviceName := range ctx.Services {
-// 		serviceNames = append(serviceNames, serviceName)
-// 	}
-
-// 	return serviceNames
-// }

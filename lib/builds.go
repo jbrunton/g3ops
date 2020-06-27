@@ -60,7 +60,7 @@ func Build(service string, version string, cmdCtx *G3opsCommandContext) {
 	funk.ForEach(envMap, func(envvar string, envval string) {
 		os.Setenv(envvar, envval)
 	})
-	funk.ForEach(cmdCtx.Context.Ci.Defaults.Build.Env, func(envvar string, envtemplate string) {
+	funk.ForEach(cmdCtx.Config.Ci.Defaults.Build.Env, func(envvar string, envtemplate string) {
 		envval := os.ExpandEnv(envtemplate)
 		envMap[envvar] = envval
 		os.Setenv(envvar, envval)
@@ -75,7 +75,7 @@ func Build(service string, version string, cmdCtx *G3opsCommandContext) {
 	}
 	build.ImageTag = tag
 
-	funk.ForEach(strings.Split(cmdCtx.Context.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
+	funk.ForEach(strings.Split(cmdCtx.Config.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
 		command := parseCommand(os.ExpandEnv(cmd))
 		if command.cmd != "" {
 			execCommand(command, cmdCtx.DryRun)

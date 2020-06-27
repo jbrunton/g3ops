@@ -20,14 +20,14 @@ var buildCmd = &cobra.Command{
 			return errors.New(styles.StyleError("Unexpected arguments, only <service> expected"))
 		}
 
-		ctx, err := lib.LoadContextManifest()
+		config, err := lib.LoadContextConfig()
 		if err != nil {
 			panic(err)
 		}
 
 		var serviceNames []string
 
-		for serviceName := range ctx.Services {
+		for serviceName := range config.Services {
 			if serviceName == args[0] {
 				return nil
 			}

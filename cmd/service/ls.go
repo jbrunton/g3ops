@@ -15,14 +15,14 @@ var lsCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "Lists services in the current context",
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx, err := lib.LoadContextManifest()
+		config, err := lib.LoadContextConfig()
 		if err == nil {
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Name", "Manifest"})
 			table.SetColumnColor(
 				tablewriter.Colors{tablewriter.FgGreenColor},
 				tablewriter.Colors{tablewriter.FgYellowColor})
-			for serviceName, service := range ctx.Services {
+			for serviceName, service := range config.Services {
 				//fmt.Println(serviceName)
 				cwd, err := os.Getwd()
 				if err != nil {
