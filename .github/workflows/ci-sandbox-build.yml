@@ -32,7 +32,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: manifest_check
-    if: ${{ fromJson(needs.manifest_check.outputs.buildMatrix).include != [] }}
+    if: ${{ needs.manifest_check.outputs.buildRequired == true }}
     strategy:
       matrix: ${{ fromJson(needs.manifest_check.outputs.buildMatrix) }}
     env:

@@ -40,7 +40,10 @@ func newBuildMatrixCmd() *cobra.Command {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildMatrix::%s", json)
+			fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildMatrix::%s\n", json)
+			if len(buildTasks) > 0 {
+				fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildRequired::1\n")
+			}
 		},
 	}
 }
