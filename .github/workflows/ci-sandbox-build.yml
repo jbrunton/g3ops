@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.CI_ADMIN_ACCESS_TOKEN }}
+          token: ${{ secrets.G3OPS_ADMIN_ACCESS_TOKEN }}
 
       - uses: actions/setup-go@v2
         with:
