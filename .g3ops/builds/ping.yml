@@ -1,4 +1,9 @@
 builds:
+- id: fd460926-e999-43ce-8269-daff6f2d656d
+  version: 1.4.2
+  buildSha: 79468ca
+  imageTag: 1.4.2-fd460926-e999-43ce-8269-daff6f2d656d
+  timestamp: 2020-06-27T20:37:25.157103277Z
 - id: 21ec62bc-6d3d-4437-93f1-a7bd0e88bc9f
   version: 1.4.1
   buildSha: 9f2a0f2
