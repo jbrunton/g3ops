@@ -8,14 +8,11 @@ on:
     branches:
       - master
 
-env:
-  BUILD_BRANCH: master
-
 jobs:
 
   manifest_check:
     runs-on: ubuntu-latest
-    if: github.event.ref == format('refs/heads/{0}', env.BUILD_BRANCH)
+    if: github.event.ref == format('refs/heads/{0}', 'master')
     outputs:
       buildMatrix: ${{ steps.check.outputs.buildMatrix }}
       
