@@ -10,15 +10,17 @@ import (
 	"github.com/thoas/go-funk"
 )
 
-func execCommands(commands string, context *G3opsContext) {
+// ExecCommands - execute a sequence of bash commands
+func ExecCommands(commands string, context *G3opsContext) {
 	funk.ForEach(strings.Split(commands, "\n"), func(command string) {
 		if strings.TrimSpace(command) != "" {
-			execCommand(command, context)
+			ExecCommand(command, context)
 		}
 	})
 }
 
-func execCommand(command string, context *G3opsContext) {
+// ExecCommand - execute a bash command
+func ExecCommand(command string, context *G3opsContext) {
 	if context.DryRun {
 		fmt.Println(aurora.Yellow("--dry-run passed, skipping command. Would have run:"))
 		fmt.Println(aurora.Yellow("  " + command))

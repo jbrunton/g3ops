@@ -6,7 +6,10 @@ on:
       - master
   push:
     branches:
-      - master
+      - list-238
+
+env:
+  TARGET_BRANCH: list-238
 
 jobs:
 
@@ -41,6 +44,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.CI_ADMIN_ACCESS_TOKEN }}
+
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.14.4'
@@ -50,3 +56,12 @@ jobs:
 
       - name: build
         run: g3ops service build ${{ matrix.service }}
+
+      - name: 'commit'
+        run: |
+          git config --global user.email "jbrunton-ci-minion@outlook.com"
+          git config --global user.name "jbrunton-ci-minion"
+          
+          g3ops commit build ${{ matrix.service }}
+          
+          git push origin HEAD:$TARGET_BRANCH
