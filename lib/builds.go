@@ -39,7 +39,7 @@ func getCatalogFileName(service string) string {
 const buildsDir = ".g3ops/builds"
 
 // Build - creates a build for the service and updates the catalog
-func Build(service string, version string, cmdCtx *G3opsCommandContext) {
+func Build(service string, version string, context *G3opsContext) {
 	build, err := createBuild(service, version)
 	if err != nil {
 		fmt.Println(err)
@@ -60,7 +60,7 @@ func Build(service string, version string, cmdCtx *G3opsCommandContext) {
 	funk.ForEach(envMap, func(envvar string, envval string) {
 		os.Setenv(envvar, envval)
 	})
-	funk.ForEach(cmdCtx.Context.Ci.Defaults.Build.Env, func(envvar string, envtemplate string) {
+	funk.ForEach(context.Config.Ci.Defaults.Build.Env, func(envvar string, envtemplate string) {
 		envval := os.ExpandEnv(envtemplate)
 		envMap[envvar] = envval
 		os.Setenv(envvar, envval)
@@ -75,10 +75,10 @@ func Build(service string, version string, cmdCtx *G3opsCommandContext) {
 	}
 	build.ImageTag = tag
 
-	funk.ForEach(strings.Split(cmdCtx.Context.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
+	funk.ForEach(strings.Split(context.Config.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
 		command := parseCommand(os.ExpandEnv(cmd))
 		if command.cmd != "" {
-			execCommand(command, cmdCtx.DryRun)
+			execCommand(command, context)
 		}
 	})
 

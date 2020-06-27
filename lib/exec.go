@@ -21,9 +21,9 @@ func parseCommand(cmd string) command {
 	return command{strings.TrimSpace(cmd), components[0], components[1:len(components)]}
 }
 
-func execCommand(command command, dryRun bool) {
+func execCommand(command command, context *G3opsContext) {
 	fmt.Println("Running", aurora.Green(command.cmd).Bold(), "...")
-	if dryRun {
+	if context.DryRun {
 		fmt.Println(aurora.Yellow("--dry-run passed, skipping command. Would have run:"))
 		fmt.Println(aurora.Yellow("  " + command.cmd))
 		return

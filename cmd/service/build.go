@@ -3,9 +3,9 @@ package service
 import (
 	"errors"
 
-	"github.com/spf13/cobra"
 	"github.com/jbrunton/g3ops/cmd/styles"
 	"github.com/jbrunton/g3ops/lib"
+	"github.com/spf13/cobra"
 )
 
 var buildCmd = &cobra.Command{
@@ -20,14 +20,14 @@ var buildCmd = &cobra.Command{
 			return errors.New(styles.StyleError("Unexpected arguments, only <service> expected"))
 		}
 
-		ctx, err := lib.LoadContextManifest()
+		context, err := lib.GetContext(cmd)
 		if err != nil {
 			panic(err)
 		}
 
 		var serviceNames []string
 
-		for serviceName := range ctx.Services {
+		for serviceName := range context.Config.Services {
 			if serviceName == args[0] {
 				return nil
 			}
@@ -38,13 +38,15 @@ var buildCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		service := args[0]
-
-		serviceManifest, err := lib.LoadServiceManifest(service)
+		context, err := lib.GetContext(cmd)
+		if err != nil {
+			panic(err)
+		}
+		serviceManifest, err := context.LoadServiceManifest(service)
 		if err != nil {
 			panic(err)
 		}
 
-		cmdCtx := lib.GetCommandContext(cmd)
-		lib.Build(service, serviceManifest.Version, &cmdCtx)
+		lib.Build(service, serviceManifest.Version, &context)
 	},
 }
