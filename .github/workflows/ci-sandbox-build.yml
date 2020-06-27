@@ -9,12 +9,13 @@ on:
       - master
 
 env:
-  BUILD_BRANCH: list-237
+  BUILD_BRANCH: master
 
 jobs:
 
   manifest_check:
     runs-on: ubuntu-latest
+    if: github.event.ref == format('refs/heads/{0}', env.BUILD_BRANCH)
     outputs:
       buildMatrix: ${{ steps.check.outputs.buildMatrix }}
       
@@ -29,7 +30,6 @@ jobs:
 
       - name: check manifest
         id: check
-        # if: github.event.ref == format('refs/heads/{0}', env.BUILD_BRANCH)
         run: g3ops set-outputs build-matrix
 
   build:

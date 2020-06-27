@@ -30,7 +30,6 @@ func newBuildMatrixCmd() *cobra.Command {
 					fmt.Fprintf(cmd.OutOrStdout(), "Build %q required for service %q\n", serviceManifest.Version, serviceName)
 					buildTasks = append(buildTasks, map[string]string{
 						"service": serviceName,
-						"version": serviceManifest.Version,
 					})
 				}
 			}
