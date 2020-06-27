@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/Masterminds/semver"
 	"github.com/google/uuid"
+	"github.com/logrusorgru/aurora"
 	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v2"
 )
@@ -75,14 +75,9 @@ func Build(service string, version string, context *G3opsContext) {
 	}
 	build.ImageTag = tag
 
-	funk.ForEach(strings.Split(context.Config.Ci.Defaults.Build.Command, "\n"), func(cmd string) {
-		command := parseCommand(os.ExpandEnv(cmd))
-		if command.cmd != "" {
-			execCommand(command, context)
-		}
-	})
+	execCommands(context.Config.Ci.Defaults.Build.Command, context)
 
-	saveBuild(service, build)
+	saveBuild(service, build, context)
 }
 
 func createBuild(service string, version string) (G3opsBuild, error) {
@@ -105,7 +100,7 @@ func createBuild(service string, version string) (G3opsBuild, error) {
 }
 
 // SaveBuild - saves a new build to the catalog for the given service
-func saveBuild(service string, build G3opsBuild) {
+func saveBuild(service string, build G3opsBuild, context *G3opsContext) {
 	catalog := LoadBuildCatalog(service)
 	catalog.Builds = append([]G3opsBuild{build}, catalog.Builds...)
 	fileName := getCatalogFileName(service)
@@ -114,17 +109,21 @@ func saveBuild(service string, build G3opsBuild) {
 		panic(err)
 	}
 
-	if _, err := os.Stat(buildsDir); err != nil {
-		if os.IsNotExist(err) {
-			os.MkdirAll(buildsDir, os.ModePerm)
-		} else {
+	if context.DryRun {
+		fmt.Println(aurora.Yellow(fmt.Sprintf("--dry-run passed, skipping update of %q", fileName)))
+	} else {
+		if _, err := os.Stat(buildsDir); err != nil {
+			if os.IsNotExist(err) {
+				os.MkdirAll(buildsDir, os.ModePerm)
+			} else {
+				panic(err)
+			}
+		}
+
+		err = ioutil.WriteFile(fileName, data, 0644)
+		if err != nil {
 			panic(err)
 		}
-	}
-	// TODO: check builds dir exists
-	err = ioutil.WriteFile(fileName, data, 0644)
-	if err != nil {
-		panic(err)
 	}
 }
 
@@ -149,18 +148,25 @@ func LoadBuildCatalog(service string) G3opsBuildCatalog {
 }
 
 func validateVersion(service string, version string) error {
-	catalog := LoadBuildCatalog(service)
-
 	_, err := semver.NewVersion(version)
 	if err != nil {
 		return fmt.Errorf("Invalid version name %q, must be a semantic version", version)
 	}
 
-	for _, build := range catalog.Builds {
-		if build.Version == version {
-			return fmt.Errorf("Build already exists for version %q", version)
-		}
+	if BuildExists(service, version) {
+		return fmt.Errorf("Build already exists for version %q", version)
 	}
 
 	return nil
+}
+
+// BuildExists - returns whether a build already exists for the given version name and service
+func BuildExists(service string, version string) bool {
+	catalog := LoadBuildCatalog(service)
+	for _, build := range catalog.Builds {
+		if build.Version == version {
+			return true
+		}
+	}
+	return false
 }
