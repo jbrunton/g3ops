@@ -6,10 +6,10 @@ on:
       - master
   push:
     branches:
-      - list-238
+      - master
 
 env:
-  TARGET_BRANCH: list-238
+  TARGET_BRANCH: master
 
 jobs:
 
