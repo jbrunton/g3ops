@@ -18,5 +18,6 @@ ci:
       env:
         TAG: $BUILD_VERSION-$BUILD_ID
       command: |
+        echo "$G3OPS_DOCKER_ACCESS_TOKEN" | docker login -u "$G3OPS_DOCKER_USERNAME" --password-stdin
         docker-compose build $BUILD_SERVICE
         docker-compose push $BUILD_SERVICE

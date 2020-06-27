@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/jbrunton/g3ops/cmd/context"
+	"github.com/jbrunton/g3ops/cmd/outputs"
 	"github.com/jbrunton/g3ops/cmd/service"
 	"github.com/jbrunton/g3ops/cmd/styles"
 )
@@ -78,4 +79,5 @@ func init() {
 
 	rootCmd.AddCommand(context.ContextCmd)
 	rootCmd.AddCommand(service.ServiceCmd)
+	rootCmd.AddCommand(outputs.OutputsCmd)
 }

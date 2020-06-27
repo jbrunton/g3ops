@@ -1,55 +1,39 @@
 package lib
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
 	"github.com/logrusorgru/aurora"
+	"github.com/thoas/go-funk"
 )
 
-type command struct {
-	cmd  string
-	name string
-	args []string
+func execCommands(commands string, context *G3opsContext) {
+	funk.ForEach(strings.Split(commands, "\n"), func(command string) {
+		if strings.TrimSpace(command) != "" {
+			execCommand(command, context)
+		}
+	})
 }
 
-func parseCommand(cmd string) command {
-	components := strings.Split(cmd, " ")
-	return command{strings.TrimSpace(cmd), components[0], components[1:len(components)]}
-}
-
-func execCommand(command command, context *G3opsContext) {
-	fmt.Println("Running", aurora.Green(command.cmd).Bold(), "...")
+func execCommand(command string, context *G3opsContext) {
 	if context.DryRun {
 		fmt.Println(aurora.Yellow("--dry-run passed, skipping command. Would have run:"))
-		fmt.Println(aurora.Yellow("  " + command.cmd))
+		fmt.Println(aurora.Yellow("  " + command))
 		return
 	}
 
-	process := exec.Command(command.name, command.args...)
+	fmt.Println("Running", aurora.Green(command).Bold(), "...")
 
-	stdout, err := process.StdoutPipe()
+	process := exec.Command("bash", "-c", command)
+	process.Stdout = os.Stdout
+	process.Stderr = os.Stderr
+
+	err := process.Run()
+
 	if err != nil {
-		panic(err)
-	}
-
-	var stderr bytes.Buffer
-	process.Stderr = &stderr
-
-	process.Start()
-
-	scanner := bufio.NewScanner(stdout)
-	scanner.Split(bufio.ScanLines)
-	for scanner.Scan() {
-		m := scanner.Text()
-		fmt.Println("  " + m)
-	}
-	err = process.Wait()
-	if err != nil {
-		fmt.Println(stderr.String())
-		panic(err)
+		os.Exit(1)
 	}
 }
