@@ -11,20 +11,30 @@ import (
 // G3opsConfig - type of current g3ops context
 type G3opsConfig struct {
 	Name         string
-	Environments map[string]struct {
-		Manifest string
-	}
-	Services map[string]struct {
-		Manifest string
-	}
-	Ci struct {
-		Defaults struct {
-			Build struct {
-				Env     map[string]string
-				Command string
-			}
-		}
-	}
+	Environments map[string]g3opsEnvironmentConfig
+	Services     map[string]g3opsServiceConfig
+	Ci           g3opsCiConfig
+}
+
+type g3opsEnvironmentConfig struct {
+	Manifest string
+}
+
+type g3opsServiceConfig struct {
+	Manifest string
+}
+
+type g3opsCiConfig struct {
+	Defaults g3opsCiDefaultsConfig
+}
+
+type g3opsCiDefaultsConfig struct {
+	Build g3opsBuildConfig
+}
+
+type g3opsBuildConfig struct {
+	Env     map[string]string
+	Command string
 }
 
 // G3opsCommandContext - current command context
@@ -59,8 +69,12 @@ func LoadContextConfig() (G3opsConfig, error) {
 		return G3opsConfig{}, err
 	}
 
+	return parseConfig(data)
+}
+
+func parseConfig(input []byte) (G3opsConfig, error) {
 	config := G3opsConfig{}
-	err = yaml.Unmarshal(data, &config)
+	err := yaml.Unmarshal(input, &config)
 	if err != nil {
 		panic(err)
 	}
