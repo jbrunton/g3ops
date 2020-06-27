@@ -18,6 +18,7 @@ jobs:
     if: github.event_name == 'push'
     outputs:
       buildMatrix: ${{ steps.check.outputs.buildMatrix }}
+      buildRequired: ${{ steps.check.outputs.buildRequired }}
       
     steps:
       - uses: actions/checkout@v2
