@@ -31,7 +31,6 @@ func resolveTags(input []string, context *lib.G3opsContext) {
 		}
 		repoTags[serviceManifest.Build.Repository] = build.ImageTag
 	}
-	fmt.Printf("%v\n", repoTags)
 	for _, line := range input {
 		if imageRegex.MatchString(line) {
 			fmt.Println(repoRegex.ReplaceAllStringFunc(line, func(repo string) string {
