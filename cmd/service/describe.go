@@ -8,8 +8,9 @@ import (
 
 // GetCmd - g3ops context get
 var describeCmd = &cobra.Command{
-	Use:   "describe",
+	Use:   "describe <service>",
 	Short: "Prints the current g3ops context",
+	Args:  lib.ValidateArgs([]lib.ArgValidator{lib.ServiceValidator}),
 	Run: func(cmd *cobra.Command, args []string) {
 		context, err := lib.GetContext(cmd)
 		if err != nil {
