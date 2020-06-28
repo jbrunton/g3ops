@@ -13,7 +13,8 @@ env:
 
 jobs:
 
-  manifest_check:
+  sandbox_manifest_check:
+    id: manifest_check
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     outputs:
@@ -33,7 +34,7 @@ jobs:
         id: check
         run: g3ops set-outputs build-matrix
 
-  build:
+  sandbox_build:
     runs-on: ubuntu-latest
     needs: manifest_check
     if: ${{ needs.manifest_check.outputs.buildRequired == true }}
