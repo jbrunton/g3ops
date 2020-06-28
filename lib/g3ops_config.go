@@ -64,6 +64,7 @@ func loadContextConfig(path string) (*G3opsConfig, error) {
 	return parseConfig(data)
 }
 
+// TODO: rename this to G3opsServiceManifest?
 // G3opsService - type of current g3ops context
 type G3opsService struct {
 	Name    string
