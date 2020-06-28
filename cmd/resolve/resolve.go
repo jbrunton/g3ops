@@ -12,4 +12,5 @@ var ResolveCmd = &cobra.Command{
 
 func init() {
 	ResolveCmd.AddCommand(newResolveTagsCmd())
+	ResolveCmd.AddCommand(newResolveDigestsCmd())
 }
