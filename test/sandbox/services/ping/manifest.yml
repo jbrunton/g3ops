@@ -1,4 +1,4 @@
 name: ping
 version: 1.4.3
 build:
-  repository: jbrunton/g3ops-sandbox-hello
+  repository: jbrunton/g3ops-sandbox-ping

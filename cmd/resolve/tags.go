@@ -15,10 +15,24 @@ import (
 var repoRegex, imageRegex *regexp.Regexp
 
 func resolveTags(input []string, context *lib.G3opsContext) {
+	versions := make(map[string]string)
+	for service := range context.Config.Services {
+		serviceManifest, err := context.LoadServiceManifest(service)
+		if err != nil {
+			panic(err)
+		}
+		// Note: this is for testing. Should be based on environment files.
+		versions[serviceManifest.Build.Repository] = serviceManifest.Version
+	}
+	fmt.Printf("%v\n", versions)
 	for _, line := range input {
 		if imageRegex.MatchString(line) {
-			fmt.Println(repoRegex.ReplaceAllStringFunc(line, func(line string) string {
-				return fmt.Sprintf("%s:%s", line, "tag")
+			fmt.Println(repoRegex.ReplaceAllStringFunc(line, func(repo string) string {
+				version := versions[repo]
+				if version == "" {
+					return repo
+				}
+				return fmt.Sprintf("%s:%s", repo, version)
 			}))
 		} else {
 			fmt.Println(line)
@@ -61,5 +75,5 @@ func newResolveTagsCmd() *cobra.Command {
 
 func init() {
 	repoRegex = regexp.MustCompile(`\S+\/\S+`)
-	imageRegex = regexp.MustCompile(`^\s*image:\s*` + repoRegex.String() + `\s*$`)
+	imageRegex = regexp.MustCompile(`^\s*image: \s*` + repoRegex.String() + `\s*$`)
 }
