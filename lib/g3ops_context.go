@@ -9,12 +9,19 @@ import (
 
 // G3opsContext - current command context
 type G3opsContext struct {
-	Config G3opsConfig
+	Config *G3opsConfig
 	DryRun bool
 }
 
+var contextCache map[*cobra.Command]*G3opsContext
+
 // GetContext - returns the current command context
-func GetContext(cmd *cobra.Command) (G3opsContext, error) {
+func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
+	context := contextCache[cmd]
+	if context != nil {
+		return context, nil
+	}
+
 	dryRun, err := cmd.Flags().GetBool("dry-run")
 	if err != nil {
 		panic(err)
@@ -25,15 +32,16 @@ func GetContext(cmd *cobra.Command) (G3opsContext, error) {
 		panic(err)
 	}
 
-	config, err := LoadContextConfig(configPath)
+	config, err := GetContextConfig(configPath)
 	if err != nil {
-		return G3opsContext{}, err
+		return nil, err
 	}
 
-	return G3opsContext{
+	context = &G3opsContext{
 		Config: config,
 		DryRun: dryRun,
-	}, nil
+	}
+	return context, nil
 }
 
 // LoadServiceManifest - finds and returns the G3opsService for the given service
@@ -53,4 +61,8 @@ func (context *G3opsContext) LoadServiceManifest(name string) (G3opsService, err
 	}
 
 	return service, nil
+}
+
+func init() {
+	contextCache = make(map[*cobra.Command]*G3opsContext)
 }

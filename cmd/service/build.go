@@ -20,6 +20,6 @@ var buildCmd = &cobra.Command{
 			panic(err)
 		}
 
-		lib.Build(service, serviceManifest.Version, &context)
+		lib.Build(service, serviceManifest.Version, context)
 	},
 }

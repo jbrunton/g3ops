@@ -36,15 +36,29 @@ type g3opsBuildConfig struct {
 	Command string
 }
 
-// LoadContextConfig - finds and returns the G3opsConfig
-func LoadContextConfig(path string) (G3opsConfig, error) {
+var configCache map[string]*G3opsConfig
+
+// GetContextConfig - finds and returns the G3opsConfig
+func GetContextConfig(path string) (*G3opsConfig, error) {
+	config := configCache[path]
+	if config != nil {
+		return config, nil
+	}
+	config, err := loadContextConfig(path)
+	if err == nil {
+		configCache[path] = config
+	}
+	return config, err
+}
+
+func loadContextConfig(path string) (*G3opsConfig, error) {
 	if path == "" {
 		path = ".g3ops/config.yml"
 	}
 	data, err := ioutil.ReadFile(path)
 
 	if err != nil {
-		return G3opsConfig{}, err
+		return nil, err
 	}
 
 	return parseConfig(data)
@@ -56,7 +70,7 @@ type G3opsService struct {
 	Version string
 }
 
-func parseConfig(input []byte) (G3opsConfig, error) {
+func parseConfig(input []byte) (*G3opsConfig, error) {
 	config := G3opsConfig{}
 	err := yaml.Unmarshal(input, &config)
 	if err != nil {
@@ -81,5 +95,9 @@ func parseConfig(input []byte) (G3opsConfig, error) {
 		config.Services[serviceName] = service
 	}
 
-	return config, nil
+	return &config, nil
+}
+
+func init() {
+	configCache = make(map[string]*G3opsConfig)
 }

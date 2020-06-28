@@ -76,5 +76,5 @@ func TestParseConfig(t *testing.T) {
 		},
 	}
 
-	assertDeepEqual("Mismatch in config", config, expectedConfig, t)
+	assertDeepEqual("Mismatch in config", *config, expectedConfig, t)
 }
