@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/jbrunton/g3ops/lib"
 
@@ -13,6 +14,8 @@ import (
 )
 
 var repoRegex, imageRegex *regexp.Regexp
+
+const latestSuffix = ":latest"
 
 func resolveTags(input []string, context *lib.G3opsContext) {
 	repoTags := make(map[string]string)
@@ -32,6 +35,9 @@ func resolveTags(input []string, context *lib.G3opsContext) {
 	for _, line := range input {
 		if imageRegex.MatchString(line) {
 			fmt.Println(repoRegex.ReplaceAllStringFunc(line, func(repo string) string {
+				if strings.HasSuffix(repo, latestSuffix) {
+					repo = repo[:len(repo)-len(latestSuffix)]
+				}
 				tag := repoTags[repo]
 				if tag == "" {
 					return repo
@@ -78,6 +84,6 @@ func newResolveTagsCmd() *cobra.Command {
 }
 
 func init() {
-	repoRegex = regexp.MustCompile(`[-\w]+\/[-\w]+`)
+	repoRegex = regexp.MustCompile(`[-\w]+\/[-\w]+(:latest)?`)
 	imageRegex = regexp.MustCompile(`^\s*image:\s+"?` + repoRegex.String() + `"?\s*$`)
 }
