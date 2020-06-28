@@ -17,20 +17,26 @@ var repoRegex, imageRegex *regexp.Regexp
 
 const latestSuffix = ":latest"
 
-func resolveTags(input []string, context *lib.G3opsContext) {
+func resolveTags(input []string, env string, context *lib.G3opsContext) {
 	repoTags := make(map[string]string)
+	envManifest, err := context.LoadEnvironmentManifest(env)
+	if err != nil {
+		panic(err)
+	}
 	for service := range context.Config.Services {
 		serviceManifest, err := context.LoadServiceManifest(service)
 		if err != nil {
 			panic(err)
 		}
 		// Note: this is for testing. Should be based on environment files.
-		build, err := lib.FindBuild(service, serviceManifest.Version)
+		serviceInfo, err := envManifest.FindService(service)
 		if err != nil {
 			panic(err) // TODO: error nicely
 		}
+		build, err := lib.FindBuild(service, serviceInfo.Version)
 		repoTags[serviceManifest.Build.Repository] = build.ImageTag
 	}
+	fmt.Printf("%v", repoTags)
 	for _, line := range input {
 		if imageRegex.MatchString(line) {
 			fmt.Println(repoRegex.ReplaceAllStringFunc(line, func(repo string) string {
@@ -51,7 +57,7 @@ func resolveTags(input []string, context *lib.G3opsContext) {
 
 func newResolveTagsCmd() *cobra.Command {
 	return &cobra.Command{
-		Use: "tags",
+		Use: "tags <environment>",
 		Run: func(cmd *cobra.Command, args []string) {
 			info, err := os.Stdin.Stat()
 			if err != nil {
@@ -77,7 +83,7 @@ func newResolveTagsCmd() *cobra.Command {
 			if err != nil {
 				panic(err)
 			}
-			resolveTags(input, context)
+			resolveTags(input, args[0], context)
 		},
 	}
 }

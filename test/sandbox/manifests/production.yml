@@ -2,6 +2,6 @@ deploy:
   host: www.sandbox.example.com
 services:
   - name: ping
-    version: 1.2
+    version: 1.4.2
   - name: hello
-    version: 0.2.3
+    version: 0.3.4
