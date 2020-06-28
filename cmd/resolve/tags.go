@@ -78,6 +78,6 @@ func newResolveTagsCmd() *cobra.Command {
 }
 
 func init() {
-	repoRegex = regexp.MustCompile(`\S+\/\S+`)
-	imageRegex = regexp.MustCompile(`^\s*image: \s*` + repoRegex.String() + `\s*$`)
+	repoRegex = regexp.MustCompile(`[-\w]+\/[-\w]+`)
+	imageRegex = regexp.MustCompile(`^\s*image:\s+"?` + repoRegex.String() + `"?\s*$`)
 }
