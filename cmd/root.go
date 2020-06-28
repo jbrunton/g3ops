@@ -16,17 +16,15 @@ limitations under the License.
 package cmd
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/jbrunton/g3ops/cmd/commit"
 	"github.com/jbrunton/g3ops/cmd/context"
 	"github.com/jbrunton/g3ops/cmd/outputs"
+	"github.com/jbrunton/g3ops/cmd/resolve"
 	"github.com/jbrunton/g3ops/cmd/service"
 	"github.com/jbrunton/g3ops/cmd/styles"
 )
@@ -85,33 +83,5 @@ func init() {
 	rootCmd.AddCommand(service.ServiceCmd)
 	rootCmd.AddCommand(outputs.OutputsCmd)
 	rootCmd.AddCommand(commit.CommitCmd)
-
-	resolveImagesCmd := &cobra.Command{
-		Use: "resolve-images",
-		Run: func(cmd *cobra.Command, args []string) {
-			info, err := os.Stdin.Stat()
-			if err != nil {
-				panic(err)
-			}
-			if info.Mode()&os.ModeNamedPipe == 0 {
-				fmt.Println("No input provided. This command expects input from a pipe.")
-				return
-			}
-
-			reader := bufio.NewReader(os.Stdin)
-			var output []string
-
-			for {
-				input, _, err := reader.ReadLine()
-				if err != nil && err == io.EOF {
-					break
-				}
-				output = append(output, string(input))
-			}
-
-			fmt.Println(strings.Join(output, "\n"))
-		},
-	}
-
-	rootCmd.AddCommand(resolveImagesCmd)
+	rootCmd.AddCommand(resolve.ResolveCmd)
 }

@@ -1,2 +1,4 @@
 name: hello
 version: 0.3.5
+build:
+  repository: jbrunton/g3ops-sandbox-hello

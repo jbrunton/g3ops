@@ -68,6 +68,11 @@ func loadContextConfig(path string) (*G3opsConfig, error) {
 type G3opsService struct {
 	Name    string
 	Version string
+	Build   g3opsBuildInfo
+}
+
+type g3opsBuildInfo struct {
+	Repository string
 }
 
 func parseConfig(input []byte) (*G3opsConfig, error) {
