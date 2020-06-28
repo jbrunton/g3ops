@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jbrunton/g3ops/cmd/environment"
+
 	"github.com/spf13/cobra"
 
 	"github.com/jbrunton/g3ops/cmd/commit"
@@ -82,4 +84,5 @@ func init() {
 	rootCmd.AddCommand(service.ServiceCmd)
 	rootCmd.AddCommand(outputs.OutputsCmd)
 	rootCmd.AddCommand(commit.CommitCmd)
+	rootCmd.AddCommand(environment.EnvironmentCmd)
 }

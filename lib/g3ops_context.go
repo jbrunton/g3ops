@@ -46,9 +46,9 @@ func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
 
 // LoadServiceManifest - finds and returns the G3opsService for the given service
 func (context *G3opsContext) LoadServiceManifest(name string) (G3opsService, error) {
-	serviceContext := context.Config.Services[name]
+	serviceConfig := context.Config.Services[name]
 
-	data, err := ioutil.ReadFile(serviceContext.Manifest)
+	data, err := ioutil.ReadFile(serviceConfig.Manifest)
 
 	if err != nil {
 		return G3opsService{}, err
@@ -61,6 +61,25 @@ func (context *G3opsContext) LoadServiceManifest(name string) (G3opsService, err
 	}
 
 	return service, nil
+}
+
+// LoadEnvironmentManifest - finds and returns the G3opsEnvironment for the given environment name
+func (context *G3opsContext) LoadEnvironmentManifest(name string) (G3opsEnvironment, error) {
+	environmentConfig := context.Config.Environments[name]
+
+	data, err := ioutil.ReadFile(environmentConfig.Manifest)
+
+	if err != nil {
+		return G3opsEnvironment{}, err
+	}
+
+	envManifest := G3opsEnvironment{}
+	err = yaml.Unmarshal(data, &envManifest)
+	if err != nil {
+		panic(err)
+	}
+
+	return envManifest, nil
 }
 
 func init() {
