@@ -50,8 +50,8 @@ func newCommitBuildCmd() *cobra.Command {
 				panic(err)
 			}
 
-			lib.ExecCommand(fmt.Sprintf("git add .g3ops/builds/%s.yml", service), &context)
-			lib.ExecCommand(fmt.Sprintf(`git commit -m "Generated build for %s %s"`, service, serviceManifest.Version), &context)
+			lib.ExecCommand(fmt.Sprintf("git add .g3ops/builds/%s.yml", service), context)
+			lib.ExecCommand(fmt.Sprintf(`git commit -m "Generated build for %s %s"`, service, serviceManifest.Version), context)
 		},
 	}
 }
