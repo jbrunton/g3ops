@@ -1,4 +1,9 @@
 builds:
+- id: 9589cf85-5c7d-4a65-a287-27aa85620428
+  version: 1.4.3
+  buildSha: 51d9823
+  imageTag: 1.4.3-9589cf85-5c7d-4a65-a287-27aa85620428
+  timestamp: 2020-06-27T20:51:04.834303322Z
 - id: fd460926-e999-43ce-8269-daff6f2d656d
   version: 1.4.2
   buildSha: 79468ca

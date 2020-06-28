@@ -1,4 +1,9 @@
 builds:
+- id: 13173120-99b9-47f2-b335-44e7bfa8d247
+  version: 0.3.5
+  buildSha: b3d2fe6
+  imageTag: 0.3.5-13173120-99b9-47f2-b335-44e7bfa8d247
+  timestamp: 2020-06-27T20:51:55.872854947Z
 - id: a1a00d14-610c-4631-abd8-62f0b2a7503b
   version: 0.3.4
   buildSha: 90cdd8f
