@@ -15,24 +15,28 @@ import (
 var repoRegex, imageRegex *regexp.Regexp
 
 func resolveTags(input []string, context *lib.G3opsContext) {
-	versions := make(map[string]string)
+	repoTags := make(map[string]string)
 	for service := range context.Config.Services {
 		serviceManifest, err := context.LoadServiceManifest(service)
 		if err != nil {
 			panic(err)
 		}
 		// Note: this is for testing. Should be based on environment files.
-		versions[serviceManifest.Build.Repository] = serviceManifest.Version
+		build, err := lib.FindBuild(service, serviceManifest.Version)
+		if err != nil {
+			panic(err) // TODO: error nicely
+		}
+		repoTags[serviceManifest.Build.Repository] = build.ImageTag
 	}
-	fmt.Printf("%v\n", versions)
+	fmt.Printf("%v\n", repoTags)
 	for _, line := range input {
 		if imageRegex.MatchString(line) {
 			fmt.Println(repoRegex.ReplaceAllStringFunc(line, func(repo string) string {
-				version := versions[repo]
-				if version == "" {
+				tag := repoTags[repo]
+				if tag == "" {
 					return repo
 				}
-				return fmt.Sprintf("%s:%s", repo, version)
+				return fmt.Sprintf("%s:%s", repo, tag)
 			}))
 		} else {
 			fmt.Println(line)

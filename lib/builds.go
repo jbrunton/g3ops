@@ -147,6 +147,19 @@ func LoadBuildCatalog(service string) G3opsBuildCatalog {
 	return catalog
 }
 
+// FindBuild - Searches cataglog for build version
+func FindBuild(service string, version string) (G3opsBuild, error) {
+	catalog := LoadBuildCatalog(service)
+
+	for _, build := range catalog.Builds {
+		if build.Version == version {
+			return build, nil
+		}
+	}
+
+	return G3opsBuild{}, fmt.Errorf("Unable to find build for %q %q", service, version)
+}
+
 func validateVersion(service string, version string) error {
 	_, err := semver.NewVersion(version)
 	if err != nil {
