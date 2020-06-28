@@ -11,12 +11,6 @@ import (
 // ArgValidator - function which returns an error if the argument is invalid
 type ArgValidator func(cmd *cobra.Command, arg string) error
 
-// // ArgDefinition - provides a named validator
-// type ArgDefinition struct {
-// 	name     string
-// 	validate ArgValidator
-// }
-
 // ValidateArgs - Returns a function which validates all the given arguments
 func ValidateArgs(argValidators []ArgValidator) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
