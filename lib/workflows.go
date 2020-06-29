@@ -2,7 +2,6 @@ package lib
 
 import (
 	"bytes"
-	"crypto/md5"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -11,7 +10,6 @@ import (
 
 	"github.com/logrusorgru/aurora"
 	"github.com/sergi/go-diff/diffmatchpatch"
-	"gopkg.in/yaml.v2"
 
 	"github.com/jbrunton/g3ops/cmd/styles"
 )
@@ -97,10 +95,6 @@ jobs:
         run: #@ commit_step()
 `
 
-type workflowLockFile struct {
-	Build string
-}
-
 // ValidateWorkflows - returns an error if the workflows are out of date
 func ValidateWorkflows(context *G3opsContext) error {
 	expectedBuildWorkflow := GenerateWorkflow(context)
@@ -121,30 +115,13 @@ func ValidateWorkflows(context *G3opsContext) error {
 // GenerateWorkflowFile - generates workflow, saves to file and updates workflow-lock.json
 func GenerateWorkflowFile(context *G3opsContext) {
 	buildWorkflow := GenerateWorkflow(context)
-	buildChecksum := fmt.Sprintf("%x", md5.Sum(buildWorkflow))
 	buildWorkflowPath := context.Config.Ci.Workflows.Build.Target
-
-	lockInfo := workflowLockFile{
-		Build: buildChecksum,
-	}
-
-	lockFilePath := ".g3ops/workflow-lock.yml"
-	lockFileData, err := yaml.Marshal(&lockInfo)
-	if err != nil {
-		panic(err)
-	}
 
 	if context.DryRun {
 		fmt.Println(aurora.Yellow(fmt.Sprintf("--dry-run passed, would have updated file %q:", buildWorkflowPath)))
 		fmt.Println(aurora.Yellow(string(buildWorkflow)))
-		fmt.Println(aurora.Yellow(fmt.Sprintf("--dry-run passed, would have updated file %q:", lockFilePath)))
-		fmt.Println(aurora.Yellow(string(lockFileData)))
 	} else {
 		err := ioutil.WriteFile(buildWorkflowPath, buildWorkflow, 0644)
-		if err != nil {
-			panic(err)
-		}
-		err = ioutil.WriteFile(lockFilePath, lockFileData, 0644)
 		if err != nil {
 			panic(err)
 		}
