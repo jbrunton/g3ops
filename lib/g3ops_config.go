@@ -15,6 +15,15 @@ type G3opsConfig struct {
 	Ci           g3opsCiConfig
 }
 
+type g3opsWorkflowsConfig struct {
+	Build g3opsWorkflowConfig
+}
+
+type g3opsWorkflowConfig struct {
+	Values string
+	Target string
+}
+
 type g3opsEnvironmentConfig struct {
 	Manifest string
 }
@@ -24,7 +33,8 @@ type g3opsServiceConfig struct {
 }
 
 type g3opsCiConfig struct {
-	Defaults g3opsCiDefaultsConfig
+	Defaults  g3opsCiDefaultsConfig
+	Workflows g3opsWorkflowsConfig
 }
 
 type g3opsCiDefaultsConfig struct {
