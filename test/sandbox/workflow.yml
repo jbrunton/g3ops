@@ -1,0 +1,8 @@
+#@data/values
+---
+workflow:
+  name: ci-build
+git:
+  main_branch: master
+  user_name: jbrunton-ci-minion
+  user_email: jbrunton-ci-minion@outlook.com
