@@ -1,10 +1,14 @@
 package workflow
 
 import (
+	"crypto/md5"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/jbrunton/g3ops/cmd/styles"
+	"github.com/logrusorgru/aurora"
+	"gopkg.in/yaml.v2"
 
 	"github.com/jbrunton/g3ops/lib"
 	"github.com/spf13/cobra"
@@ -91,11 +95,15 @@ jobs:
         run: #@ commit_step()
 `
 
+type workflowLockFile struct {
+	Build string
+}
+
 func newGenerateWorkflowCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "generate",
 		Short: "Generates workflow files",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			context, err := lib.GetContext(cmd)
 			if err != nil {
 				fmt.Println(styles.StyleError(err.Error()))
@@ -112,7 +120,30 @@ func newGenerateWorkflowCmd() *cobra.Command {
 				context.Config.Ci.Workflows.Build.Values,
 				context.Config.Ci.Workflows.Build.Target), context, template)
 
-			return nil
+			buildWorkflow, err := ioutil.ReadFile(context.Config.Ci.Workflows.Build.Target)
+			if err != nil {
+				panic(err)
+			}
+			buildChecksum := fmt.Sprintf("%x", md5.Sum(buildWorkflow))
+
+			lockInfo := workflowLockFile{
+				Build: buildChecksum,
+			}
+
+			lockFilePath := ".g3ops/workflow-lock.yml"
+			lockFileData, err := yaml.Marshal(&lockInfo)
+			if err != nil {
+				panic(err)
+			}
+
+			if context.DryRun {
+				fmt.Println(aurora.Yellow(fmt.Sprintf("--dry-run passed, skipping update of %q", lockFilePath)))
+			} else {
+				err = ioutil.WriteFile(lockFilePath, lockFileData, 0644)
+				if err != nil {
+					panic(err)
+				}
+			}
 		},
 	}
 }
