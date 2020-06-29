@@ -1,7 +1,7 @@
 #@data/values
 ---
 workflow:
-  name: ci-build
+  name: ci-sandbox-build
 git:
   main_branch: master
   user_name: jbrunton-ci-minion
