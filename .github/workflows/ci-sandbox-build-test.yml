@@ -49,6 +49,7 @@ jobs:
       run: g3ops service build ${{ matrix.service }}
     - name: commit
       run: |
+        asd
         git config --global user.name 'jbrunton-ci-minion'
         git config --global user.email 'jbrunton-ci-minion@outlook.com'
         g3ops commit build ${ matrix.service }

@@ -1,18 +1,14 @@
-name: ci-sandbox-build
-
-on:
+name: ci-build
+true:
   pull_request:
     branches:
-      - master
+    - master
   push:
     branches:
-      - master
-
+    - master
 env:
-  TARGET_BRANCH: master
-
+  MAIN_BRANCH: master
 jobs:
-
   manifest_check:
     name: sandbox_manifest_check
     runs-on: ubuntu-latest
@@ -20,20 +16,16 @@ jobs:
     outputs:
       buildMatrix: ${{ steps.check.outputs.buildMatrix }}
       buildRequired: ${{ steps.check.outputs.buildRequired }}
-      
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '^1.14.4'
-
-      - name: install g3ops
-        run: go get github.com/jbrunton/g3ops
-
-      - name: check manifest
-        id: check
-        run: g3ops set-outputs build-matrix
-
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14.4
+    - name: install g3ops
+      run: go get github.com/jbrunton/g3ops
+    - name: check manifest
+      id: check
+      run: g3ops set-outputs build-matrix
   build:
     name: sandbox_build
     runs-on: ubuntu-latest
@@ -44,27 +36,20 @@ jobs:
     env:
       G3OPS_DOCKER_ACCESS_TOKEN: ${{ secrets.G3OPS_DOCKER_ACCESS_TOKEN }}
       G3OPS_DOCKER_USERNAME: ${{ secrets.G3OPS_DOCKER_USERNAME }}
-
     steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.G3OPS_ADMIN_ACCESS_TOKEN }}
-
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '^1.14.4'
-
-      - name: install g3ops
-        run: go get github.com/jbrunton/g3ops
-
-      - name: build
-        run: g3ops service build ${{ matrix.service }}
-
-      - name: 'commit'
-        run: |
-          git config --global user.email "jbrunton-ci-minion@outlook.com"
-          git config --global user.name "jbrunton-ci-minion"
-          
-          g3ops commit build ${{ matrix.service }}
-          
-          git push origin HEAD:$TARGET_BRANCH
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.G3OPS_ADMIN_ACCESS_TOKEN }}
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14.4
+    - name: install g3ops
+      run: go get github.com/jbrunton/g3ops
+    - name: build
+      run: g3ops service build ${{ matrix.service }}
+    - name: commit
+      run: |
+        git config --global user.name 'jbrunton-ci-minion'
+        git config --global user.email 'jbrunton-ci-minion@outlook.com'
+        g3ops commit build ${{ matrix.service }}
+        git push origin:master

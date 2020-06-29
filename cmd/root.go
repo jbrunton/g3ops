@@ -19,8 +19,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jbrunton/g3ops/cmd/workflow"
-
 	"github.com/spf13/cobra"
 
 	"github.com/jbrunton/g3ops/cmd/commit"
@@ -28,6 +26,7 @@ import (
 	"github.com/jbrunton/g3ops/cmd/outputs"
 	"github.com/jbrunton/g3ops/cmd/service"
 	"github.com/jbrunton/g3ops/cmd/styles"
+	"github.com/jbrunton/g3ops/cmd/workflows"
 )
 
 var cfgFile string
@@ -84,5 +83,5 @@ func init() {
 	rootCmd.AddCommand(service.ServiceCmd)
 	rootCmd.AddCommand(outputs.OutputsCmd)
 	rootCmd.AddCommand(commit.CommitCmd)
-	rootCmd.AddCommand(workflow.WorkflowCmd)
+	rootCmd.AddCommand(workflows.WorkflowsCmd)
 }

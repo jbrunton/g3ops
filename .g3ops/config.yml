@@ -24,4 +24,4 @@ ci:
   workflows:
     build:
       values: ./test/sandbox/workflow.yml
-      target: ./.github/workflows/ci-sandbox-build-test.yml
+      target: ./.github/workflows/ci-sandbox-build.yml
