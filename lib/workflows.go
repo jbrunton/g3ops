@@ -59,7 +59,10 @@ jobs:
           go-version: '^1.14.4'
 
       - name: install g3ops
-        run: go get github.com/jbrunton/g3ops
+				run: go get github.com/jbrunton/g3ops
+				
+      - name: validate workflows
+        run: g3ops workflows check
 
       - name: check manifest
         id: check
