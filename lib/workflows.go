@@ -31,7 +31,7 @@ const template = `
 
 name: #@ data.values.workflow.name
 
-on:
+"on":
   pull_request:
     branches:
       - #@ data.values.git.main_branch
