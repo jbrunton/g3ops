@@ -19,8 +19,13 @@ func ExecCommands(commands string, context *G3opsContext) {
 	})
 }
 
-// ExecCommand - execute a bash command
+// ExecCommand - executes a bash command
 func ExecCommand(command string, context *G3opsContext) {
+	ExecCommandI(command, context, "")
+}
+
+// ExecCommandI - execute a bash command
+func ExecCommandI(command string, context *G3opsContext, input string) {
 	if context.DryRun {
 		fmt.Println(aurora.Yellow("--dry-run passed, skipping command. Would have run:"))
 		fmt.Println(aurora.Yellow("  " + command))
@@ -30,6 +35,14 @@ func ExecCommand(command string, context *G3opsContext) {
 	fmt.Println("Running", aurora.Green(command).Bold(), "...")
 
 	process := exec.Command("bash", "-c", command)
+	if input != "" {
+		stdin, err := process.StdinPipe()
+		if err != nil {
+			panic(err)
+		}
+		stdin.Write([]byte(input))
+		stdin.Close()
+	}
 	process.Stdout = os.Stdout
 	process.Stderr = os.Stderr
 
