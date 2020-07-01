@@ -43,6 +43,22 @@ env:
   MAIN_BRANCH: #@ data.values.git.main_branch
 
 jobs:
+  workflows_check:
+    name: sandbox_workflow_check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ^1.14.4
+      - uses: jbrunton/setup-k14s@v1
+        with:
+          only: ytt
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: install g3ops
+        run: go get github.com/jbrunton/g3ops
+      - name: validate workflows
+        run: g3ops workflows check
 
   manifest_check:
     name: sandbox_manifest_check
@@ -60,9 +76,6 @@ jobs:
 
       - name: install g3ops
         run: go get github.com/jbrunton/g3ops
-        
-      - name: validate workflows
-        run: g3ops workflows check
 
       - name: check manifest
         id: check
