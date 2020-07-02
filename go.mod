@@ -14,6 +14,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/sergi/go-diff v1.1.0
 	github.com/sourcegraph/go-diff v0.5.3 // indirect
+	github.com/spf13/afero v1.1.2
 	github.com/spf13/cobra v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.4.0
 	github.com/thoas/go-funk v0.7.0

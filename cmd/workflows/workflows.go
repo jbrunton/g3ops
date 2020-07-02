@@ -20,7 +20,8 @@ func newGenerateWorkflowCmd() *cobra.Command {
 				fmt.Println(styles.StyleError(err.Error()))
 				os.Exit(1)
 			}
-			lib.GenerateWorkflows(context)
+			fs := lib.CreateOsFs()
+			lib.GenerateWorkflows(fs, context)
 		},
 	}
 }
