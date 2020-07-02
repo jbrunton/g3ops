@@ -12,6 +12,13 @@ import (
 	"github.com/google/go-jsonnet"
 )
 
+type workflowDefinition struct {
+	name        string
+	source      string
+	destination string
+	content     string
+}
+
 func getWorkflowTemplates(workflowsDir string, context *G3opsContext) []string {
 	files := []string{}
 	err := filepath.Walk(workflowsDir, func(path string, f os.FileInfo, err error) error {
@@ -43,14 +50,14 @@ func getWorkflowName(workflowsDir string, filename string) string {
 	return strings.TrimSuffix(templateFileName, filepath.Ext(templateFileName))
 }
 
-// GenerateWorkflows - generate workflow files for the given context
-func GenerateWorkflows(context *G3opsContext) {
+func generateWorkflowDefinitions(context *G3opsContext) []workflowDefinition {
 	vm := jsonnet.MakeVM()
 	vm.StringOutput = true
 	vm.ErrorFormatter.SetColorFormatter(color.New(color.FgRed).Fprintf)
 
 	workflowsDir := filepath.Join(filepath.Dir(context.Path), "/workflows")
 	templates := getWorkflowTemplates(workflowsDir, context)
+	definitions := []workflowDefinition{}
 	for _, templatePath := range templates {
 		workflowName := getWorkflowName(workflowsDir, templatePath)
 		input, err := ioutil.ReadFile(templatePath)
@@ -64,8 +71,24 @@ func GenerateWorkflows(context *G3opsContext) {
 			fmt.Sprintf("# Source: %s", templatePath),
 			fmt.Sprintf("# Created at: %s", time.Now().UTC().Format(time.RFC822)),
 		}, "\n")
-		err = ioutil.WriteFile(destinationPath, []byte(meta+"\n"+workflow), 0644)
-		fmt.Println("Generated", destinationPath, "from", templatePath)
+		definition := workflowDefinition{
+			name:        workflowName,
+			source:      templatePath,
+			destination: destinationPath,
+			content:     meta + "\n" + workflow,
+		}
+		definitions = append(definitions, definition)
+	}
+
+	return definitions
+}
+
+// GenerateWorkflows - generate workflow files for the given context
+func GenerateWorkflows(context *G3opsContext) {
+	definitions := generateWorkflowDefinitions(context)
+	for _, definition := range definitions {
+		err := ioutil.WriteFile(definition.destination, []byte(definition.content), 0644)
+		fmt.Println("Generated", definition.destination, "from", definition.source)
 		if err != nil {
 			panic(err)
 		}
