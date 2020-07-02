@@ -36,7 +36,8 @@ func newCheckWorkflowCmd() *cobra.Command {
 				fmt.Println(styles.StyleError(err.Error()))
 				os.Exit(1)
 			}
-			err = lib.ValidateWorkflows(context)
+			fs := lib.CreateOsFs()
+			err = lib.ValidateWorkflows(fs, context)
 			if err != nil {
 				fmt.Println(styles.StyleError(err.Error()))
 				os.Exit(1)
