@@ -55,7 +55,7 @@ func generateWorkflowDefinitions(fs *afero.Afero, context *G3opsContext) []workf
 	vm.StringOutput = true
 	vm.ErrorFormatter.SetColorFormatter(color.New(color.FgRed).Fprintf)
 
-	workflowsDir := filepath.Join(filepath.Dir(context.Path), "/workflows")
+	workflowsDir := filepath.Join(context.Dir, "/workflows")
 	templates := getWorkflowTemplates(fs, workflowsDir, context)
 	definitions := []workflowDefinition{}
 	for _, templatePath := range templates {
@@ -98,18 +98,5 @@ func GenerateWorkflows(fs *afero.Afero, context *G3opsContext) {
 
 // ValidateWorkflows - returns an error if the workflows are out of date
 func ValidateWorkflows(context *G3opsContext) error {
-	// 			expectedBuildWorkflow := GenerateWorkflow(context)
-	// 			buildWorkflowFile := context.Config.Ci.Workflows.Build.Target
-	// 			actualBuildWorkflow, err := ioutil.ReadFile(buildWorkflowFile)
-	// 				if err != nil {
-	// 							return err
-	// 			}
-	// 			if string(expectedBuildWorkflow) != string(actualBuildWorkflow) {
-	// 							dmp := diffmatchpatch.New()
-	// 							diffs := dmp.DiffMain(string(expectedBuildWorkflow), string(actualBuildWorkflow), false)
-	// 							fmt.Printf("Workflow %q is out of date. Diff:\n%s", buildWorkflowFile, dmp.DiffPrettyText(diffs))
-	// 							return errors.New("Workflows are out of date, please run g3ops workflows generate")
-	// +               panic(err)
-	// 				}
 	return nil
 }

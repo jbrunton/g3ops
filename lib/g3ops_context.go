@@ -2,6 +2,7 @@ package lib
 
 import (
 	"io/ioutil"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -9,9 +10,10 @@ import (
 
 // G3opsContext - current command context
 type G3opsContext struct {
-	Path   string
-	Config *G3opsConfig
-	DryRun bool
+	Dir        string
+	ConfigPath string
+	Config     *G3opsConfig
+	DryRun     bool
 }
 
 var contextCache map[*cobra.Command]*G3opsContext
@@ -35,10 +37,6 @@ func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
 
 	if configPath == "" {
 		configPath = ".g3ops/config.yml"
-		// configPath, err = filepath.Abs(".g3ops/config.yml")
-		// if err != nil {
-		// 	panic(err)
-		// }
 	}
 
 	config, err := GetContextConfig(configPath)
@@ -47,9 +45,10 @@ func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
 	}
 
 	context = &G3opsContext{
-		Config: config,
-		DryRun: dryRun,
-		Path:   configPath,
+		Config:     config,
+		DryRun:     dryRun,
+		ConfigPath: configPath,
+		Dir:        filepath.Dir(configPath),
 	}
 	return context, nil
 }
