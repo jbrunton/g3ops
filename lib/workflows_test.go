@@ -21,7 +21,7 @@ func TestGetWorkflowName(t *testing.T) {
 
 func TestGenerateWorkflowDefinitions(t *testing.T) {
 	context := &G3opsContext{
-		Dir: ".g3ops", // TODO: context path should be the directory, not the path of the config
+		Dir: ".g3ops",
 	}
 	fs := CreateMemFs()
 	fs.WriteFile(".g3ops/workflows/test.jsonnet", []byte(testTemplate), 0644)
