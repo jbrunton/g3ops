@@ -62,9 +62,6 @@ func GetContextConfig(path string) (*G3opsConfig, error) {
 }
 
 func loadContextConfig(path string) (*G3opsConfig, error) {
-	if path == "" {
-		path = ".g3ops/config.yml"
-	}
 	data, err := ioutil.ReadFile(path)
 
 	if err != nil {
