@@ -6,13 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func newTestContext() *G3opsContext {
-// 	return &G3opsContext{
-// 		Config: &G3opsConfig{
-// 		},
-// 	}
-// }
-
 const testTemplate = `
 std.manifestYamlDoc({
   greeting: "Hello, World!"
