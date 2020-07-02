@@ -6,7 +6,9 @@ replace github.com/spf13/cobra => github.com/jbrunton/cobra v1.0.1-0.20200626143
 
 require (
 	github.com/Masterminds/semver v1.5.0
+	github.com/fatih/color v1.9.0
 	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/google/go-jsonnet v0.16.0
 	github.com/google/uuid v1.1.1
 	github.com/logrusorgru/aurora v0.0.0-20200102142835-e9ef32dff381
 	github.com/olekukonko/tablewriter v0.0.4
