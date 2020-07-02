@@ -1,175 +1,91 @@
 package lib
 
 import (
-	"bytes"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
+	"path/filepath"
+	"strings"
+	"time"
 
-	"github.com/logrusorgru/aurora"
-	"github.com/sergi/go-diff/diffmatchpatch"
-
-	"github.com/jbrunton/g3ops/cmd/styles"
+	"github.com/fatih/color"
+	"github.com/google/go-jsonnet"
 )
 
-const template = `
-#@ load("@ytt:data", "data")
+func getWorkflowTemplates(workflowsDir string, context *G3opsContext) []string {
+	files := []string{}
+	err := filepath.Walk(workflowsDir, func(path string, f os.FileInfo, err error) error {
+		if filepath.Ext(path) == ".jsonnet" {
+			files = append(files, path)
+		}
+		return nil
+	})
 
-#@ def commit_step():
-#@   user_name = data.values.git.user_name
-#@   user_email = data.values.git.user_email
-#@   main_branch = data.values.git.main_branch
-#@   return """
-#@     git config --global user.name '{0}'
-#@     git config --global user.email '{1}'
-#@     g3ops commit build ${{{{ matrix.service }}}}
-#@     git push origin:{2}
-#@   """.lstrip().format(user_name, user_email, main_branch)
-#@ end
-
-name: #@ data.values.workflow.name
-
-"on":
-  pull_request:
-    branches:
-      - #@ data.values.git.main_branch
-  push:
-    branches:
-      - #@ data.values.git.main_branch
-
-env:
-  MAIN_BRANCH: #@ data.values.git.main_branch
-
-jobs:
-  workflows_check:
-    name: sandbox_workflow_check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: ^1.14.4
-      - uses: jbrunton/setup-k14s@v1
-        with:
-          only: ytt
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: install g3ops
-        run: go get github.com/jbrunton/g3ops
-      - name: validate workflows
-        run: g3ops workflows check
-
-  manifest_check:
-    name: sandbox_manifest_check
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    outputs:
-      buildMatrix: ${{ steps.check.outputs.buildMatrix }}
-      buildRequired: ${{ steps.check.outputs.buildRequired }}
-      
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '^1.14.4'
-
-      - name: install g3ops
-        run: go get github.com/jbrunton/g3ops
-
-      - name: check manifest
-        id: check
-        run: g3ops set-outputs build-matrix
-
-  build:
-    name: sandbox_build
-    runs-on: ubuntu-latest
-    needs: manifest_check
-    if: ${{ needs.manifest_check.outputs.buildRequired == true }}
-    strategy:
-      matrix: ${{ fromJson(needs.manifest_check.outputs.buildMatrix) }}
-    env:
-      G3OPS_DOCKER_ACCESS_TOKEN: ${{ secrets.G3OPS_DOCKER_ACCESS_TOKEN }}
-      G3OPS_DOCKER_USERNAME: ${{ secrets.G3OPS_DOCKER_USERNAME }}
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.G3OPS_ADMIN_ACCESS_TOKEN }}
-
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '^1.14.4'
-
-      - name: install g3ops
-        run: go get github.com/jbrunton/g3ops
-
-      - name: build
-        run: g3ops service build ${{ matrix.service }}
-
-      - name: 'commit'
-        run: #@ commit_step()
-`
-
-// ValidateWorkflows - returns an error if the workflows are out of date
-func ValidateWorkflows(context *G3opsContext) error {
-	expectedBuildWorkflow := GenerateWorkflow(context)
-	buildWorkflowFile := context.Config.Ci.Workflows.Build.Target
-	actualBuildWorkflow, err := ioutil.ReadFile(buildWorkflowFile)
 	if err != nil {
-		return err
+		panic(err)
 	}
-	if string(expectedBuildWorkflow) != string(actualBuildWorkflow) {
-		dmp := diffmatchpatch.New()
-		diffs := dmp.DiffMain(string(expectedBuildWorkflow), string(actualBuildWorkflow), false)
-		fmt.Printf("Workflow %q is out of date. Diff:\n%s", buildWorkflowFile, dmp.DiffPrettyText(diffs))
-		return errors.New("Workflows are out of date, please run g3ops workflows generate")
-	}
-	return nil
+
+	return files
 }
 
-// GenerateWorkflowFile - generates workflow, saves to file and updates workflow-lock.json
-func GenerateWorkflowFile(context *G3opsContext) {
-	buildWorkflow := GenerateWorkflow(context)
-	buildWorkflowPath := context.Config.Ci.Workflows.Build.Target
+func getWorkflowName(workflowsDir string, filename string) string {
+	templateDir, templateFileName := filepath.Split(filename)
+	if templateFileName == "template.jsonnet" {
+		// Check to see if the file is a top level template.
+		if filepath.Clean(templateDir) != filepath.Clean(workflowsDir) {
+			// If the file is called template.jsonnet and it's in a subdirectory, then rename it to the directory name.
+			// E.g. "workflows/my-workflow/template.jsonnet" returns "my-workflow"
+			return filepath.Base(templateDir)
+		}
+	}
+	// In all other cases, simply return the name of the file less the extension.
+	// E.g. "workflows/my-workflow.jsonnet" returns "my-workflow"
+	return strings.TrimSuffix(templateFileName, filepath.Ext(templateFileName))
+}
 
-	if context.DryRun {
-		fmt.Println(aurora.Yellow(fmt.Sprintf("--dry-run passed, would have updated file %q:", buildWorkflowPath)))
-		fmt.Println(aurora.Yellow(string(buildWorkflow)))
-	} else {
-		err := ioutil.WriteFile(buildWorkflowPath, buildWorkflow, 0644)
+// GenerateWorkflows - generate workflow files for the given context
+func GenerateWorkflows(context *G3opsContext) {
+	vm := jsonnet.MakeVM()
+	vm.StringOutput = true
+	vm.ErrorFormatter.SetColorFormatter(color.New(color.FgRed).Fprintf)
+
+	workflowsDir := filepath.Join(filepath.Dir(context.Path), "/workflows")
+	templates := getWorkflowTemplates(workflowsDir, context)
+	for _, templatePath := range templates {
+		workflowName := getWorkflowName(workflowsDir, templatePath)
+		input, err := ioutil.ReadFile(templatePath)
+		if err != nil {
+			panic(err)
+		}
+		workflow, err := vm.EvaluateSnippet(templatePath, string(input))
+		destinationPath := ".github/workflows/" + workflowName + ".yml"
+		meta := strings.Join([]string{
+			"# File generated by g3ops, do not modify",
+			fmt.Sprintf("# Source: %s", templatePath),
+			fmt.Sprintf("# Created at: %s", time.Now().UTC().Format(time.RFC822)),
+		}, "\n")
+		err = ioutil.WriteFile(destinationPath, []byte(meta+"\n"+workflow), 0644)
+		fmt.Println("Generated", destinationPath, "from", templatePath)
 		if err != nil {
 			panic(err)
 		}
 	}
 }
 
-// GenerateWorkflow - generate workflow
-func GenerateWorkflow(context *G3opsContext) []byte {
-	valuesPath := context.Config.Ci.Workflows.Build.Values
-	//targetPath := context.Config.Ci.Workflows.Build.Target
-	_, err := os.Stat(valuesPath)
-	if err != nil {
-		fmt.Println(styles.StyleError(err.Error()))
-		os.Exit(1)
-	}
-
-	process := exec.Command("bash", "-c", fmt.Sprintf("ytt -f - -f %s", valuesPath))
-	stdin, err := process.StdinPipe()
-	if err != nil {
-		panic(err)
-	}
-	stdin.Write([]byte(template))
-	stdin.Close()
-	var out bytes.Buffer
-	process.Stdout = &out
-	process.Stderr = os.Stderr
-
-	err = process.Run()
-
-	if err != nil {
-		os.Exit(1)
-	}
-
-	return out.Bytes()
+// ValidateWorkflows - returns an error if the workflows are out of date
+func ValidateWorkflows(context *G3opsContext) error {
+	// 			expectedBuildWorkflow := GenerateWorkflow(context)
+	// 			buildWorkflowFile := context.Config.Ci.Workflows.Build.Target
+	// 			actualBuildWorkflow, err := ioutil.ReadFile(buildWorkflowFile)
+	// 				if err != nil {
+	// 							return err
+	// 			}
+	// 			if string(expectedBuildWorkflow) != string(actualBuildWorkflow) {
+	// 							dmp := diffmatchpatch.New()
+	// 							diffs := dmp.DiffMain(string(expectedBuildWorkflow), string(actualBuildWorkflow), false)
+	// 							fmt.Printf("Workflow %q is out of date. Diff:\n%s", buildWorkflowFile, dmp.DiffPrettyText(diffs))
+	// 							return errors.New("Workflows are out of date, please run g3ops workflows generate")
+	// +               panic(err)
+	// 				}
+	return nil
 }
