@@ -15,6 +15,7 @@ require (
 	github.com/sergi/go-diff v1.1.0
 	github.com/sourcegraph/go-diff v0.5.3 // indirect
 	github.com/spf13/cobra v0.0.0-00010101000000-000000000000
+	github.com/stretchr/testify v1.4.0
 	github.com/thoas/go-funk v0.7.0
 	gopkg.in/yaml.v2 v2.3.0
 	sourcegraph.com/sqs/pbtypes v1.0.0 // indirect
