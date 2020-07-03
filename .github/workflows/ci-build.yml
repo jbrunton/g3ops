@@ -19,9 +19,7 @@ jobs:
           go-version: '^1.14.4'
 
       - name: check static content
-        run: |
-          make statik
-          [ -z "`git status --porcelain`" ] || { echo 'Static content has changed. Run "make statik" and commit changes.'; exit 1 }
+        run: ./static-content/verify-up-date.sh
 
       - name: build
         run: make build

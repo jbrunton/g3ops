@@ -5,3 +5,5 @@ compile:
 	go build
 
 build: statik compile
+
+.PHONY: statik compile build
