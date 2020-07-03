@@ -1,10 +1,13 @@
 package lib
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/jbrunton/g3ops/cmd/styles"
 
 	"github.com/fatih/color"
 	"github.com/google/go-jsonnet"
@@ -96,20 +99,35 @@ func GenerateWorkflows(fs *afero.Afero, context *G3opsContext) {
 // ValidateWorkflows - returns an error if the workflows are out of date
 func ValidateWorkflows(fs *afero.Afero, context *G3opsContext) error {
 	definitions := generateWorkflowDefinitions(fs, context)
+	valid := true
 	for _, definition := range definitions {
+		fmt.Printf("Checking %s ... ", definition.name)
 		exists, err := fs.Exists(definition.destination)
 		if err != nil {
 			panic(err)
 		}
-		if !exists {
-			return fmt.Errorf("Missing workflow: %s", definition.destination)
+		if exists {
+			data, err := fs.ReadFile(definition.destination)
+			if err != nil {
+				panic(err)
+			}
+			actualContent := string(data)
+			if actualContent == definition.content {
+				fmt.Println(styles.StyleCommand("OK"))
+			} else {
+				valid = false
+				fmt.Println(styles.StyleError("FAILED"))
+				fmt.Printf("  Content is out of date for %q (at %s)\n", definition.name, definition.destination)
+				//fmt.Printf("Content differs for workflow: %s\nRun \"g3ops workflow generate\" to update", definition.destination)
+			}
+		} else {
+			valid = false
+			fmt.Println(styles.StyleError("FAILED"))
+			fmt.Printf("  Workflow missing for %q (expected workflow at %s)\n", definition.name, definition.destination)
 		}
-
-		data, err := fs.ReadFile(definition.destination)
-		actualContent := string(data)
-		if actualContent != definition.content {
-			return fmt.Errorf("Content differs for workflow: %s\nRun \"g3ops workflow generate\" to update", definition.destination)
-		}
+	}
+	if !valid {
+		return errors.New("workflows out of date. Run \"g3ops workflow generate\" to update")
 	}
 	return nil
 }
