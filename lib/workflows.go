@@ -98,21 +98,35 @@ type fileSource struct {
 	content     string
 }
 
-func getWorkflowSources(fs *afero.Afero, context *G3opsContext) []fileSource {
+type workflowGenerator struct {
+	name    string
+	sources []string
+}
+
+func applyFileSource(fs *afero.Afero, content *G3opsContext, source fileSource) {
+	var action string
+	exists, _ := fs.Exists(source.destination)
+	if exists {
+		actualContent, _ := fs.ReadFile(source.destination)
+		if string(actualContent) == source.content {
+			action = "  keep"
+		} else {
+			action = "update"
+		}
+	} else {
+		action = "create"
+	}
+	fs.WriteFile(source.destination, []byte(source.content), 0644)
+	fmt.Println("  ", action, source.destination)
+}
+
+func applyGenerator(fs *afero.Afero, context *G3opsContext, generator workflowGenerator) {
 	sourceFs, err := statikFs.New()
 	if err != nil {
 		panic(err)
 	}
 
-	sourcePaths := []string{
-		"/workflows/common/git.libsonnet",
-		"/workflows/g3ops/config.libsonnet",
-		"/workflows/g3ops/template.jsonnet",
-	}
-
-	sources := []fileSource{}
-
-	for _, sourcePath := range sourcePaths {
+	for _, sourcePath := range generator.sources {
 		file, err := sourceFs.Open(sourcePath)
 		if err != nil {
 			fmt.Println(err)
@@ -129,30 +143,21 @@ func getWorkflowSources(fs *afero.Afero, context *G3opsContext) []fileSource {
 			destination: destinationPath,
 			content:     string(content),
 		}
-		sources = append(sources, source)
+		applyFileSource(fs, context, source)
 	}
-	return sources
 }
 
 // InitWorkflows - copies g3ops workflow sources to context directory
 func InitWorkflows(fs *afero.Afero, context *G3opsContext) {
-	sources := getWorkflowSources(fs, context)
-	for _, source := range sources {
-		var action string
-		exists, _ := fs.Exists(source.destination)
-		if exists {
-			actualContent, _ := fs.ReadFile(source.destination)
-			if string(actualContent) == source.content {
-				action = "  keep"
-			} else {
-				action = "update"
-			}
-		} else {
-			action = "create"
-		}
-		fs.WriteFile(source.destination, []byte(source.content), 0644)
-		fmt.Println("  ", action, source.destination)
+	generator := workflowGenerator{
+		name: "g3ops",
+		sources: []string{
+			"/workflows/common/git.libsonnet",
+			"/workflows/g3ops/config.libsonnet",
+			"/workflows/g3ops/template.jsonnet",
+		},
 	}
+	applyGenerator(fs, context, generator)
 }
 
 // GenerateWorkflows - generate workflow files for the given context
