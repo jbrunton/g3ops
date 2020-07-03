@@ -12,6 +12,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/logrusorgru/aurora v0.0.0-20200102142835-e9ef32dff381
 	github.com/olekukonko/tablewriter v0.0.4
+	github.com/rakyll/statik v0.1.7
 	github.com/sergi/go-diff v1.1.0
 	github.com/sourcegraph/go-diff v0.5.3 // indirect
 	github.com/spf13/afero v1.1.2
