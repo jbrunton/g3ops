@@ -19,7 +19,9 @@ jobs:
           go-version: '^1.14.4'
 
       - name: check static content
-        run: ./verify-statik-content.sh
+        run: |
+          go get github.com/rakyll/statik
+          ./verify-statik-content.sh
 
       - name: build
         run: make build
