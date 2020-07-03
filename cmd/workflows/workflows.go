@@ -7,7 +7,6 @@ import (
 	"github.com/jbrunton/g3ops/cmd/styles"
 
 	"github.com/jbrunton/g3ops/lib"
-	_ "github.com/jbrunton/g3ops/statik"
 	"github.com/spf13/cobra"
 )
 
