@@ -117,7 +117,7 @@ func applyFileSource(fs *afero.Afero, content *G3opsContext, source fileSource) 
 		action = "create"
 	}
 	fs.WriteFile(source.destination, []byte(source.content), 0644)
-	fmt.Println("  ", action, source.destination)
+	fmt.Println(action, source.destination)
 }
 
 func applyGenerator(fs *afero.Afero, context *G3opsContext, generator workflowGenerator) {
