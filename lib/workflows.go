@@ -3,6 +3,7 @@ package lib
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,6 +12,8 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/google/go-jsonnet"
+	_ "github.com/jbrunton/g3ops/statik"
+	statikFs "github.com/rakyll/statik/fs"
 	"github.com/spf13/afero"
 )
 
@@ -87,6 +90,74 @@ func generateWorkflowDefinitions(fs *afero.Afero, context *G3opsContext) []workf
 	}
 
 	return definitions
+}
+
+type fileSource struct {
+	source      string
+	destination string
+	content     string
+}
+
+type workflowGenerator struct {
+	name    string
+	sources []string
+}
+
+func applyFileSource(fs *afero.Afero, content *G3opsContext, source fileSource) {
+	var action string
+	exists, _ := fs.Exists(source.destination)
+	if exists {
+		actualContent, _ := fs.ReadFile(source.destination)
+		if string(actualContent) == source.content {
+			action = "  keep"
+		} else {
+			action = "update"
+		}
+	} else {
+		action = "create"
+	}
+	fs.WriteFile(source.destination, []byte(source.content), 0644)
+	fmt.Println(action, source.destination)
+}
+
+func applyGenerator(fs *afero.Afero, context *G3opsContext, generator workflowGenerator) {
+	sourceFs, err := statikFs.New()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, sourcePath := range generator.sources {
+		file, err := sourceFs.Open(sourcePath)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		defer file.Close()
+		content, err := ioutil.ReadAll(file)
+		destinationPath := filepath.Join(context.Dir, sourcePath)
+		if err != nil {
+			panic(err)
+		}
+		source := fileSource{
+			source:      sourcePath,
+			destination: destinationPath,
+			content:     string(content),
+		}
+		applyFileSource(fs, context, source)
+	}
+}
+
+// InitWorkflows - copies g3ops workflow sources to context directory
+func InitWorkflows(fs *afero.Afero, context *G3opsContext) {
+	generator := workflowGenerator{
+		name: "g3ops",
+		sources: []string{
+			"/workflows/common/git.libsonnet",
+			"/workflows/g3ops/config.libsonnet",
+			"/workflows/g3ops/template.jsonnet",
+		},
+	}
+	applyGenerator(fs, context, generator)
 }
 
 // GenerateWorkflows - generate workflow files for the given context

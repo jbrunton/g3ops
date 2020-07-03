@@ -7,6 +7,7 @@ import (
 	"github.com/jbrunton/g3ops/cmd/styles"
 
 	"github.com/jbrunton/g3ops/lib"
+	_ "github.com/jbrunton/g3ops/statik"
 	"github.com/spf13/cobra"
 )
 
@@ -48,6 +49,23 @@ func newCheckWorkflowCmd() *cobra.Command {
 	}
 }
 
+func newInitWorkflowsCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "init",
+		Short: "Initialize g3ops workflow",
+		Run: func(cmd *cobra.Command, args []string) {
+			context, err := lib.GetContext(cmd)
+			if err != nil {
+				fmt.Println(styles.StyleError(err.Error()))
+				os.Exit(1)
+			}
+
+			fs := lib.CreateOsFs()
+			lib.InitWorkflows(fs, context)
+		},
+	}
+}
+
 // WorkflowsCmd represents the context command
 var WorkflowsCmd = &cobra.Command{
 	Use: "workflows",
@@ -56,4 +74,5 @@ var WorkflowsCmd = &cobra.Command{
 func init() {
 	WorkflowsCmd.AddCommand(newGenerateWorkflowCmd())
 	WorkflowsCmd.AddCommand(newCheckWorkflowCmd())
+	WorkflowsCmd.AddCommand(newInitWorkflowsCmd())
 }

@@ -80,3 +80,18 @@ func ExampleValidateWorkflows() {
 	//   Content is out of date for "test" (at .github/workflows/test.yml)
 	// Checking test ... [1;32mOK[0m
 }
+
+func ExampleInitWorkflows() {
+	context := &G3opsContext{
+		Dir: ".g3ops",
+	}
+	fs := CreateMemFs()
+	fs.WriteFile(".g3ops/workflows/common/git.libsonnet", []byte(""), 0644)
+
+	InitWorkflows(fs, context)
+
+	// Output:
+	// update .g3ops/workflows/common/git.libsonnet
+	// create .g3ops/workflows/g3ops/config.libsonnet
+	// create .g3ops/workflows/g3ops/template.jsonnet
+}
