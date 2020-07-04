@@ -3,7 +3,6 @@ package lib
 import (
 	"fmt"
 
-	"github.com/logrusorgru/aurora"
 	"github.com/spf13/afero"
 	"github.com/xeipuuv/gojsonschema"
 	"gopkg.in/yaml.v2"
@@ -67,7 +66,7 @@ func (validator *workflowValidator) validateContent(definition *workflowDefiniti
 	}
 
 	if !exists {
-		reason := fmt.Sprintf("Workflow missing for %s (expected workflow at %s)", aurora.Bold(definition.name), definition.destination)
+		reason := fmt.Sprintf("Workflow missing for %q (expected workflow at %s)", definition.name, definition.destination)
 		return validationResult{
 			valid:  false,
 			errors: []string{reason},
@@ -81,7 +80,7 @@ func (validator *workflowValidator) validateContent(definition *workflowDefiniti
 
 	actualContent := string(data)
 	if actualContent != definition.content {
-		reason := fmt.Sprintf("Content is out of date for %s (%s)", aurora.Bold(definition.name), definition.destination)
+		reason := fmt.Sprintf("Content is out of date for %q (%s)", definition.name, definition.destination)
 		return validationResult{
 			valid:  false,
 			errors: []string{reason},
