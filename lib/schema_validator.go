@@ -16,39 +16,47 @@ type validationResult struct {
 	errors []string
 }
 
+func convertToStringDictKeysRecursive(mapping map[interface{}]interface{}, keyPrefix string) (interface{}, error) {
+	dict := make(map[string]interface{})
+	for key, entry := range mapping {
+		str, ok := key.(string)
+		if !ok {
+			return nil, formatInvalidKeyError(keyPrefix, key)
+		}
+		var newKeyPrefix string
+		if keyPrefix == "" {
+			newKeyPrefix = str
+		} else {
+			newKeyPrefix = fmt.Sprintf("%s.%s", keyPrefix, str)
+		}
+		convertedEntry, err := convertToStringKeysRecursive(entry, newKeyPrefix)
+		if err != nil {
+			return nil, err
+		}
+		dict[str] = convertedEntry
+	}
+	return dict, nil
+}
+
+func convertToStringListKeysRecursive(list []interface{}, keyPrefix string) (interface{}, error) {
+	var convertedList []interface{}
+	for index, entry := range list {
+		newKeyPrefix := fmt.Sprintf("%s[%d]", keyPrefix, index)
+		convertedEntry, err := convertToStringKeysRecursive(entry, newKeyPrefix)
+		if err != nil {
+			return nil, err
+		}
+		convertedList = append(convertedList, convertedEntry)
+	}
+	return convertedList, nil
+}
+
 func convertToStringKeysRecursive(value interface{}, keyPrefix string) (interface{}, error) {
 	if mapping, ok := value.(map[interface{}]interface{}); ok {
-		dict := make(map[string]interface{})
-		for key, entry := range mapping {
-			str, ok := key.(string)
-			if !ok {
-				return nil, formatInvalidKeyError(keyPrefix, key)
-			}
-			var newKeyPrefix string
-			if keyPrefix == "" {
-				newKeyPrefix = str
-			} else {
-				newKeyPrefix = fmt.Sprintf("%s.%s", keyPrefix, str)
-			}
-			convertedEntry, err := convertToStringKeysRecursive(entry, newKeyPrefix)
-			if err != nil {
-				return nil, err
-			}
-			dict[str] = convertedEntry
-		}
-		return dict, nil
+		return convertToStringDictKeysRecursive(mapping, keyPrefix)
 	}
 	if list, ok := value.([]interface{}); ok {
-		var convertedList []interface{}
-		for index, entry := range list {
-			newKeyPrefix := fmt.Sprintf("%s[%d]", keyPrefix, index)
-			convertedEntry, err := convertToStringKeysRecursive(entry, newKeyPrefix)
-			if err != nil {
-				return nil, err
-			}
-			convertedList = append(convertedList, convertedEntry)
-		}
-		return convertedList, nil
+		return convertToStringListKeysRecursive(list, keyPrefix)
 	}
 	return value, nil
 }
