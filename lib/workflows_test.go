@@ -26,42 +26,60 @@ func TestGenerateWorkflowDefinitions(t *testing.T) {
 	assert.Equal(t, definitions[0].content, exampleWorkflow)
 }
 
-// func TestValidateWorkflows(t *testing.T) {
-// 	fs, context := newTestContext()
+func TestValidateWorkflows(t *testing.T) {
+	fs, context := newTestContext()
 
-// 	fs.WriteFile(".g3ops/workflows/test.jsonnet", []byte(exampleTemplate), 0644)
-// 	err := ValidateWorkflows(fs, context)
-// 	assert.EqualError(t, err, "workflows out of date. Run \"g3ops workflow generate\" to update")
+	// invalid template
+	fs.WriteFile(".g3ops/workflows/test.jsonnet", []byte(invalidTemplate), 0644)
+	err := ValidateWorkflows(fs, context)
+	assert.EqualError(t, err, "workflow validation failed")
 
-// 	fs.WriteFile(".github/workflows/test.yml", []byte("incorrect content"), 0644)
-// 	err = ValidateWorkflows(fs, context)
-// 	assert.EqualError(t, err, "workflows out of date. Run \"g3ops workflow generate\" to update")
+	// valid template, missing workflow
+	fs.WriteFile(".g3ops/workflows/test.jsonnet", []byte(exampleTemplate), 0644)
+	err = ValidateWorkflows(fs, context)
+	assert.EqualError(t, err, "workflow validation failed")
 
-// 	fs.WriteFile(".github/workflows/test.yml", []byte(exampleWorkflow), 0644)
-// 	err = ValidateWorkflows(fs, context)
-// 	assert.NoError(t, err)
-// }
+	// valid template, out of date workflow
+	fs.WriteFile(".github/workflows/test.yml", []byte("incorrect content"), 0644)
+	err = ValidateWorkflows(fs, context)
+	assert.EqualError(t, err, "workflow validation failed")
+
+	// valid template, up to date workflow
+	fs.WriteFile(".github/workflows/test.yml", []byte(exampleWorkflow), 0644)
+	err = ValidateWorkflows(fs, context)
+	assert.NoError(t, err)
+}
 
 func ExampleValidateWorkflows() {
 	fs, context := newTestContext()
 
+	// invalid template
+	fs.WriteFile(".g3ops/workflows/test.jsonnet", []byte(invalidTemplate), 0644)
+	ValidateWorkflows(fs, context)
+
+	// valid template, missing workflow
 	fs.WriteFile(".g3ops/workflows/test.jsonnet", []byte(exampleTemplate), 0644)
 	ValidateWorkflows(fs, context)
 
+	// valid template, out of date workflow
 	fs.WriteFile(".github/workflows/test.yml", []byte("incorrect content"), 0644)
 	ValidateWorkflows(fs, context)
 
+	// valid template, up to date workflow
 	fs.WriteFile(".github/workflows/test.yml", []byte(exampleWorkflow), 0644)
 	ValidateWorkflows(fs, context)
 
 	// Output:
-	// Checking test ... [1;31mFAILED[0m
+	// Checking [1mtest[0m ... [1;31mFAILED[0m
+	//   Workflow failed schema validation:
+	//   ► (root): jobs is required
+	// Checking [1mtest[0m ... [1;31mFAILED[0m
 	//   Workflow missing for "test" (expected workflow at .github/workflows/test.yml)
-	//   Run "g3ops workflow generate" to update
-	// Checking test ... [1;31mFAILED[0m
-	//   Content is out of date for "test" (at .github/workflows/test.yml)
-	//   Run "g3ops workflow generate" to update
-	// Checking test ... [1;32mOK[0m
+	//   ► Run "g3ops workflow generate" to update
+	// Checking [1mtest[0m ... [1;31mFAILED[0m
+	//   Content is out of date for "test" (.github/workflows/test.yml)
+	//   ► Run "g3ops workflow generate" to update
+	// Checking [1mtest[0m ... [1;32mOK[0m
 }
 
 func ExampleInitWorkflows() {
