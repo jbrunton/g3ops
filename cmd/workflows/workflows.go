@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newGenerateWorkflowCmd() *cobra.Command {
+func newUpdateWorkflowsCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "generate",
-		Short: "Generates workflow files",
+		Use:   "update",
+		Short: "Updates workflow files",
 		Run: func(cmd *cobra.Command, args []string) {
 			context, err := lib.GetContext(cmd)
 			if err != nil {
@@ -21,12 +21,12 @@ func newGenerateWorkflowCmd() *cobra.Command {
 				os.Exit(1)
 			}
 			fs := lib.CreateOsFs()
-			lib.GenerateWorkflows(fs, context)
+			lib.UpdateWorkflows(fs, context)
 		},
 	}
 }
 
-func newCheckWorkflowCmd() *cobra.Command {
+func newCheckWorkflowsCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "check",
 		Short: "Check workflow files are up to date",
@@ -71,7 +71,7 @@ var WorkflowsCmd = &cobra.Command{
 }
 
 func init() {
-	WorkflowsCmd.AddCommand(newGenerateWorkflowCmd())
-	WorkflowsCmd.AddCommand(newCheckWorkflowCmd())
+	WorkflowsCmd.AddCommand(newUpdateWorkflowsCmd())
+	WorkflowsCmd.AddCommand(newCheckWorkflowsCmd())
 	WorkflowsCmd.AddCommand(newInitWorkflowsCmd())
 }

@@ -158,10 +158,11 @@ func InitWorkflows(fs *afero.Afero, context *G3opsContext) {
 		},
 	}
 	applyGenerator(fs, context, generator)
+	UpdateWorkflows(fs, context)
 }
 
-// GenerateWorkflows - generate workflow files for the given context
-func GenerateWorkflows(fs *afero.Afero, context *G3opsContext) {
+// UpdateWorkflows - update workflow files for the given context
+func UpdateWorkflows(fs *afero.Afero, context *G3opsContext) {
 	definitions := generateWorkflowDefinitions(fs, context)
 	for _, definition := range definitions {
 		err := fs.WriteFile(definition.destination, []byte(definition.content), 0644)
