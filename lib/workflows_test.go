@@ -18,12 +18,12 @@ func TestGenerateWorkflowDefinitions(t *testing.T) {
 	fs, context := newTestContext()
 	fs.WriteFile(".g3ops/workflows/test.jsonnet", []byte(exampleTemplate), 0644)
 
-	definitions := generateWorkflowDefinitions(fs, context)
+	definitions := GetWorkflowDefinitions(fs, context)
 
 	assert.Len(t, definitions, 1)
-	assert.Equal(t, ".g3ops/workflows/test.jsonnet", definitions[0].source)
-	assert.Equal(t, ".github/workflows/test.yml", definitions[0].destination)
-	assert.Equal(t, definitions[0].content, exampleWorkflow)
+	assert.Equal(t, ".g3ops/workflows/test.jsonnet", definitions[0].Source)
+	assert.Equal(t, ".github/workflows/test.yml", definitions[0].Destination)
+	assert.Equal(t, definitions[0].Content, exampleWorkflow)
 }
 
 func TestValidateWorkflows(t *testing.T) {
