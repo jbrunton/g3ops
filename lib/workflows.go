@@ -172,24 +172,6 @@ func GenerateWorkflows(fs *afero.Afero, context *G3opsContext) {
 	}
 }
 
-// func getSchema() *jsonschema.Schema {
-// 	schemaLoader := gojsonschema.NewReferenceLoader("https://json.schemastore.org/github-workflow")
-// 	// response, err := http.Get("https://json.schemastore.org/github-workflow")
-// 	// if err != nil {
-// 	// 	panic(err)
-// 	// }
-// 	// defer response.Body.Close()
-// 	// data, err := ioutil.ReadAll(response.Body)
-// 	// if err != nil {
-// 	// 	panic(err)
-// 	// }
-// 	// schema := &jsonschema.Schema{}
-// 	// if err := json.Unmarshal(data, schema); err != nil {
-// 	// 	panic("unmarshal schema: " + err.Error())
-// 	// }
-// 	// return schema
-// }
-
 // ValidateWorkflows - returns an error if the workflows are out of date
 func ValidateWorkflows(fs *afero.Afero, context *G3opsContext) error {
 	workflowValidator := newWorkflowValidator(fs)
@@ -197,6 +179,7 @@ func ValidateWorkflows(fs *afero.Afero, context *G3opsContext) error {
 	valid := true
 	for _, definition := range definitions {
 		fmt.Printf("Checking %s ... ", aurora.Bold(definition.name))
+
 		schemaResult := workflowValidator.validateSchema(definition)
 		if !schemaResult.valid {
 			fmt.Println(styles.StyleError("FAILED"))
@@ -205,15 +188,19 @@ func ValidateWorkflows(fs *afero.Afero, context *G3opsContext) error {
 				fmt.Printf("  ► %s\n", err)
 			}
 			valid = false
-		} else {
-			contentResult := workflowValidator.validateContent(definition)
-			if !contentResult.valid {
-				fmt.Println(styles.StyleError("FAILED"))
-				fmt.Println("  " + contentResult.errors[0])
-				fmt.Println("  ► Run \"g3ops workflow generate\" to update")
-				valid = false
-			}
+			continue
 		}
+
+		contentResult := workflowValidator.validateContent(definition)
+		if !contentResult.valid {
+			fmt.Println(styles.StyleError("FAILED"))
+			fmt.Println("  " + contentResult.errors[0])
+			fmt.Println("  ► Run \"g3ops workflow generate\" to update")
+			valid = false
+			continue
+		}
+
+		fmt.Println(styles.StyleOK("OK"))
 	}
 	if !valid {
 		return errors.New("workflow validation failed")
