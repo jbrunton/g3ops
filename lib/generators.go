@@ -32,10 +32,17 @@ func updateFileContent(fs *afero.Afero, destination string, content string, deta
 			action = "     update"
 		}
 	} else {
-		action = "       create"
+		action = "     create"
 	}
-	fs.WriteFile(destination, []byte(content), 0644)
-	fmt.Println(action, destination, details)
+	err := fs.WriteFile(destination, []byte(content), 0644)
+	if err != nil {
+		panic(err)
+	}
+	if details != "" {
+		fmt.Println(action, destination, details)
+	} else {
+		fmt.Println(action, destination)
+	}
 }
 
 func applyGenerator(fs *afero.Afero, context *G3opsContext, generator workflowGenerator) {
