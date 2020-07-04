@@ -13,7 +13,6 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/google/go-jsonnet"
-	_ "github.com/jbrunton/g3ops/statik"
 	statikFs "github.com/rakyll/statik/fs"
 	"github.com/spf13/afero"
 	"github.com/xeipuuv/gojsonschema"
