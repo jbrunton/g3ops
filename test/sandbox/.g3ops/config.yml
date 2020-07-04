@@ -1,0 +1,27 @@
+name: g3ops
+
+environments:
+  production:
+    manifest: ../manifests/production.yml
+  staging:
+    manifest: ../manifests/staging.yml
+
+services:
+  ping:
+    manifest: ../services/ping/manifest.yml
+  hello:
+    manifest: ../services/hello/manifest.yml
+
+ci:
+  defaults:
+    build:
+      env:
+        TAG: $BUILD_VERSION-$BUILD_ID
+      command: |
+        echo "$G3OPS_DOCKER_ACCESS_TOKEN" | docker login -u "$G3OPS_DOCKER_USERNAME" --password-stdin
+        docker-compose build $BUILD_SERVICE
+        docker-compose push $BUILD_SERVICE
+  # workflows:
+  #   build:
+  #     values: ../workflow.yml
+  #     target: ./.github/workflows/ci-sandbox-build.yml
