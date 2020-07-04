@@ -23,10 +23,9 @@ var lsCmd = &cobra.Command{
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Name", "Manifest"})
 			table.SetColumnColor(
-				tablewriter.Colors{tablewriter.FgGreenColor},
-				tablewriter.Colors{tablewriter.FgYellowColor})
+				tablewriter.Colors{tablewriter.FgYellowColor},
+				tablewriter.Colors{})
 			for serviceName, service := range context.Config.Services {
-				//fmt.Println(serviceName)
 				cwd, err := os.Getwd()
 				if err != nil {
 					panic(err)
@@ -34,7 +33,7 @@ var lsCmd = &cobra.Command{
 				relPath, err := filepath.Rel(cwd, service.Manifest)
 				table.Append([]string{serviceName, relPath})
 			}
-			table.Render() // Send output
+			table.Render()
 		} else {
 			fmt.Println("No current context found")
 		}

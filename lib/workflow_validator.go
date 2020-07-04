@@ -8,31 +8,35 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type workflowValidator struct {
+// WorkflowValidator - validates a workflow definition
+type WorkflowValidator struct {
 	fs     *afero.Afero
 	schema *gojsonschema.Schema
 }
 
-type validationResult struct {
-	valid  bool
-	errors []string
+// ValidationResult - validate result
+type ValidationResult struct {
+	Valid  bool
+	Errors []string
 }
 
-func newWorkflowValidator(fs *afero.Afero) *workflowValidator {
+// NewWorkflowValidator - creates a new validator for the given filesystem
+func NewWorkflowValidator(fs *afero.Afero) *WorkflowValidator {
 	schemaLoader := gojsonschema.NewReferenceLoader("https://json.schemastore.org/github-workflow")
 	schema, err := gojsonschema.NewSchema(schemaLoader)
 	if err != nil {
 		panic(err)
 	}
-	return &workflowValidator{
+	return &WorkflowValidator{
 		fs:     fs,
 		schema: schema,
 	}
 }
 
-func (validator *workflowValidator) validateSchema(definition *workflowDefinition) validationResult {
+// ValidateSchema - validates the template for the definition generates a valid workflow
+func (validator *WorkflowValidator) ValidateSchema(definition *WorkflowDefinition) ValidationResult {
 	var yamlData map[interface{}]interface{}
-	err := yaml.Unmarshal([]byte(definition.content), &yamlData)
+	err := yaml.Unmarshal([]byte(definition.Content), &yamlData)
 	if err != nil {
 		panic(err)
 	}
@@ -53,43 +57,44 @@ func (validator *workflowValidator) validateSchema(definition *workflowDefinitio
 		errors = append(errors, error.String())
 	}
 
-	return validationResult{
-		valid:  result.Valid(),
-		errors: errors,
+	return ValidationResult{
+		Valid:  result.Valid(),
+		Errors: errors,
 	}
 }
 
-func (validator *workflowValidator) validateContent(definition *workflowDefinition) validationResult {
-	exists, err := validator.fs.Exists(definition.destination)
+// ValidateContent - validates the content at the destination in the definition is up to date
+func (validator *WorkflowValidator) ValidateContent(definition *WorkflowDefinition) ValidationResult {
+	exists, err := validator.fs.Exists(definition.Destination)
 	if err != nil {
 		panic(err)
 	}
 
 	if !exists {
-		reason := fmt.Sprintf("Workflow missing for %q (expected workflow at %s)", definition.name, definition.destination)
-		return validationResult{
-			valid:  false,
-			errors: []string{reason},
+		reason := fmt.Sprintf("Workflow missing for %q (expected workflow at %s)", definition.Name, definition.Destination)
+		return ValidationResult{
+			Valid:  false,
+			Errors: []string{reason},
 		}
 	}
 
-	data, err := validator.fs.ReadFile(definition.destination)
+	data, err := validator.fs.ReadFile(definition.Destination)
 	if err != nil {
 		panic(err)
 	}
 
 	actualContent := string(data)
-	if actualContent != definition.content {
-		reason := fmt.Sprintf("Content is out of date for %q (%s)", definition.name, definition.destination)
-		return validationResult{
-			valid:  false,
-			errors: []string{reason},
+	if actualContent != definition.Content {
+		reason := fmt.Sprintf("Content is out of date for %q (%s)", definition.Name, definition.Destination)
+		return ValidationResult{
+			Valid:  false,
+			Errors: []string{reason},
 		}
 	}
 
-	return validationResult{
-		valid:  true,
-		errors: []string{},
+	return ValidationResult{
+		Valid:  true,
+		Errors: []string{},
 	}
 }
 

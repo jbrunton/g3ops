@@ -22,15 +22,15 @@ var lsBuildsCmd = &cobra.Command{
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"Version", "Build Time", "Build SHA", "Image", "ID"})
 		table.SetColumnColor(
-			tablewriter.Colors{tablewriter.FgGreenColor},
 			tablewriter.Colors{tablewriter.FgYellowColor},
-			tablewriter.Colors{tablewriter.FgYellowColor},
-			tablewriter.Colors{tablewriter.FgYellowColor},
-			tablewriter.Colors{tablewriter.FgYellowColor})
+			tablewriter.Colors{},
+			tablewriter.Colors{},
+			tablewriter.Colors{},
+			tablewriter.Colors{})
 		for _, build := range catalog.Builds {
 			table.Append([]string{build.Version, build.FormatTimestamp(), build.BuildSha, build.ImageTag, build.ID})
 		}
-		table.Render() // Send output
+		table.Render()
 	},
 }
 
