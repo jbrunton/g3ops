@@ -3,6 +3,7 @@ package lib
 import (
 	"testing"
 
+	_ "github.com/jbrunton/g3ops/statik"
 	"github.com/stretchr/testify/assert"
 )
 
