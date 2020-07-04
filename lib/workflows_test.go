@@ -90,6 +90,6 @@ func ExampleInitWorkflows() {
 
 	// Output:
 	// update .g3ops/workflows/common/git.libsonnet
-	// create .g3ops/workflows/g3ops/config.libsonnet
-	// create .g3ops/workflows/g3ops/template.jsonnet
+	//      create .g3ops/workflows/g3ops/config.libsonnet
+	//      create .g3ops/workflows/g3ops/template.jsonnet
 }

@@ -106,6 +106,7 @@ func newInitWorkflowsCmd() *cobra.Command {
 
 			fs := lib.CreateOsFs()
 			lib.InitWorkflows(fs, context)
+			lib.UpdateWorkflows(fs, context)
 		},
 	}
 }

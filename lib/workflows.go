@@ -103,7 +103,6 @@ func InitWorkflows(fs *afero.Afero, context *G3opsContext) {
 		},
 	}
 	applyGenerator(fs, context, generator)
-	UpdateWorkflows(fs, context)
 }
 
 // UpdateWorkflows - update workflow files for the given context
