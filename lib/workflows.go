@@ -9,12 +9,14 @@ import (
 	"strings"
 
 	"github.com/jbrunton/g3ops/cmd/styles"
+	"gopkg.in/yaml.v2"
 
 	"github.com/fatih/color"
 	"github.com/google/go-jsonnet"
 	_ "github.com/jbrunton/g3ops/statik"
 	statikFs "github.com/rakyll/statik/fs"
 	"github.com/spf13/afero"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 type workflowDefinition struct {
@@ -172,8 +174,78 @@ func GenerateWorkflows(fs *afero.Afero, context *G3opsContext) {
 	}
 }
 
+// func getSchema() *jsonschema.Schema {
+// 	schemaLoader := gojsonschema.NewReferenceLoader("https://json.schemastore.org/github-workflow")
+// 	// response, err := http.Get("https://json.schemastore.org/github-workflow")
+// 	// if err != nil {
+// 	// 	panic(err)
+// 	// }
+// 	// defer response.Body.Close()
+// 	// data, err := ioutil.ReadAll(response.Body)
+// 	// if err != nil {
+// 	// 	panic(err)
+// 	// }
+// 	// schema := &jsonschema.Schema{}
+// 	// if err := json.Unmarshal(data, schema); err != nil {
+// 	// 	panic("unmarshal schema: " + err.Error())
+// 	// }
+// 	// return schema
+// }
+
+func convertToStringKeysRecursive(value interface{}, keyPrefix string) (interface{}, error) {
+	if mapping, ok := value.(map[interface{}]interface{}); ok {
+		dict := make(map[string]interface{})
+		for key, entry := range mapping {
+			str, ok := key.(string)
+			if !ok {
+				return nil, formatInvalidKeyError(keyPrefix, key)
+			}
+			var newKeyPrefix string
+			if keyPrefix == "" {
+				newKeyPrefix = str
+			} else {
+				newKeyPrefix = fmt.Sprintf("%s.%s", keyPrefix, str)
+			}
+			convertedEntry, err := convertToStringKeysRecursive(entry, newKeyPrefix)
+			if err != nil {
+				return nil, err
+			}
+			dict[str] = convertedEntry
+		}
+		return dict, nil
+	}
+	if list, ok := value.([]interface{}); ok {
+		var convertedList []interface{}
+		for index, entry := range list {
+			newKeyPrefix := fmt.Sprintf("%s[%d]", keyPrefix, index)
+			convertedEntry, err := convertToStringKeysRecursive(entry, newKeyPrefix)
+			if err != nil {
+				return nil, err
+			}
+			convertedList = append(convertedList, convertedEntry)
+		}
+		return convertedList, nil
+	}
+	return value, nil
+}
+
+func formatInvalidKeyError(keyPrefix string, key interface{}) error {
+	var location string
+	if keyPrefix == "" {
+		location = "at top level"
+	} else {
+		location = fmt.Sprintf("in %s", keyPrefix)
+	}
+	return fmt.Errorf("Non-string key %s: %#v", location, key)
+}
+
 // ValidateWorkflows - returns an error if the workflows are out of date
 func ValidateWorkflows(fs *afero.Afero, context *G3opsContext) error {
+	schemaLoader := gojsonschema.NewReferenceLoader("https://json.schemastore.org/github-workflow")
+	schema, err := gojsonschema.NewSchema(schemaLoader)
+	if err != nil {
+		panic(err)
+	}
 	definitions := generateWorkflowDefinitions(fs, context)
 	valid := true
 	for _, definition := range definitions {
@@ -189,17 +261,52 @@ func ValidateWorkflows(fs *afero.Afero, context *G3opsContext) error {
 			}
 			actualContent := string(data)
 			if actualContent == definition.content {
-				fmt.Println(styles.StyleCommand("OK"))
+				//yamlData := map[string]interface{}{"type": "string"}
+				var yamlData map[interface{}]interface{}
+				err = yaml.Unmarshal(data, &yamlData)
+				if err != nil {
+					panic(err)
+				}
+				// var jsonData map[string]interface{}
+				// jsonData = make(map[string]interface{})
+				// for key, value := range yamlData {
+				// 	jsonData[fmt.Sprintf("%v", key)] = value
+				// }
+				//jsonData := map[string]interface{}{"type": map[string]interface{}{"foo": "bar"}}
+				jsonData, err := convertToStringKeysRecursive(yamlData, "")
+				if err != nil {
+					panic(err)
+				}
+				//fmt.Printf("%#v\n", jsonData)
+				loader := gojsonschema.NewGoLoader(jsonData)
+				//result := schema.Validate(context.Context, jsonData)
+				result, err := schema.Validate(loader)
+				if err != nil {
+					panic(err)
+				}
+				if !result.Valid() {
+					fmt.Println(styles.StyleError("FAILED"))
+					fmt.Println("  Workflow failed schema validation:")
+					for _, err := range result.Errors() {
+						// Err implements the ResultError interface
+						fmt.Printf("  - %s\n", err)
+					}
+					valid = false
+				} else {
+					fmt.Println(styles.StyleCommand("OK"))
+				}
 			} else {
 				valid = false
 				fmt.Println(styles.StyleError("FAILED"))
 				fmt.Printf("  Content is out of date for %q (at %s)\n", definition.name, definition.destination)
+				fmt.Println("  Run \"g3ops workflow generate\" to update")
 				//fmt.Printf("Content differs for workflow: %s\nRun \"g3ops workflow generate\" to update", definition.destination)
 			}
 		} else {
 			valid = false
 			fmt.Println(styles.StyleError("FAILED"))
 			fmt.Printf("  Workflow missing for %q (expected workflow at %s)\n", definition.name, definition.destination)
+			fmt.Println("  Run \"g3ops workflow generate\" to update")
 		}
 	}
 	if !valid {
