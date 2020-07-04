@@ -2,6 +2,7 @@ package lib
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -35,6 +36,9 @@ func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
 		panic(err)
 	}
 
+	if configPath == "" {
+		configPath = os.Getenv("G3OPS_CONFIG")
+	}
 	if configPath == "" {
 		configPath = ".g3ops/config.yml"
 	}
