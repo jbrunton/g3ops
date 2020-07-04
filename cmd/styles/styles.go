@@ -38,6 +38,11 @@ func StyleCommand(s string) aurora.Value {
 	return aurora.Green(s).Bold()
 }
 
+// StyleOK - style ok logs
+func StyleOK(s string) aurora.Value {
+	return aurora.Green(s).Bold()
+}
+
 // StyleCommandUsage - style command usage examples
 func StyleCommandUsage(s string) string {
 	styledCommand := StyleCommand(s).String()
