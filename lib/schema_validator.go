@@ -16,6 +16,16 @@ type validationResult struct {
 	errors []string
 }
 
+func convertToStringKeysRecursive(value interface{}, keyPrefix string) (interface{}, error) {
+	if mapping, ok := value.(map[interface{}]interface{}); ok {
+		return convertToStringDictKeysRecursive(mapping, keyPrefix)
+	}
+	if list, ok := value.([]interface{}); ok {
+		return convertToStringListKeysRecursive(list, keyPrefix)
+	}
+	return value, nil
+}
+
 func convertToStringDictKeysRecursive(mapping map[interface{}]interface{}, keyPrefix string) (interface{}, error) {
 	dict := make(map[string]interface{})
 	for key, entry := range mapping {
@@ -49,16 +59,6 @@ func convertToStringListKeysRecursive(list []interface{}, keyPrefix string) (int
 		convertedList = append(convertedList, convertedEntry)
 	}
 	return convertedList, nil
-}
-
-func convertToStringKeysRecursive(value interface{}, keyPrefix string) (interface{}, error) {
-	if mapping, ok := value.(map[interface{}]interface{}); ok {
-		return convertToStringDictKeysRecursive(mapping, keyPrefix)
-	}
-	if list, ok := value.([]interface{}); ok {
-		return convertToStringListKeysRecursive(list, keyPrefix)
-	}
-	return value, nil
 }
 
 func formatInvalidKeyError(keyPrefix string, key interface{}) error {
