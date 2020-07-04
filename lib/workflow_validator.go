@@ -3,11 +3,14 @@ package lib
 import (
 	"fmt"
 
+	"github.com/logrusorgru/aurora"
+	"github.com/spf13/afero"
 	"github.com/xeipuuv/gojsonschema"
 	"gopkg.in/yaml.v2"
 )
 
-type schemaValidator struct {
+type workflowValidator struct {
+	fs     *afero.Afero
 	schema *gojsonschema.Schema
 }
 
@@ -71,20 +74,21 @@ func formatInvalidKeyError(keyPrefix string, key interface{}) error {
 	return fmt.Errorf("Non-string key %s: %#v", location, key)
 }
 
-func newSchemaValidator() *schemaValidator {
+func newWorkflowValidator(fs *afero.Afero) *workflowValidator {
 	schemaLoader := gojsonschema.NewReferenceLoader("https://json.schemastore.org/github-workflow")
 	schema, err := gojsonschema.NewSchema(schemaLoader)
 	if err != nil {
 		panic(err)
 	}
-	return &schemaValidator{
+	return &workflowValidator{
+		fs:     fs,
 		schema: schema,
 	}
 }
 
-func (validator *schemaValidator) validate(data []byte) validationResult {
+func (validator *workflowValidator) validateSchema(definition *workflowDefinition) validationResult {
 	var yamlData map[interface{}]interface{}
-	err := yaml.Unmarshal(data, &yamlData)
+	err := yaml.Unmarshal([]byte(definition.content), &yamlData)
 	if err != nil {
 		panic(err)
 	}
@@ -108,5 +112,39 @@ func (validator *schemaValidator) validate(data []byte) validationResult {
 	return validationResult{
 		valid:  result.Valid(),
 		errors: errors,
+	}
+}
+
+func (validator *workflowValidator) validateContent(definition *workflowDefinition) validationResult {
+	exists, err := validator.fs.Exists(definition.destination)
+	if err != nil {
+		panic(err)
+	}
+
+	if !exists {
+		reason := fmt.Sprintf("Workflow missing for %s (expected workflow at %s)", aurora.Bold(definition.name), definition.destination)
+		return validationResult{
+			valid:  false,
+			errors: []string{reason},
+		}
+	}
+
+	data, err := validator.fs.ReadFile(definition.destination)
+	if err != nil {
+		panic(err)
+	}
+
+	actualContent := string(data)
+	if actualContent != definition.content {
+		reason := fmt.Sprintf("Content is out of date for %s (%s)", aurora.Bold(definition.name), definition.destination)
+		return validationResult{
+			valid:  false,
+			errors: []string{reason},
+		}
+	}
+
+	return validationResult{
+		valid:  true,
+		errors: []string{},
 	}
 }
