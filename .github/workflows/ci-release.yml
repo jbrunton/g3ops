@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.deployment.task == 'release' }}
     steps:
+    - uses: actions/checkout@v2
     - run: npm install
     - run: npm run release -- ${INCREMENT:-minor}
       env:
