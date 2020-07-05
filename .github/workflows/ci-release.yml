@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Setup git 
-      run:
+      run: |
         git config --global user.name "jbrunton-ci-minion"
         git config --global user.email "jbrunton-ci-minion@outlook.com"
 
