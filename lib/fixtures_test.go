@@ -9,7 +9,8 @@ import (
 func newTestContext() (*afero.Afero, *G3opsContext) {
 	fs := CreateMemFs()
 	context := &G3opsContext{
-		Dir: ".g3ops",
+		Dir:       ".g3ops",
+		GithubDir: ".github/",
 	}
 	return fs, context
 }

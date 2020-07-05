@@ -32,7 +32,8 @@ func ValidateArgs(argValidators []ArgValidator) cobra.PositionalArgs {
 
 // ServiceValidator - validates the name of a service
 func ServiceValidator(cmd *cobra.Command, arg string) error {
-	context, err := GetContext(cmd)
+	fs := CreateOsFs()
+	context, err := GetContext(fs, cmd)
 	if err != nil {
 		panic(err)
 	}

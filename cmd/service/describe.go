@@ -12,7 +12,8 @@ var describeCmd = &cobra.Command{
 	Short: "Prints the current g3ops context",
 	Args:  lib.ValidateArgs([]lib.ArgValidator{lib.ServiceValidator}),
 	Run: func(cmd *cobra.Command, args []string) {
-		context, err := lib.GetContext(cmd)
+		fs := lib.CreateOsFs()
+		context, err := lib.GetContext(fs, cmd)
 		if err != nil {
 			panic(err)
 		}

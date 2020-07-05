@@ -2,8 +2,10 @@ package lib
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
@@ -12,6 +14,7 @@ import (
 type G3opsContext struct {
 	Dir        string
 	ConfigPath string
+	GithubDir  string
 	Config     *G3opsConfig
 	DryRun     bool
 }
@@ -19,7 +22,7 @@ type G3opsContext struct {
 var contextCache map[*cobra.Command]*G3opsContext
 
 // GetContext - returns the current command context
-func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
+func GetContext(fs *afero.Afero, cmd *cobra.Command) (*G3opsContext, error) {
 	context := contextCache[cmd]
 	if context != nil {
 		return context, nil
@@ -36,19 +39,33 @@ func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
 	}
 
 	if configPath == "" {
+		configPath = os.Getenv("G3OPS_CONFIG")
+	}
+	if configPath == "" {
 		configPath = ".g3ops/config.yml"
 	}
 
-	config, err := GetContextConfig(configPath)
+	contextDir := filepath.Dir(configPath)
+
+	config, err := GetContextConfig(fs, cmd, configPath)
 	if err != nil {
 		return nil, err
+	}
+
+	githubDir := config.Workflows.GithubDir
+	if githubDir == "" {
+		githubDir = ".github/"
+	}
+	if !filepath.IsAbs(githubDir) {
+		githubDir = filepath.Join(filepath.Dir(contextDir), githubDir)
 	}
 
 	context = &G3opsContext{
 		Config:     config,
 		DryRun:     dryRun,
 		ConfigPath: configPath,
-		Dir:        filepath.Dir(configPath),
+		GithubDir:  githubDir,
+		Dir:        contextDir,
 	}
 	return context, nil
 }

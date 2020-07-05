@@ -13,7 +13,8 @@ func newBuildMatrixCmd() *cobra.Command {
 		Use:   "build-matrix",
 		Short: "Sets buildMatrix output describing any builds required",
 		Run: func(cmd *cobra.Command, args []string) {
-			context, err := lib.GetContext(cmd)
+			fs := lib.CreateOsFs()
+			context, err := lib.GetContext(fs, cmd)
 			if err != nil {
 				panic(err)
 			}

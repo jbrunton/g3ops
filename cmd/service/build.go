@@ -11,7 +11,8 @@ var buildCmd = &cobra.Command{
 	Args:  lib.ValidateArgs([]lib.ArgValidator{lib.ServiceValidator}),
 	Run: func(cmd *cobra.Command, args []string) {
 		service := args[0]
-		context, err := lib.GetContext(cmd)
+		fs := lib.CreateOsFs()
+		context, err := lib.GetContext(fs, cmd)
 		if err != nil {
 			panic(err)
 		}

@@ -12,7 +12,8 @@ func newContextGetCmd() *cobra.Command {
 		Use:   "get",
 		Short: "Prints the current g3ops context",
 		Run: func(cmd *cobra.Command, args []string) {
-			context, err := lib.GetContext(cmd)
+			fs := lib.CreateOsFs()
+			context, err := lib.GetContext(fs, cmd)
 			if err == nil {
 				fmt.Fprintln(cmd.OutOrStdout(), context.Config.Name)
 			} else {

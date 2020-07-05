@@ -16,8 +16,8 @@ func TestGetCommandValidConfig(t *testing.T) {
 	result := test.ExecCommand(cmd)
 
 	actual := strings.TrimSpace(result.Out)
-	if actual != "sandbox" {
-		t.Fatalf("expected \"%s\" got \"%s\"", "sandbox", actual)
+	if actual != "g3ops" {
+		t.Fatalf("expected \"%s\" got \"%s\"", "g3ops", actual)
 	}
 }
 
