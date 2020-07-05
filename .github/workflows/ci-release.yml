@@ -9,5 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.deployment.task == 'release' }}
     steps:
-    - run: echo "Building release"
-
+    - run: npm install
+    - run: npm run release -- ${INCREMENT:-minor}
+      env:
+        INCREMENT: ${{ github.event.deployment.increment }}
