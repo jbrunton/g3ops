@@ -13,6 +13,7 @@ import (
 type G3opsContext struct {
 	Dir        string
 	ConfigPath string
+	GithubDir  string
 	Config     *G3opsConfig
 	DryRun     bool
 }
@@ -43,16 +44,27 @@ func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
 		configPath = ".g3ops/config.yml"
 	}
 
+	contextDir := filepath.Dir(configPath)
+
 	config, err := GetContextConfig(configPath)
 	if err != nil {
 		return nil, err
+	}
+
+	githubDir := config.Workflows.GithubDir
+	if githubDir == "" {
+		githubDir = ".github/"
+	}
+	if !filepath.IsAbs(githubDir) {
+		githubDir = filepath.Join(contextDir, githubDir)
 	}
 
 	context = &G3opsContext{
 		Config:     config,
 		DryRun:     dryRun,
 		ConfigPath: configPath,
-		Dir:        filepath.Dir(configPath),
+		GithubDir:  githubDir,
+		Dir:        contextDir,
 	}
 	return context, nil
 }

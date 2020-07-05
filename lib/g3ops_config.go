@@ -13,15 +13,11 @@ type G3opsConfig struct {
 	Environments map[string]g3opsEnvironmentConfig
 	Services     map[string]g3opsServiceConfig
 	Ci           g3opsCiConfig
+	Workflows    g3opsWorkflowsConfig
 }
 
 type g3opsWorkflowsConfig struct {
-	Build g3opsWorkflowConfig
-}
-
-type g3opsWorkflowConfig struct {
-	Values string
-	Target string
+	GithubDir string `yaml:"githubDir"`
 }
 
 type g3opsEnvironmentConfig struct {
@@ -33,8 +29,7 @@ type g3opsServiceConfig struct {
 }
 
 type g3opsCiConfig struct {
-	Defaults  g3opsCiDefaultsConfig
-	Workflows g3opsWorkflowsConfig
+	Defaults g3opsCiDefaultsConfig
 }
 
 type g3opsCiDefaultsConfig struct {
