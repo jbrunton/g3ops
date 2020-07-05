@@ -4,7 +4,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jbrunton/g3ops/test"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/spf13/cobra"
@@ -23,7 +22,6 @@ func TestGetContextDefaults(t *testing.T) {
 	fs := CreateMemFs()
 	fs.WriteFile(".g3ops/config.yml", []byte("name: test-context"), 0644)
 	cmd := testCommand()
-	//test.ExecCommand(cmd) // required in order to parse flags
 
 	context, err := GetContext(fs, cmd)
 	assert.NoError(t, err)
@@ -38,8 +36,7 @@ func TestGetContextConfigFlag(t *testing.T) {
 	fs := CreateMemFs()
 	fs.WriteFile("my-g3ops-context/my-config.yml", []byte("name: test-context"), 0644)
 	cmd := testCommand()
-	cmd.SetArgs([]string{"--config", "my-g3ops-context/my-config.yml"})
-	cmd.Execute() // required in order to parse flags
+	cmd.ParseFlags([]string{"--config", "my-g3ops-context/my-config.yml"})
 
 	context, err := GetContext(fs, cmd)
 	assert.NoError(t, err)
@@ -54,7 +51,6 @@ func TestGetContextConfigEnvArg(t *testing.T) {
 	fs.WriteFile("my-g3ops-context/my-config.yml", []byte("name: test-context"), 0644)
 	cmd := testCommand()
 	os.Setenv("G3OPS_CONFIG", "my-g3ops-context/my-config.yml")
-	test.ExecCommand(cmd) // required in order to parse flags
 
 	context, err := GetContext(fs, cmd)
 	assert.NoError(t, err)
@@ -80,9 +76,7 @@ func TestGetContextNestedRelGithubDir(t *testing.T) {
 	fs := CreateMemFs()
 	fs.WriteFile("nested-app/.g3ops/config.yml", []byte("workflows:\n  githubDir: ../.github"), 0644)
 	cmd := testCommand()
-	cmd.SetArgs([]string{"--config", "nested-app/.g3ops/config.yml"})
-	cmd.Execute()
-	//os.Setenv("G3OPS_CONFIG", "nested-app/.g3ops/config.yml")
+	cmd.ParseFlags([]string{"--config", "nested-app/.g3ops/config.yml"})
 
 	context, err := GetContext(fs, cmd)
 	assert.NoError(t, err)
