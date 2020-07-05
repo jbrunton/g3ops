@@ -23,4 +23,4 @@ ci:
         docker-compose push $BUILD_SERVICE
 
 workflows:
-  githubDir: ../../../.github
+  githubDir: ../../.github
