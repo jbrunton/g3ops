@@ -13,6 +13,7 @@ jobs:
     - run: git config --global user.name "jbrunton-ci-minion"
     - run: git config --global user.email "jbrunton-ci-minion@outlook.com"
     - run: git fetch --tags
+    - run: get fetch
     - run: git describe --tags --abbrev=0
 #     - run: npm install
 #     - run: npm run release -- ${INCREMENT:-patch}
