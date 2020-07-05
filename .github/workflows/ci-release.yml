@@ -13,8 +13,9 @@ jobs:
     - run: git config --global user.name "jbrunton-ci-minion"
     - run: git config --global user.email "jbrunton-ci-minion@outlook.com"
     - run: git fetch --tags
-    - run: npm install
-    - run: npm run release -- ${INCREMENT:-patch}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        INCREMENT: ${{ github.event.deployment.payload.increment }}
+    - run: git describe --tags --abbrev=0
+#     - run: npm install
+#     - run: npm run release -- ${INCREMENT:-patch}
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         INCREMENT: ${{ github.event.deployment.payload.increment }}
