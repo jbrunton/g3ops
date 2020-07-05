@@ -13,4 +13,5 @@ jobs:
     - run: npm install
     - run: npm run release -- ${INCREMENT:-minor}
       env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         INCREMENT: ${{ github.event.deployment.increment }}
