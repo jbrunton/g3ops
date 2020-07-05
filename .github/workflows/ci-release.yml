@@ -10,15 +10,12 @@ jobs:
     if: ${{ github.event.deployment.task == 'release' }}
     steps:
     - uses: actions/checkout@v2
+    - run: git config --global user.name "jbrunton-ci-minion"
+    - run: git config --global user.email "jbrunton-ci-minion@outlook.com"
+    - run: git tag
+#    - run: npm install
 
-    - name: Setup git 
-      run: |
-        git config --global user.name "jbrunton-ci-minion"
-        git config --global user.email "jbrunton-ci-minion@outlook.com"
-
-    - run: npm install
-
-    - run: npm run release -- ${INCREMENT:-patch}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        INCREMENT: ${{ github.event.deployment.payload.increment }}
+#     - run: npm run release -- ${INCREMENT:-patch}
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         INCREMENT: ${{ github.event.deployment.payload.increment }}
