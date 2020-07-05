@@ -1,14 +1,13 @@
 name: ci-release
 
 on:
-  push:
-    tags:
-      - '[0-9]+.*'
+  deployment
 
 jobs:
 
-  build:
+  release:
     runs-on: ubuntu-latest
+    if: ${{ github.event.deployment.task == 'release' }}
     steps:
-      - run: git tag
-    
+    - run: echo "Building release"
+
