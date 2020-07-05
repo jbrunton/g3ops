@@ -2,7 +2,7 @@
 # Source: .g3ops/workflows/g3ops/template.jsonnet
 "jobs":
   "check_workflows":
-    "name": "check workflows"
+    "name": "check-workflows"
     "runs-on": "ubuntu-latest"
     "steps":
     - "uses": "actions/checkout@v2"
