@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
@@ -21,7 +22,7 @@ type G3opsContext struct {
 var contextCache map[*cobra.Command]*G3opsContext
 
 // GetContext - returns the current command context
-func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
+func GetContext(fs *afero.Afero, cmd *cobra.Command) (*G3opsContext, error) {
 	context := contextCache[cmd]
 	if context != nil {
 		return context, nil
@@ -46,7 +47,7 @@ func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
 
 	contextDir := filepath.Dir(configPath)
 
-	config, err := GetContextConfig(configPath)
+	config, err := GetContextConfig(fs, cmd, configPath)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +57,7 @@ func GetContext(cmd *cobra.Command) (*G3opsContext, error) {
 		githubDir = ".github/"
 	}
 	if !filepath.IsAbs(githubDir) {
-		githubDir = filepath.Join(contextDir, githubDir)
+		githubDir = filepath.Join(filepath.Dir(contextDir), githubDir)
 	}
 
 	context = &G3opsContext{

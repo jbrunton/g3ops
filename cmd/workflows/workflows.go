@@ -16,13 +16,13 @@ func newListWorkflowsCmd() *cobra.Command {
 		Use:   "ls",
 		Short: "List workflows",
 		Run: func(cmd *cobra.Command, args []string) {
-			context, err := lib.GetContext(cmd)
+			fs := lib.CreateOsFs()
+			context, err := lib.GetContext(fs, cmd)
 			if err != nil {
 				fmt.Println(styles.StyleError(err.Error()))
 				os.Exit(1)
 			}
 
-			fs := lib.CreateOsFs()
 			definitions := lib.GetWorkflowDefinitions(fs, context)
 			validator := lib.NewWorkflowValidator(fs)
 
@@ -60,12 +60,12 @@ func newUpdateWorkflowsCmd() *cobra.Command {
 		Use:   "update",
 		Short: "Updates workflow files",
 		Run: func(cmd *cobra.Command, args []string) {
-			context, err := lib.GetContext(cmd)
+			fs := lib.CreateOsFs()
+			context, err := lib.GetContext(fs, cmd)
 			if err != nil {
 				fmt.Println(styles.StyleError(err.Error()))
 				os.Exit(1)
 			}
-			fs := lib.CreateOsFs()
 			lib.UpdateWorkflows(fs, context)
 		},
 	}
@@ -76,12 +76,12 @@ func newCheckWorkflowsCmd() *cobra.Command {
 		Use:   "check",
 		Short: "Check workflow files are up to date",
 		Run: func(cmd *cobra.Command, args []string) {
-			context, err := lib.GetContext(cmd)
+			fs := lib.CreateOsFs()
+			context, err := lib.GetContext(fs, cmd)
 			if err != nil {
 				fmt.Println(styles.StyleError(err.Error()))
 				os.Exit(1)
 			}
-			fs := lib.CreateOsFs()
 			err = lib.ValidateWorkflows(fs, context)
 			if err != nil {
 				fmt.Println(styles.StyleError(err.Error()))
@@ -98,13 +98,12 @@ func newInitWorkflowsCmd() *cobra.Command {
 		Use:   "init",
 		Short: "Initialize g3ops workflow",
 		Run: func(cmd *cobra.Command, args []string) {
-			context, err := lib.GetContext(cmd)
+			fs := lib.CreateOsFs()
+			context, err := lib.GetContext(fs, cmd)
 			if err != nil {
 				fmt.Println(styles.StyleError(err.Error()))
 				os.Exit(1)
 			}
-
-			fs := lib.CreateOsFs()
 			lib.InitWorkflows(fs, context)
 			lib.UpdateWorkflows(fs, context)
 		},

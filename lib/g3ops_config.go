@@ -1,9 +1,10 @@
 package lib
 
 import (
-	"io/ioutil"
 	"path/filepath"
 
+	"github.com/spf13/afero"
+	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
 
@@ -41,23 +42,23 @@ type g3opsBuildConfig struct {
 	Command string
 }
 
-var configCache map[string]*G3opsConfig
+var configCache map[*cobra.Command]*G3opsConfig
 
 // GetContextConfig - finds and returns the G3opsConfig
-func GetContextConfig(path string) (*G3opsConfig, error) {
-	config := configCache[path]
+func GetContextConfig(fs *afero.Afero, cmd *cobra.Command, path string) (*G3opsConfig, error) {
+	config := configCache[cmd]
 	if config != nil {
 		return config, nil
 	}
-	config, err := loadContextConfig(path)
+	config, err := loadContextConfig(fs, path)
 	if err == nil {
-		configCache[path] = config
+		configCache[cmd] = config
 	}
 	return config, err
 }
 
-func loadContextConfig(path string) (*G3opsConfig, error) {
-	data, err := ioutil.ReadFile(path)
+func loadContextConfig(fs *afero.Afero, path string) (*G3opsConfig, error) {
+	data, err := fs.ReadFile(path)
 
 	if err != nil {
 		return nil, err
@@ -101,5 +102,5 @@ func parseConfig(input []byte) (*G3opsConfig, error) {
 }
 
 func init() {
-	configCache = make(map[string]*G3opsConfig)
+	configCache = make(map[*cobra.Command]*G3opsConfig)
 }
