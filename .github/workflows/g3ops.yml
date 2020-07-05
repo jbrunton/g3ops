@@ -11,7 +11,13 @@
         "go-version": "^1.14.4"
     - "name": "install g3ops"
       "run": "go get github.com/jbrunton/g3ops"
-    - "name": "validate workflows"
+    - "env":
+        "G3OPS_CONFIG": ".g3ops/config.yml"
+      "name": "validate g3ops workflows"
+      "run": "g3ops workflows check"
+    - "env":
+        "G3OPS_CONFIG": "test/sandbox/.g3ops/config.yml"
+      "name": "validate sandbox workflows"
       "run": "g3ops workflows check"
 "name": "g3ops"
 "on":
