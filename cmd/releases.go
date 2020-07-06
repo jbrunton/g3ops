@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jbrunton/g3ops/lib"
+
 	"github.com/olekukonko/tablewriter"
 
 	"github.com/google/go-github/github"
@@ -17,21 +19,25 @@ func newListReleasesCmd() *cobra.Command {
 		Use:   "ls",
 		Short: "Lists services in the current context",
 		Run: func(cmd *cobra.Command, args []string) {
-			ctx := context.Background()
+			fs := lib.CreateOsFs()
+			g3ops, err := lib.GetContext(fs, cmd)
+			if err != nil {
+				panic(err)
+			}
 			token := os.Getenv("GITHUB_TOKEN")
 			var client *github.Client
 			if token != "" {
 				ts := oauth2.StaticTokenSource(
 					&oauth2.Token{AccessToken: token},
 				)
-				tc := oauth2.NewClient(ctx, ts)
+				tc := oauth2.NewClient(context.Background(), ts)
 				client = github.NewClient(tc)
 			} else {
 				fmt.Println("Warning: no GITHUB_TOKEN set. g3ops won't be able to authenticate, and some functionality won't be supported.")
 				client = github.NewClient(nil)
 			}
 
-			releases, _, err := client.Repositories.ListReleases(context.Background(), "jbrunton", "g3ops", nil)
+			releases, _, err := client.Repositories.ListReleases(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, nil)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
