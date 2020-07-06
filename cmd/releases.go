@@ -3,39 +3,16 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
-	"path/filepath"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/jbrunton/g3ops/lib"
 
 	"github.com/olekukonko/tablewriter"
 
-	"github.com/blang/semver/v4"
-	"github.com/google/go-github/github"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"golang.org/x/oauth2"
 )
-
-func newGithubClient() *github.Client {
-	token := os.Getenv("GITHUB_TOKEN")
-
-	if token == "" {
-		fmt.Println("Warning: no GITHUB_TOKEN set. g3ops won't be able to authenticate, and some functionality won't be supported.")
-		return github.NewClient(nil)
-	}
-
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(context.Background(), ts)
-	return github.NewClient(tc)
-}
 
 func newListReleasesCmd(fs *afero.Afero) *cobra.Command {
 	cmd := &cobra.Command{
@@ -47,7 +24,7 @@ func newListReleasesCmd(fs *afero.Afero) *cobra.Command {
 				panic(err)
 			}
 
-			client := newGithubClient()
+			client := lib.NewGithubClient()
 			releases, _, err := client.Repositories.ListReleases(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, nil)
 			if err != nil {
 				fmt.Println(err)
@@ -97,62 +74,7 @@ func newCreateReleaseCmd(executor lib.Executor) *cobra.Command {
 				panic(err)
 			}
 
-			dir, err := ioutil.TempDir("", strings.Join([]string{"g3ops", g3ops.RepoName, "*"}, "-"))
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			executor.ExecCommand(fmt.Sprintf("git clone --depth 1 git@github.com:%s.git %s", g3ops.Config.Repo, dir), lib.ExecOptions{DryRun: g3ops.DryRun})
-
-			// TODO: specify context, not config, and require .g3ops directory in context
-			newContext, err := lib.NewContext(fs, filepath.Join(dir, ".g3ops", "config.yml"), g3ops.DryRun)
-			if err != nil {
-				panic(err)
-			}
-			manifest, err := newContext.GetReleaseManifest()
-			if err != nil {
-				panic(err)
-			}
-
-			version, err := semver.Make(manifest.Version)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println("Current version:", version.String())
-
-			version.IncrementPatch()
-			fmt.Println("New version:", version.String())
-			manifest.Version = version.String()
-			err = newContext.SaveReleaseManifest(manifest)
-			if err != nil {
-				panic(err)
-			}
-
-			branchName := fmt.Sprintf("release-%s-%s", version.String(), strconv.Itoa(int(time.Now().UTC().Unix())))
-			commitMessage := fmt.Sprintf("Update version to %s", version.String())
-			lib.CommitChanges(dir, []string{"manifest.yml"}, commitMessage, branchName, g3ops, executor)
-
-			client := newGithubClient()
-			repo, _, err := client.Repositories.Get(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName)
-			if err != nil {
-				panic(err)
-			}
-
-			// TODO: only create PR if config.releases.createPullRequest is true
-			newPr := &github.NewPullRequest{
-				Title: &commitMessage,
-				Head:  &branchName,
-				Base:  repo.DefaultBranch,
-			}
-			pr, _, err := client.PullRequests.Create(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, newPr)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-
-			fmt.Printf("Created PR for release: %s\n", *pr.HTMLURL)
-
-			defer os.RemoveAll(dir)
+			lib.CreateNewRelease(fs, executor, g3ops)
 		},
 	}
 	return cmd
