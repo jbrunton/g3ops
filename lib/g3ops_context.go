@@ -1,9 +1,11 @@
 package lib
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -12,11 +14,13 @@ import (
 
 // G3opsContext - current command context
 type G3opsContext struct {
-	Dir        string
-	ConfigPath string
-	GithubDir  string
-	Config     *G3opsConfig
-	DryRun     bool
+	Dir           string
+	ConfigPath    string
+	GithubDir     string
+	Config        *G3opsConfig
+	DryRun        bool
+	RepoOwnerName string
+	RepoName      string
 }
 
 var contextCache map[*cobra.Command]*G3opsContext
@@ -66,6 +70,18 @@ func GetContext(fs *afero.Afero, cmd *cobra.Command) (*G3opsContext, error) {
 		ConfigPath: configPath,
 		GithubDir:  githubDir,
 		Dir:        contextDir,
+	}
+
+	if config.Repo != "" {
+		regex := regexp.MustCompile(`^(\w+)/(\w+)$`)
+		matches := regex.FindStringSubmatch(config.Repo)
+		if len(matches) > 0 {
+			context.RepoOwnerName = matches[1]
+			context.RepoName = matches[2]
+		} else {
+			fmt.Printf("Invalid repo name: %s\n", config.Repo)
+			os.Exit(1)
+		}
 	}
 	return context, nil
 }

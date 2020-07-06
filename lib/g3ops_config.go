@@ -15,6 +15,7 @@ type G3opsConfig struct {
 	Services     map[string]g3opsServiceConfig
 	Ci           g3opsCiConfig
 	Workflows    g3opsWorkflowsConfig
+	Repo         string
 }
 
 type g3opsWorkflowsConfig struct {

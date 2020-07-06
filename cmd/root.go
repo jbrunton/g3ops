@@ -84,4 +84,5 @@ func init() {
 	rootCmd.AddCommand(outputs.OutputsCmd)
 	rootCmd.AddCommand(commit.CommitCmd)
 	rootCmd.AddCommand(workflows.WorkflowsCmd)
+	rootCmd.AddCommand(newReleasesCmd())
 }
