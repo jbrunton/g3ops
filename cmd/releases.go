@@ -17,6 +17,7 @@ import (
 
 	"github.com/blang/semver/v4"
 	"github.com/google/go-github/github"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
 )
@@ -36,12 +37,11 @@ func newGithubClient() *github.Client {
 	return github.NewClient(tc)
 }
 
-func newListReleasesCmd() *cobra.Command {
+func newListReleasesCmd(fs *afero.Afero) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "Lists services in the current context",
 		Run: func(cmd *cobra.Command, args []string) {
-			fs := lib.CreateOsFs()
 			g3ops, err := lib.GetContext(fs, cmd)
 			if err != nil {
 				panic(err)
@@ -86,7 +86,7 @@ func newListReleasesCmd() *cobra.Command {
 	return cmd
 }
 
-func newCreateReleaseCmd() *cobra.Command {
+func newCreateReleaseCmd(executor lib.Executor) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Updates manifest to trigger to a new release",
@@ -102,7 +102,7 @@ func newCreateReleaseCmd() *cobra.Command {
 				log.Fatal(err)
 			}
 
-			lib.ExecCommand(fmt.Sprintf("git clone --depth 1 git@github.com:%s.git %s", g3ops.Config.Repo, dir), g3ops)
+			executor.ExecCommand(fmt.Sprintf("git clone --depth 1 git@github.com:%s.git %s", g3ops.Config.Repo, dir), lib.ExecOptions{DryRun: g3ops.DryRun})
 
 			// TODO: specify context, not config, and require .g3ops directory in context
 			newContext, err := lib.NewContext(fs, filepath.Join(dir, ".g3ops", "config.yml"), g3ops.DryRun)
@@ -130,7 +130,7 @@ func newCreateReleaseCmd() *cobra.Command {
 
 			branchName := fmt.Sprintf("release-%s-%s", version.String(), strconv.Itoa(int(time.Now().UTC().Unix())))
 			commitMessage := fmt.Sprintf("Update version to %s", version.String())
-			lib.CommitChanges(dir, []string{"manifest.yml"}, commitMessage, branchName, g3ops)
+			lib.CommitChanges(dir, []string{"manifest.yml"}, commitMessage, branchName, g3ops, executor)
 
 			client := newGithubClient()
 			repo, _, err := client.Repositories.Get(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName)
@@ -158,11 +158,11 @@ func newCreateReleaseCmd() *cobra.Command {
 	return cmd
 }
 
-func newReleasesCmd() *cobra.Command {
+func newReleasesCmd(fs *afero.Afero, executor lib.Executor) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "releases",
 	}
-	cmd.AddCommand(newListReleasesCmd())
-	cmd.AddCommand(newCreateReleaseCmd())
+	cmd.AddCommand(newListReleasesCmd(fs))
+	cmd.AddCommand(newCreateReleaseCmd(executor))
 	return cmd
 }

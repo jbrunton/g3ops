@@ -14,6 +14,7 @@ import (
 
 // G3opsContext - current command context
 type G3opsContext struct {
+	FileSystem    *afero.Afero
 	Dir           string
 	ConfigPath    string
 	GithubDir     string
@@ -43,6 +44,7 @@ func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext,
 	}
 
 	context := &G3opsContext{
+		FileSystem: fs,
 		Config:     config,
 		DryRun:     dryRun,
 		ConfigPath: configPath,

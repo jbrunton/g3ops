@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jbrunton/g3ops/lib"
+
 	"github.com/spf13/cobra"
 
 	"github.com/jbrunton/g3ops/cmd/commit"
@@ -79,10 +81,12 @@ func init() {
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
+	fs := lib.CreateOsFs()
+	executor := lib.NewCommandExecutor()
 	rootCmd.AddCommand(context.ContextCmd)
-	rootCmd.AddCommand(service.ServiceCmd)
+	rootCmd.AddCommand(service.NewServiceCmd(executor))
 	rootCmd.AddCommand(outputs.OutputsCmd)
-	rootCmd.AddCommand(commit.CommitCmd)
+	rootCmd.AddCommand(commit.NewCommitCmd(executor))
 	rootCmd.AddCommand(workflows.WorkflowsCmd)
-	rootCmd.AddCommand(newReleasesCmd())
+	rootCmd.AddCommand(newReleasesCmd(fs, executor))
 }

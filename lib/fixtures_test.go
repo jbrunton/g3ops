@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/afero"
+	"github.com/stretchr/testify/mock"
 )
 
 func newTestContext() (*afero.Afero, *G3opsContext) {
@@ -73,4 +74,12 @@ func newTestWorkflowDefinition(name string, content string) *WorkflowDefinition 
 		Destination: fmt.Sprintf(".github/workflows/%s.yml", name),
 		Content:     content,
 	}
+}
+
+type TestExecutor struct {
+	mock.Mock
+}
+
+func (executor *TestExecutor) ExecCommand(command string, opts ExecOptions) {
+	executor.Called(command, opts)
 }
