@@ -116,7 +116,7 @@ func init() {
 
 // GetReleaseManifest - returns the release manifest (if it exists)
 func (context *G3opsContext) GetReleaseManifest() (G3opsReleaseManifest, error) {
-	data, err := ioutil.ReadFile(filepath.Join(context.Dir, "manifest.yml")) // TODO: read config
+	data, err := ioutil.ReadFile(filepath.Join(filepath.Dir(context.Dir), "manifest.yml")) // TODO: read config
 
 	if err != nil {
 		return G3opsReleaseManifest{}, err
@@ -129,4 +129,14 @@ func (context *G3opsContext) GetReleaseManifest() (G3opsReleaseManifest, error) 
 	}
 
 	return manifest, nil
+}
+
+// SaveReleaseManifest - updates the release manifest
+func (context *G3opsContext) SaveReleaseManifest(manifest G3opsReleaseManifest) error {
+	out, err := yaml.Marshal(&manifest)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(filepath.Join(filepath.Dir(context.Dir), "manifest.yml"), out, 0644) // TODO: read config
+	return err
 }
