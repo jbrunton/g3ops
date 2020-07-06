@@ -6,10 +6,10 @@ import (
 )
 
 // NewCommitCmd - new commit command
-func NewCommitCmd(executor lib.Executor) *cobra.Command {
+func NewCommitCmd(container *lib.Container) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "commit",
 	}
-	cmd.AddCommand(newCommitBuildCmd(executor))
+	cmd.AddCommand(newCommitBuildCmd(container))
 	return cmd
 }

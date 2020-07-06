@@ -83,3 +83,10 @@ type TestExecutor struct {
 func (executor *TestExecutor) ExecCommand(command string, opts ExecOptions) {
 	executor.Called(command, opts)
 }
+
+func NewTestContainer(g3ops *G3opsContext) Container {
+	return Container{
+		FileSystem: CreateMemFs(),
+		Executor:   &TestExecutor{},
+	}
+}

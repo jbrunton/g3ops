@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newBuildServiceCmd(executor lib.Executor) *cobra.Command {
+func newBuildServiceCmd(container *lib.Container) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "build <service>",
 		Short: "Build the given service",
@@ -22,7 +22,7 @@ func newBuildServiceCmd(executor lib.Executor) *cobra.Command {
 				panic(err)
 			}
 
-			lib.Build(service, serviceManifest.Version, context, executor)
+			lib.Build(service, serviceManifest.Version, context, container.Executor)
 		},
 	}
 	return cmd

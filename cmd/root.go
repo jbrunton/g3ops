@@ -81,12 +81,11 @@ func init() {
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	fs := lib.CreateOsFs()
-	executor := lib.NewCommandExecutor()
+	container := lib.NewContainer()
 	rootCmd.AddCommand(context.ContextCmd)
-	rootCmd.AddCommand(service.NewServiceCmd(executor))
+	rootCmd.AddCommand(service.NewServiceCmd(container))
 	rootCmd.AddCommand(outputs.OutputsCmd)
-	rootCmd.AddCommand(commit.NewCommitCmd(executor))
+	rootCmd.AddCommand(commit.NewCommitCmd(container))
 	rootCmd.AddCommand(workflows.WorkflowsCmd)
-	rootCmd.AddCommand(newReleasesCmd(fs, executor))
+	rootCmd.AddCommand(newReleasesCmd(container))
 }

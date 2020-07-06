@@ -10,16 +10,15 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 
-	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
-func newListReleasesCmd(fs *afero.Afero) *cobra.Command {
+func newListReleasesCmd(container *lib.Container) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "Lists services in the current context",
 		Run: func(cmd *cobra.Command, args []string) {
-			g3ops, err := lib.GetContext(fs, cmd)
+			g3ops, err := lib.GetContext(container.FileSystem, cmd)
 			if err != nil {
 				panic(err)
 			}
@@ -63,7 +62,7 @@ func newListReleasesCmd(fs *afero.Afero) *cobra.Command {
 	return cmd
 }
 
-func newCreateReleaseCmd(executor lib.Executor) *cobra.Command {
+func newCreateReleaseCmd(container *lib.Container) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Updates manifest to trigger to a new release",
@@ -74,17 +73,17 @@ func newCreateReleaseCmd(executor lib.Executor) *cobra.Command {
 				panic(err)
 			}
 
-			lib.CreateNewRelease(fs, executor, g3ops)
+			lib.CreateNewRelease(fs, container.Executor, g3ops)
 		},
 	}
 	return cmd
 }
 
-func newReleasesCmd(fs *afero.Afero, executor lib.Executor) *cobra.Command {
+func newReleasesCmd(container *lib.Container) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "releases",
 	}
-	cmd.AddCommand(newListReleasesCmd(fs))
-	cmd.AddCommand(newCreateReleaseCmd(executor))
+	cmd.AddCommand(newListReleasesCmd(container))
+	cmd.AddCommand(newCreateReleaseCmd(container))
 	return cmd
 }

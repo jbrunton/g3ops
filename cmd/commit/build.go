@@ -9,7 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newCommitBuildCmd(executor lib.Executor) *cobra.Command {
+func newCommitBuildCmd(container *lib.Container) *cobra.Command {
+	executor := container.Executor
 	return &cobra.Command{
 		Use:   "build",
 		Short: "Commits the build catalog for the given service",

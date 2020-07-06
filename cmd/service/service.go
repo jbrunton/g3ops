@@ -23,7 +23,7 @@ import (
 )
 
 // NewServiceCmd - new service command
-func NewServiceCmd(executor lib.Executor) *cobra.Command {
+func NewServiceCmd(container *lib.Container) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "service",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -31,7 +31,7 @@ func NewServiceCmd(executor lib.Executor) *cobra.Command {
 		},
 	}
 	cmd.AddCommand(lsCmd)
-	cmd.AddCommand(newBuildServiceCmd(executor))
+	cmd.AddCommand(newBuildServiceCmd(container))
 	cmd.AddCommand(buildsCmd)
 	cmd.AddCommand(describeCmd)
 	return cmd
