@@ -9,6 +9,7 @@ type Container struct {
 	FileSystem    *afero.Afero
 	Executor      Executor
 	GitHubService GitHubService
+	Clock         Clock
 }
 
 // Copy - creates a copy of the container

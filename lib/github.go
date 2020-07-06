@@ -12,7 +12,22 @@ import (
 // GitHubService - service for interacting with the GitHub API
 type GitHubService interface {
 	GetRepository(g3ops *G3opsContext) (*github.Repository, error)
-	CreatePullRequest(newPr *github.NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error)
+	CreatePullRequest(newPr *NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error)
+}
+
+// NewPullRequest - represents a new pull request
+type NewPullRequest struct {
+	Title string
+	Head  string
+	Base  string
+}
+
+func (newPr *NewPullRequest) toArg() *github.NewPullRequest {
+	return &github.NewPullRequest{
+		Title: github.String(newPr.Title),
+		Head:  github.String(newPr.Head),
+		Base:  github.String(newPr.Base),
+	}
 }
 
 // HTTPGitHubService - concrete implementation of GitHubService
@@ -27,8 +42,8 @@ func (service *HTTPGitHubService) GetRepository(g3ops *G3opsContext) (*github.Re
 }
 
 // CreatePullRequest - creates a pull request in the given repository
-func (service *HTTPGitHubService) CreatePullRequest(newPr *github.NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error) {
-	pr, _, err := service.client.PullRequests.Create(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, newPr)
+func (service *HTTPGitHubService) CreatePullRequest(newPr *NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error) {
+	pr, _, err := service.client.PullRequests.Create(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, newPr.toArg())
 	return pr, err
 }
 

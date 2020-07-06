@@ -73,7 +73,7 @@ func newCreateReleaseCmd(container *lib.Container) *cobra.Command {
 				panic(err)
 			}
 
-			lib.CreateNewRelease(fs, container.Executor, container.GitHubService, g3ops)
+			lib.CreateNewRelease(fs, container.Executor, container.GitHubService, container.Clock, g3ops)
 		},
 	}
 	return cmd
