@@ -2,15 +2,18 @@ package lib
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/google/go-github/github"
 	"github.com/spf13/afero"
+	"github.com/stretchr/testify/mock"
 )
 
 func newTestContext() (*afero.Afero, *G3opsContext) {
 	fs := CreateMemFs()
 	context := &G3opsContext{
 		Dir:       ".g3ops",
-		GithubDir: ".github/",
+		GitHubDir: ".github/",
 	}
 	return fs, context
 }
@@ -73,4 +76,47 @@ func newTestWorkflowDefinition(name string, content string) *WorkflowDefinition 
 		Destination: fmt.Sprintf(".github/workflows/%s.yml", name),
 		Content:     content,
 	}
+}
+
+type TestExecutor struct {
+	mock.Mock
+}
+
+func (executor *TestExecutor) ExecCommand(command string, opts ExecOptions) {
+	executor.Called(command, opts)
+	fmt.Println("Running " + command)
+}
+
+func NewTestContainer(g3ops *G3opsContext) Container {
+	return Container{
+		FileSystem:    CreateMemFs(),
+		Executor:      &TestExecutor{},
+		GitHubService: &MockGitHubService{},
+	}
+}
+
+type MockGitHubService struct {
+	mock.Mock
+}
+
+func (service *MockGitHubService) GetRepository(g3ops *G3opsContext) (*github.Repository, error) {
+	args := service.Called(g3ops)
+	return args.Get(0).(*github.Repository), args.Error(1)
+}
+
+func (service *MockGitHubService) CreatePullRequest(newPr *NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error) {
+	args := service.Called(newPr, g3ops)
+	return args.Get(0).(*github.PullRequest), args.Error(1)
+}
+
+type TestClock struct {
+	time time.Time
+}
+
+func NewTestClock(time time.Time) *TestClock {
+	return &TestClock{time: time}
+}
+
+func (clock *TestClock) Now() time.Time {
+	return clock.time
 }

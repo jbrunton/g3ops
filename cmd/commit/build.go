@@ -9,7 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newCommitBuildCmd() *cobra.Command {
+func newCommitBuildCmd(container *lib.Container) *cobra.Command {
+	executor := container.Executor
 	return &cobra.Command{
 		Use:   "build",
 		Short: "Commits the build catalog for the given service",
@@ -52,8 +53,8 @@ func newCommitBuildCmd() *cobra.Command {
 				panic(err)
 			}
 
-			lib.ExecCommand(fmt.Sprintf("git add .g3ops/builds/%s.yml", service), context)
-			lib.ExecCommand(fmt.Sprintf(`git commit -m "Generated build for %s %s"`, service, serviceManifest.Version), context)
+			executor.ExecCommand(fmt.Sprintf("git add .g3ops/builds/%s.yml", service), lib.ExecOptions{DryRun: context.DryRun})
+			executor.ExecCommand(fmt.Sprintf(`git commit -m "Generated build for %s %s"`, service, serviceManifest.Version), lib.ExecOptions{DryRun: context.DryRun})
 		},
 	}
 }

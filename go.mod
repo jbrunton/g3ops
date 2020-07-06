@@ -6,6 +6,8 @@ replace github.com/spf13/cobra => github.com/jbrunton/cobra v1.0.1-0.20200626143
 
 require (
 	github.com/Masterminds/semver v1.5.0
+	github.com/blang/semver v3.5.1+incompatible
+	github.com/blang/semver/v4 v4.0.0
 	github.com/fatih/color v1.9.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-jsonnet v0.16.0

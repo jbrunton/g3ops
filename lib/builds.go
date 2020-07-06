@@ -39,7 +39,7 @@ func getCatalogFileName(service string) string {
 const buildsDir = ".g3ops/builds"
 
 // Build - creates a build for the service and updates the catalog
-func Build(service string, version string, context *G3opsContext) {
+func Build(service string, version string, context *G3opsContext, executor Executor) {
 	build, err := createBuild(service, version)
 	if err != nil {
 		fmt.Println(err)
@@ -75,7 +75,7 @@ func Build(service string, version string, context *G3opsContext) {
 	}
 	build.ImageTag = tag
 
-	ExecCommands(context.Config.Ci.Defaults.Build.Command, context)
+	executor.ExecCommand(context.Config.Ci.Defaults.Build.Command, ExecOptions{DryRun: context.DryRun})
 
 	saveBuild(service, build, context)
 }

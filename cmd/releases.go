@@ -10,38 +10,20 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 
-	"github.com/google/go-github/github"
 	"github.com/spf13/cobra"
-	"golang.org/x/oauth2"
 )
 
-func newGithubClient() *github.Client {
-	token := os.Getenv("GITHUB_TOKEN")
-
-	if token == "" {
-		fmt.Println("Warning: no GITHUB_TOKEN set. g3ops won't be able to authenticate, and some functionality won't be supported.")
-		return github.NewClient(nil)
-	}
-
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(context.Background(), ts)
-	return github.NewClient(tc)
-}
-
-func newListReleasesCmd() *cobra.Command {
+func newListReleasesCmd(container *lib.Container) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "Lists services in the current context",
 		Run: func(cmd *cobra.Command, args []string) {
-			fs := lib.CreateOsFs()
-			g3ops, err := lib.GetContext(fs, cmd)
+			g3ops, err := lib.GetContext(container.FileSystem, cmd)
 			if err != nil {
 				panic(err)
 			}
 
-			client := newGithubClient()
+			client := lib.NewGitHubClient()
 			releases, _, err := client.Repositories.ListReleases(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, nil)
 			if err != nil {
 				fmt.Println(err)
@@ -80,10 +62,28 @@ func newListReleasesCmd() *cobra.Command {
 	return cmd
 }
 
-func newReleasesCmd() *cobra.Command {
+func newCreateReleaseCmd(container *lib.Container) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create",
+		Short: "Updates manifest to trigger to a new release",
+		Run: func(cmd *cobra.Command, args []string) {
+			fs := lib.CreateOsFs()
+			g3ops, err := lib.GetContext(fs, cmd)
+			if err != nil {
+				panic(err)
+			}
+
+			lib.CreateNewRelease(fs, container.Executor, container.GitHubService, container.Clock, g3ops)
+		},
+	}
+	return cmd
+}
+
+func newReleasesCmd(container *lib.Container) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "releases",
 	}
-	cmd.AddCommand(newListReleasesCmd())
+	cmd.AddCommand(newListReleasesCmd(container))
+	cmd.AddCommand(newCreateReleaseCmd(container))
 	return cmd
 }

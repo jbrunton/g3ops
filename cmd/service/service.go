@@ -18,31 +18,21 @@ package service
 import (
 	"fmt"
 
+	"github.com/jbrunton/g3ops/lib"
 	"github.com/spf13/cobra"
 )
 
-// ServiceCmd represents the context command
-var ServiceCmd = &cobra.Command{
-	Use: "service",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("service called")
-	},
-}
-
-func init() {
-	ServiceCmd.AddCommand(lsCmd)
-	ServiceCmd.AddCommand(buildCmd)
-	ServiceCmd.AddCommand(buildsCmd)
-	ServiceCmd.AddCommand(describeCmd)
-	//ContextCmd.AddCommand(describeCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// contextCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// contextCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+// NewServiceCmd - new service command
+func NewServiceCmd(container *lib.Container) *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "service",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("service called")
+		},
+	}
+	cmd.AddCommand(lsCmd)
+	cmd.AddCommand(newBuildServiceCmd(container))
+	cmd.AddCommand(buildsCmd)
+	cmd.AddCommand(describeCmd)
+	return cmd
 }
