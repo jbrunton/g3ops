@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -13,7 +12,7 @@ import (
 )
 
 // CreateNewRelease - creates a new release
-func CreateNewRelease(fs *afero.Afero, executor Executor, g3ops *G3opsContext) {
+func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService GitHubService, g3ops *G3opsContext) {
 	dir, newContext := CloneTempRepo(fs, executor, g3ops)
 	defer os.RemoveAll(dir)
 
@@ -40,8 +39,7 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, g3ops *G3opsContext) {
 	commitMessage := fmt.Sprintf("Update version to %s", version.String())
 	CommitChanges(dir, []string{"manifest.yml"}, commitMessage, branchName, newContext, executor)
 
-	client := NewGithubClient()
-	repo, _, err := client.Repositories.Get(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName)
+	repo, err := gitHubService.GetRepository(g3ops)
 	if err != nil {
 		panic(err)
 	}
@@ -52,7 +50,7 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, g3ops *G3opsContext) {
 		Head:  &branchName,
 		Base:  repo.DefaultBranch,
 	}
-	pr, _, err := client.PullRequests.Create(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, newPr)
+	pr, err := gitHubService.CreatePullRequest(newPr, g3ops)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

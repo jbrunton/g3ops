@@ -29,7 +29,7 @@ func TestGetContextDefaults(t *testing.T) {
 	assert.Equal(t, "test-context", context.Config.Name)
 	assert.Equal(t, ".g3ops/config.yml", context.ConfigPath)
 	assert.Equal(t, ".g3ops", context.Dir)
-	assert.Equal(t, ".github", context.GithubDir)
+	assert.Equal(t, ".github", context.GitHubDir)
 }
 
 func TestGetContextConfigFlag(t *testing.T) {
@@ -61,7 +61,7 @@ func TestGetContextConfigEnvArg(t *testing.T) {
 	os.Setenv("G3OPS_CONFIG", "")
 }
 
-func TestGetContextRelGithubDir(t *testing.T) {
+func TestGetContextRelGitHubDir(t *testing.T) {
 	fs := CreateMemFs()
 	fs.WriteFile(".g3ops/config.yml", []byte("workflows:\n  githubDir: ../path/to/.github"), 0644)
 	cmd := testCommand()
@@ -69,10 +69,10 @@ func TestGetContextRelGithubDir(t *testing.T) {
 	context, err := GetContext(fs, cmd)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "../path/to/.github", context.GithubDir)
+	assert.Equal(t, "../path/to/.github", context.GitHubDir)
 }
 
-func TestGetContextNestedRelGithubDir(t *testing.T) {
+func TestGetContextNestedRelGitHubDir(t *testing.T) {
 	fs := CreateMemFs()
 	fs.WriteFile("nested-app/.g3ops/config.yml", []byte("workflows:\n  githubDir: ../.github"), 0644)
 	cmd := testCommand()
@@ -81,10 +81,10 @@ func TestGetContextNestedRelGithubDir(t *testing.T) {
 	context, err := GetContext(fs, cmd)
 	assert.NoError(t, err)
 
-	assert.Equal(t, ".github", context.GithubDir)
+	assert.Equal(t, ".github", context.GitHubDir)
 }
 
-func TestGetContextAbsGithubDir(t *testing.T) {
+func TestGetContextAbsGitHubDir(t *testing.T) {
 	fs := CreateMemFs()
 	fs.WriteFile(".g3ops/config.yml", []byte("workflows:\n  githubDir: /path/to/github-dir"), 0644)
 	cmd := testCommand()
@@ -92,5 +92,5 @@ func TestGetContextAbsGithubDir(t *testing.T) {
 	context, err := GetContext(fs, cmd)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "/path/to/github-dir", context.GithubDir)
+	assert.Equal(t, "/path/to/github-dir", context.GitHubDir)
 }

@@ -16,7 +16,7 @@ import (
 type G3opsContext struct {
 	Dir           string
 	ConfigPath    string
-	GithubDir     string
+	GitHubDir     string
 	Config        *G3opsConfig
 	DryRun        bool
 	RepoOwnerName string
@@ -34,7 +34,7 @@ func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext,
 		return nil, err
 	}
 
-	githubDir := config.Workflows.GithubDir
+	githubDir := config.Workflows.GitHubDir
 	if githubDir == "" {
 		githubDir = ".github/"
 	}
@@ -46,7 +46,7 @@ func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext,
 		Config:     config,
 		DryRun:     dryRun,
 		ConfigPath: configPath,
-		GithubDir:  githubDir,
+		GitHubDir:  githubDir,
 		Dir:        contextDir,
 	}
 

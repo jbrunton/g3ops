@@ -18,7 +18,7 @@ type G3opsConfig struct {
 }
 
 type g3opsWorkflowsConfig struct {
-	GithubDir string `yaml:"githubDir"`
+	GitHubDir string `yaml:"githubDir"`
 }
 
 type g3opsEnvironmentConfig struct {

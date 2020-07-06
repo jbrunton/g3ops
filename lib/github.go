@@ -9,8 +9,37 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// NewGithubClient - creates a new client using the GITHUB_TOKEN (if set)
-func NewGithubClient() *github.Client {
+// GitHubService - service for interacting with the GitHub API
+type GitHubService interface {
+	GetRepository(g3ops *G3opsContext) (*github.Repository, error)
+	CreatePullRequest(newPr *github.NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error)
+}
+
+// HTTPGitHubService - concrete implementation of GitHubService
+type HTTPGitHubService struct {
+	client *github.Client
+}
+
+// GetRepository - returns the repository for the given context
+func (service *HTTPGitHubService) GetRepository(g3ops *G3opsContext) (*github.Repository, error) {
+	repo, _, err := service.client.Repositories.Get(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName)
+	return repo, err
+}
+
+// CreatePullRequest - creates a pull request in the given repository
+func (service *HTTPGitHubService) CreatePullRequest(newPr *github.NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error) {
+	pr, _, err := service.client.PullRequests.Create(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, newPr)
+	return pr, err
+}
+
+// NewGitHubService - creates a new instance of an HTTPGitHubService
+func NewGitHubService() *HTTPGitHubService {
+	client := NewGitHubClient()
+	return &HTTPGitHubService{client: client}
+}
+
+// NewGitHubClient - creates a new client using the GITHUB_TOKEN (if set)
+func NewGitHubClient() *github.Client {
 	token := os.Getenv("GITHUB_TOKEN")
 
 	if token == "" {

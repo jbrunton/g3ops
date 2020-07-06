@@ -23,7 +23,7 @@ func newListReleasesCmd(container *lib.Container) *cobra.Command {
 				panic(err)
 			}
 
-			client := lib.NewGithubClient()
+			client := lib.NewGitHubClient()
 			releases, _, err := client.Repositories.ListReleases(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, nil)
 			if err != nil {
 				fmt.Println(err)
@@ -73,7 +73,7 @@ func newCreateReleaseCmd(container *lib.Container) *cobra.Command {
 				panic(err)
 			}
 
-			lib.CreateNewRelease(fs, container.Executor, g3ops)
+			lib.CreateNewRelease(fs, container.Executor, container.GitHubService, g3ops)
 		},
 	}
 	return cmd

@@ -4,7 +4,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/2a4862e062bc388ef8a9/maintainability)](https://codeclimate.com/github/jbrunton/g3ops/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/2a4862e062bc388ef8a9/test_coverage)](https://codeclimate.com/github/jbrunton/g3ops/test_coverage)
 
-Go-powered Github GitOps. This is an opinionated cli for certain common GitOps tasks using Github Actions.
+Go-powered GitHub GitOps. This is an opinionated cli for certain common GitOps tasks using GitHub Actions.
 
 I don't claim this will implement industry best practices, but it will make my life a lot easier.
 

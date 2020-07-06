@@ -6,22 +6,25 @@ import (
 
 // Container - DI container
 type Container struct {
-	FileSystem *afero.Afero
-	Executor   Executor
+	FileSystem    *afero.Afero
+	Executor      Executor
+	GitHubService GitHubService
 }
 
 // Copy - creates a copy of the container
-func (container *Container) Copy() *Container {
-	return &Container{
-		FileSystem: container.FileSystem,
-		Executor:   container.Executor,
-	}
-}
+// func (container *Container) Copy() *Container {
+// 	return &Container{
+// 		FileSystem:    container.FileSystem,
+// 		Executor:      container.Executor,
+// 		GitHubService: container.GitHubService,
+// 	}
+// }
 
 // NewContainer - creates a new production container instance. Use NewTestContainer for testing.
 func NewContainer() *Container {
 	return &Container{
-		FileSystem: CreateOsFs(),
-		Executor:   &CommandExecutor{},
+		FileSystem:    CreateOsFs(),
+		Executor:      &CommandExecutor{},
+		GitHubService: NewGitHubService(),
 	}
 }

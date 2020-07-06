@@ -11,7 +11,7 @@ func newTestContext() (*afero.Afero, *G3opsContext) {
 	fs := CreateMemFs()
 	context := &G3opsContext{
 		Dir:       ".g3ops",
-		GithubDir: ".github/",
+		GitHubDir: ".github/",
 	}
 	return fs, context
 }
