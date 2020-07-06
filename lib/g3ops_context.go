@@ -25,6 +25,45 @@ type G3opsContext struct {
 
 var contextCache map[*cobra.Command]*G3opsContext
 
+// NewContext - returns a context for the given config
+func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext, error) {
+	contextDir := filepath.Dir(configPath)
+
+	config, err := GetContextConfig(fs, configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	githubDir := config.Workflows.GithubDir
+	if githubDir == "" {
+		githubDir = ".github/"
+	}
+	if !filepath.IsAbs(githubDir) {
+		githubDir = filepath.Join(filepath.Dir(contextDir), githubDir)
+	}
+
+	context := &G3opsContext{
+		Config:     config,
+		DryRun:     dryRun,
+		ConfigPath: configPath,
+		GithubDir:  githubDir,
+		Dir:        contextDir,
+	}
+
+	if config.Repo != "" {
+		regex := regexp.MustCompile(`^(\w+)/(\w+)$`)
+		matches := regex.FindStringSubmatch(config.Repo)
+		if len(matches) > 0 {
+			context.RepoOwnerName = matches[1]
+			context.RepoName = matches[2]
+		} else {
+			fmt.Printf("Invalid repo name: %s\n", config.Repo)
+			os.Exit(1)
+		}
+	}
+	return context, nil
+}
+
 // GetContext - returns the current command context
 func GetContext(fs *afero.Afero, cmd *cobra.Command) (*G3opsContext, error) {
 	context := contextCache[cmd]
@@ -49,41 +88,7 @@ func GetContext(fs *afero.Afero, cmd *cobra.Command) (*G3opsContext, error) {
 		configPath = ".g3ops/config.yml"
 	}
 
-	contextDir := filepath.Dir(configPath)
-
-	config, err := GetContextConfig(fs, cmd, configPath)
-	if err != nil {
-		return nil, err
-	}
-
-	githubDir := config.Workflows.GithubDir
-	if githubDir == "" {
-		githubDir = ".github/"
-	}
-	if !filepath.IsAbs(githubDir) {
-		githubDir = filepath.Join(filepath.Dir(contextDir), githubDir)
-	}
-
-	context = &G3opsContext{
-		Config:     config,
-		DryRun:     dryRun,
-		ConfigPath: configPath,
-		GithubDir:  githubDir,
-		Dir:        contextDir,
-	}
-
-	if config.Repo != "" {
-		regex := regexp.MustCompile(`^(\w+)/(\w+)$`)
-		matches := regex.FindStringSubmatch(config.Repo)
-		if len(matches) > 0 {
-			context.RepoOwnerName = matches[1]
-			context.RepoName = matches[2]
-		} else {
-			fmt.Printf("Invalid repo name: %s\n", config.Repo)
-			os.Exit(1)
-		}
-	}
-	return context, nil
+	return NewContext(fs, configPath, dryRun)
 }
 
 // LoadServiceManifest - finds and returns the G3opsService for the given service
@@ -107,4 +112,21 @@ func (context *G3opsContext) LoadServiceManifest(name string) (G3opsService, err
 
 func init() {
 	contextCache = make(map[*cobra.Command]*G3opsContext)
+}
+
+// GetReleaseManifest - returns the release manifest (if it exists)
+func (context *G3opsContext) GetReleaseManifest() (G3opsReleaseManifest, error) {
+	data, err := ioutil.ReadFile(filepath.Join(context.Dir, "manifest.yml")) // TODO: read config
+
+	if err != nil {
+		return G3opsReleaseManifest{}, err
+	}
+
+	manifest := G3opsReleaseManifest{}
+	err = yaml.Unmarshal(data, &manifest)
+	if err != nil {
+		panic(err)
+	}
+
+	return manifest, nil
 }

@@ -3,7 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/jbrunton/g3ops/lib"
@@ -80,10 +83,47 @@ func newListReleasesCmd() *cobra.Command {
 	return cmd
 }
 
+func newCreateReleaseCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create",
+		Short: "Updates manifest to trigger to a new release",
+		Run: func(cmd *cobra.Command, args []string) {
+			fs := lib.CreateOsFs()
+			g3ops, err := lib.GetContext(fs, cmd)
+			if err != nil {
+				panic(err)
+			}
+
+			dir, err := ioutil.TempDir("", strings.Join([]string{"g3ops", g3ops.RepoName, "*"}, "-"))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			lib.ExecCommand(fmt.Sprintf("git clone --depth 1 git@github.com:%s.git %s", g3ops.Config.Repo, dir), g3ops)
+
+			// TODO: specify context, not config, and require .g3ops directory in context
+			newContext, err := lib.NewContext(fs, filepath.Join(dir, ".g3ops", "config.yml"), g3ops.DryRun)
+			if err != nil {
+				panic(err)
+			}
+			manifest, err := newContext.GetReleaseManifest()
+			if err != nil {
+				panic(err)
+			}
+
+			fmt.Println("Version:", manifest.Version)
+
+			defer os.RemoveAll(dir)
+		},
+	}
+	return cmd
+}
+
 func newReleasesCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "releases",
 	}
 	cmd.AddCommand(newListReleasesCmd())
+	cmd.AddCommand(newCreateReleaseCmd())
 	return cmd
 }
