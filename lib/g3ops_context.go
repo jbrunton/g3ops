@@ -115,8 +115,8 @@ func init() {
 }
 
 // GetReleaseManifest - returns the release manifest (if it exists)
-func (context *G3opsContext) GetReleaseManifest() (G3opsReleaseManifest, error) {
-	data, err := ioutil.ReadFile(filepath.Join(filepath.Dir(context.Dir), "manifest.yml")) // TODO: read config
+func (context *G3opsContext) GetReleaseManifest(fs *afero.Afero) (G3opsReleaseManifest, error) {
+	data, err := fs.ReadFile(filepath.Join(filepath.Dir(context.Dir), "manifest.yml")) // TODO: read config
 
 	if err != nil {
 		return G3opsReleaseManifest{}, err

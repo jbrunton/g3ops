@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 
+	"github.com/google/go-github/github"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/mock"
 )
@@ -82,11 +83,27 @@ type TestExecutor struct {
 
 func (executor *TestExecutor) ExecCommand(command string, opts ExecOptions) {
 	executor.Called(command, opts)
+	fmt.Println("Running " + command)
 }
 
 func NewTestContainer(g3ops *G3opsContext) Container {
 	return Container{
-		FileSystem: CreateMemFs(),
-		Executor:   &TestExecutor{},
+		FileSystem:    CreateMemFs(),
+		Executor:      &TestExecutor{},
+		GitHubService: &MockGitHubService{},
 	}
+}
+
+type MockGitHubService struct {
+	mock.Mock
+}
+
+func (service *MockGitHubService) GetRepository(g3ops *G3opsContext) (*github.Repository, error) {
+	args := service.Called(g3ops)
+	return args.Get(0).(*github.Repository), args.Error(1)
+}
+
+func (service *MockGitHubService) CreatePullRequest(newPr *github.NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error) {
+	args := service.Called(newPr, g3ops)
+	return args.Get(0).(*github.PullRequest), args.Error(1)
 }

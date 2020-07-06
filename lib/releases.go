@@ -16,7 +16,7 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService GitHubSe
 	dir, newContext := CloneTempRepo(fs, executor, g3ops)
 	defer os.RemoveAll(dir)
 
-	manifest, err := newContext.GetReleaseManifest()
+	manifest, err := newContext.GetReleaseManifest(fs)
 	if err != nil {
 		panic(err)
 	}
