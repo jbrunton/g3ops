@@ -15,6 +15,21 @@ import (
 	"golang.org/x/oauth2"
 )
 
+func newGithubClient() *github.Client {
+	token := os.Getenv("GITHUB_TOKEN")
+
+	if token == "" {
+		fmt.Println("Warning: no GITHUB_TOKEN set. g3ops won't be able to authenticate, and some functionality won't be supported.")
+		return github.NewClient(nil)
+	}
+
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(context.Background(), ts)
+	return github.NewClient(tc)
+}
+
 func newListReleasesCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ls",
@@ -25,19 +40,8 @@ func newListReleasesCmd() *cobra.Command {
 			if err != nil {
 				panic(err)
 			}
-			token := os.Getenv("GITHUB_TOKEN")
-			var client *github.Client
-			if token != "" {
-				ts := oauth2.StaticTokenSource(
-					&oauth2.Token{AccessToken: token},
-				)
-				tc := oauth2.NewClient(context.Background(), ts)
-				client = github.NewClient(tc)
-			} else {
-				fmt.Println("Warning: no GITHUB_TOKEN set. g3ops won't be able to authenticate, and some functionality won't be supported.")
-				client = github.NewClient(nil)
-			}
 
+			client := newGithubClient()
 			releases, _, err := client.Repositories.ListReleases(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, nil)
 			if err != nil {
 				fmt.Println(err)
@@ -45,7 +49,7 @@ func newListReleasesCmd() *cobra.Command {
 			}
 
 			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Name", "Assets", "Status"})
+			table.SetHeader([]string{"Name", "Tag", "Assets", "Status"})
 			for _, release := range releases {
 				assets := []string{}
 				for _, asset := range release.Assets {
@@ -58,6 +62,7 @@ func newListReleasesCmd() *cobra.Command {
 					tablewriter.Colors{tablewriter.FgGreenColor},
 					tablewriter.Colors{tablewriter.FgYellowColor},
 					tablewriter.Colors{tablewriter.FgYellowColor},
+					tablewriter.Colors{tablewriter.FgYellowColor},
 				)
 				var status string
 				if *release.Draft {
@@ -66,7 +71,7 @@ func newListReleasesCmd() *cobra.Command {
 					status = "PUBLISHED"
 				}
 
-				row := []string{*release.Name, strings.Join(assets, ", "), status}
+				row := []string{*release.Name, *release.TagName, strings.Join(assets, ", "), status}
 				table.Append(row)
 			}
 			table.Render()
