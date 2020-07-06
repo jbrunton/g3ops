@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/jbrunton/g3ops/lib"
 
@@ -44,10 +45,18 @@ func newListReleasesCmd() *cobra.Command {
 			}
 
 			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Name", "Status"})
+			table.SetHeader([]string{"Name", "Assets", "Status"})
 			for _, release := range releases {
+				assets := []string{}
+				for _, asset := range release.Assets {
+					assets = append(assets, *asset.Name)
+				}
+				if len(assets) == 0 {
+					assets = []string{"(none)"}
+				}
 				table.SetColumnColor(
 					tablewriter.Colors{tablewriter.FgGreenColor},
+					tablewriter.Colors{tablewriter.FgYellowColor},
 					tablewriter.Colors{tablewriter.FgYellowColor},
 				)
 				var status string
@@ -57,7 +66,7 @@ func newListReleasesCmd() *cobra.Command {
 					status = "PUBLISHED"
 				}
 
-				row := []string{*release.Name, status}
+				row := []string{*release.Name, strings.Join(assets, ", "), status}
 				table.Append(row)
 			}
 			table.Render()
