@@ -9,7 +9,7 @@ local check_workflows_step(context) =
   };
 
 local check_workflows_job = {
-  'name': 'check_workflows',
+  'name': 'check-workflows',
   'runs-on': 'ubuntu-latest',
   steps: [
     {
