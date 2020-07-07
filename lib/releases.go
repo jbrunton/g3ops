@@ -28,7 +28,7 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService GitHubSe
 	version.IncrementPatch()
 	fmt.Println("New version:", version.String())
 	manifest.Version = version.String()
-	err = newContext.SaveReleaseManifest(manifest)
+	err = newContext.SaveReleaseManifest(fs, manifest)
 	if err != nil {
 		panic(err)
 	}

@@ -2,7 +2,6 @@ package lib
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strings"
@@ -12,7 +11,7 @@ import (
 
 // CloneTempRepo - clones a shallow copy into a temp directory. Returns the directory path and the context for the new repo.
 func CloneTempRepo(fs *afero.Afero, executor Executor, g3ops *G3opsContext) (string, *G3opsContext) {
-	dir, err := ioutil.TempDir("", strings.Join([]string{"g3ops", g3ops.RepoName, "*"}, "-"))
+	dir, err := fs.TempDir("", strings.Join([]string{"g3ops", g3ops.RepoName, "*"}, "-"))
 	if err != nil {
 		log.Fatal(err)
 	}
