@@ -31,7 +31,8 @@ func NewReleaseBuilder(container *Container, g3ops *G3opsContext) *ReleaseBuilde
 }
 
 // CreateNewRelease - creates a new release
-func (builder *ReleaseBuilder) CreateNewRelease(increment string) {
+func (builder *ReleaseBuilder) CreateNewRelease(name string, increment string) {
+	fmt.Println("name:", name, "increment:", increment)
 	fs := builder.fileSystem
 	g3ops := builder.g3ops
 	gitHubService := builder.gitHubService
@@ -44,36 +45,18 @@ func (builder *ReleaseBuilder) CreateNewRelease(increment string) {
 		panic(err)
 	}
 
-	version, err := semver.Make(manifest.Version)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Current version:", version.String())
+	newVersion := getNewReleaseVersion(name, increment, manifest.Version)
 
-	switch increment {
-	case "":
-		version.IncrementPatch()
-	case "patch":
-		version.IncrementPatch()
-	case "minor":
-		version.IncrementMinor()
-	case "major":
-		version.IncrementMajor()
-	default:
-		panic(fmt.Errorf("Unexpected increment type: %q", increment))
-	}
-
-	fmt.Println("New version:", version.String())
-	manifest.Version = version.String()
+	manifest.Version = newVersion
 	err = newContext.SaveReleaseManifest(fs, manifest)
 	if err != nil {
 		panic(err)
 	}
 
-	commitMessage := fmt.Sprintf("Update version to %s", version.String())
+	commitMessage := fmt.Sprintf("Update version to %s", newVersion)
 	var branchName string
 	if g3ops.Config.Releases.CreatePullRequest {
-		branchName = fmt.Sprintf("release-%s-%s", version.String(), strconv.Itoa(int(builder.clock.Now().UTC().Unix())))
+		branchName = fmt.Sprintf("release-%s-%s", newVersion, strconv.Itoa(int(builder.clock.Now().UTC().Unix())))
 	} else {
 		branchName = CurrentBranch(dir)
 	}
@@ -101,5 +84,37 @@ func (builder *ReleaseBuilder) CreateNewRelease(increment string) {
 			}
 			fmt.Printf("Created PR for release: %s\n", *pr.HTMLURL)
 		}
+	}
+}
+
+func getNewReleaseVersion(name string, increment string, currentVersion string) string {
+	if name != "" {
+		version, err := semver.Make(name)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Updating to version:", name)
+		return version.String()
+	} else {
+		version, err := semver.Make(currentVersion)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Current version:", version.String())
+
+		switch increment {
+		case "":
+			version.IncrementPatch()
+		case "patch":
+			version.IncrementPatch()
+		case "minor":
+			version.IncrementMinor()
+		case "major":
+			version.IncrementMajor()
+		default:
+			panic(fmt.Errorf("Unexpected increment type: %q", increment))
+		}
+		fmt.Println("New version:", version.String())
+		return version.String()
 	}
 }
