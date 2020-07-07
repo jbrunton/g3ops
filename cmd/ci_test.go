@@ -29,7 +29,7 @@ func TestCheckReleaseManifestExistingVersion(t *testing.T) {
 	cmd.SetArgs([]string{"release-manifest"})
 
 	fs.WriteFile("manifest.yml", []byte("version: 1.1.1"), 0644) // TODO: make config file optional?
-	release := &github.RepositoryRelease{Name: github.String("1.1.1")}
+	release := &github.RepositoryRelease{TagName: github.String("1.1.1")}
 	gitHubService.On("ListReleases", repoID).Return([]*github.RepositoryRelease{release}, nil)
 
 	// act
@@ -59,7 +59,7 @@ func TestCheckReleaseManifestNewVersion(t *testing.T) {
 	cmd.SetArgs([]string{"release-manifest"})
 
 	fs.WriteFile("manifest.yml", []byte("version: 1.1.2"), 0644) // TODO: make config file optional?
-	release := &github.RepositoryRelease{Name: github.String("1.1.1")}
+	release := &github.RepositoryRelease{TagName: github.String("1.1.1")}
 	gitHubService.On("ListReleases", repoID).Return([]*github.RepositoryRelease{release}, nil)
 
 	// act
