@@ -42,7 +42,7 @@ local release_job = {
 };
 
 local workflow = {
-  name: "ci-release",
+  name: "g3ops-release",
   on: {
     push: {
       branches: [git_config.main_branch]
