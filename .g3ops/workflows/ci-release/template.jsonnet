@@ -44,10 +44,7 @@ local workflow = {
   on: {
     push: {
       branches: ["master"]
-    },
-    pull_request: {
-      branches: ["master"]
-    },
+    }
   },
   jobs: {
     check_manifest: check_manifest_job,
