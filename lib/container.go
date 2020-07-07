@@ -27,6 +27,6 @@ func NewContainer() *Container {
 	return &Container{
 		FileSystem:    CreateOsFs(),
 		Executor:      &CommandExecutor{},
-		GitHubService: NewGitHubService(),
+		GitHubService: services.NewGitHubService(),
 	}
 }
