@@ -33,7 +33,7 @@
         "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
         "RELEASE_NAME": "${{ steps.check_manifest.outputs.releaseName }}"
       "run": "npm run release -- $RELEASE_NAME"
-"name": "ci-release"
+"name": "g3ops-release"
 "on":
   "push":
     "branches":
