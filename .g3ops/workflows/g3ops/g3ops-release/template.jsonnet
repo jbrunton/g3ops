@@ -1,3 +1,5 @@
+local git_config = import '../../config/git.libsonnet';
+
 local check_manifest_job = {
   "runs-on": "ubuntu-latest",
   outputs: {
@@ -25,8 +27,8 @@ local release_job = {
   "runs-on": "ubuntu-latest",
   steps: [
     { uses: "actions/checkout@v2" },
-    { run: "git config --global user.name 'jbrunton-ci-minion'" },
-    { run: "git config --global user.email 'jbrunton-ci-minion@outlook.com'" },
+    { run: "git config --global user.name '%(user)s'" % git_config },
+    { run: "git config --global user.email '%(email)s'" % git_config },
     { run: "git fetch --unshallow" },
     { run: "go build" },
     { run: "npm install" },
@@ -43,7 +45,7 @@ local workflow = {
   name: "ci-release",
   on: {
     push: {
-      branches: ["master"]
+      branches: [git_config.main_branch]
     }
   },
   jobs: {

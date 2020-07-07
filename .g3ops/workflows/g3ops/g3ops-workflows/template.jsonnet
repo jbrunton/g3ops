@@ -1,15 +1,15 @@
 local config = import 'config.libsonnet';
-local git_config = import '../common/git.libsonnet';
+local git_config = import '../../config/git.libsonnet';
 
 local check_workflows_step(context) =
   {
     name: 'validate %(name)s workflows' % context,
-    env: { 'G3OPS_CONFIG': context.config },
+    env: { 'G3OPS_CONFIG': context.config }, //TODO: make this conditional and don't set for default context
     run: 'g3ops workflows check'
   };
 
 local check_workflows_job = {
-  'name': config.job_name,
+  'name': 'check_workflows',
   'runs-on': 'ubuntu-latest',
   steps: [
     {
@@ -32,7 +32,7 @@ local check_workflows_job = {
 };
 
 local workflow = {
-  name: config.workflow_name,
+  name: 'g3ops-workflows',
   on: {
     pull_request: {
       branches: [git_config.main_branch]
