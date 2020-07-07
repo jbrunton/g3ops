@@ -87,8 +87,8 @@ func (executor *TestExecutor) ExecCommand(command string, opts ExecOptions) {
 	fmt.Println("Running " + command)
 }
 
-func NewTestContainer(g3ops *G3opsContext) Container {
-	return Container{
+func NewTestContainer(g3ops *G3opsContext) *Container {
+	return &Container{
 		FileSystem:    CreateMemFs(),
 		Executor:      &TestExecutor{},
 		GitHubService: test.NewMockGitHubService(),

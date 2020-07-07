@@ -75,13 +75,17 @@ func newCreateReleaseCmd(container *lib.Container) *cobra.Command {
 			builder := lib.NewReleaseBuilder(container, g3ops)
 
 			if len(args) > 0 {
-				builder.CreateNewRelease(args[0], "")
+				err = builder.CreateNewRelease(args[0], "")
 			} else {
 				increment, error := cmd.Flags().GetString("increment")
 				if error != nil {
 					panic(error)
 				}
-				builder.CreateNewRelease("", increment)
+				err = builder.CreateNewRelease("", increment)
+			}
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
 			}
 		},
 	}

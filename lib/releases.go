@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -31,7 +32,7 @@ func NewReleaseBuilder(container *Container, g3ops *G3opsContext) *ReleaseBuilde
 }
 
 // CreateNewRelease - creates a new release
-func (builder *ReleaseBuilder) CreateNewRelease(name string, increment string) {
+func (builder *ReleaseBuilder) CreateNewRelease(name string, increment string) error {
 	fmt.Println("name:", name, "increment:", increment)
 	fs := builder.fileSystem
 	g3ops := builder.g3ops
@@ -45,7 +46,10 @@ func (builder *ReleaseBuilder) CreateNewRelease(name string, increment string) {
 		panic(err)
 	}
 
-	newVersion := getNewReleaseVersion(name, increment, manifest.Version)
+	newVersion, err := getNewReleaseVersion(name, increment, manifest.Version)
+	if err != nil {
+		return err
+	}
 
 	manifest.Version = newVersion
 	err = newContext.SaveReleaseManifest(fs, manifest)
@@ -85,36 +89,40 @@ func (builder *ReleaseBuilder) CreateNewRelease(name string, increment string) {
 			fmt.Printf("Created PR for release: %s\n", *pr.HTMLURL)
 		}
 	}
+	return nil
 }
 
-func getNewReleaseVersion(name string, increment string, currentVersion string) string {
+func getNewReleaseVersion(name string, increment string, currentVersion string) (string, error) {
 	if name != "" {
 		version, err := semver.Make(name)
 		if err != nil {
-			panic(err)
+			return "", fmt.Errorf("invalid version name: %q, should be in semver format", name)
 		}
 		fmt.Println("Updating to version:", name)
-		return version.String()
-	} else {
-		version, err := semver.Make(currentVersion)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("Current version:", version.String())
-
-		switch increment {
-		case "":
-			version.IncrementPatch()
-		case "patch":
-			version.IncrementPatch()
-		case "minor":
-			version.IncrementMinor()
-		case "major":
-			version.IncrementMajor()
-		default:
-			panic(fmt.Errorf("Unexpected increment type: %q", increment))
-		}
-		fmt.Println("New version:", version.String())
-		return version.String()
+		return version.String(), nil
 	}
+
+	if currentVersion == "" {
+		return "", errors.New("current version isn't set, specify the new version by name")
+	}
+	version, err := semver.Make(currentVersion)
+	if err != nil {
+		return "", fmt.Errorf("error parsing current version: %q, should be in semvar format", currentVersion)
+	}
+	fmt.Println("Current version:", version.String())
+
+	switch increment {
+	case "":
+		version.IncrementPatch()
+	case "patch":
+		version.IncrementPatch()
+	case "minor":
+		version.IncrementMinor()
+	case "major":
+		version.IncrementMajor()
+	default:
+		panic(fmt.Errorf("Unexpected increment type: %q", increment))
+	}
+	fmt.Println("New version:", version.String())
+	return version.String(), nil
 }
