@@ -39,7 +39,7 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService services
 	if g3ops.Config.Releases.CreatePullRequest {
 		branchName = fmt.Sprintf("release-%s-%s", version.String(), strconv.Itoa(int(clock.Now().UTC().Unix())))
 	} else {
-		branchName = CurrentBranch()
+		branchName = CurrentBranch(dir)
 	}
 
 	CommitChanges(dir, []string{"manifest.yml"}, commitMessage, branchName, newContext, executor)
@@ -55,12 +55,15 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService services
 			Head:  branchName,
 			Base:  *repo.DefaultBranch,
 		}
-		pr, err := gitHubService.CreatePullRequest(newPr, g3ops.RepoID)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+		if g3ops.DryRun {
+			fmt.Printf("--dry-run passed, skipping pull request. Would have created PR:\n%#v\n", newPr)
+		} else {
+			pr, err := gitHubService.CreatePullRequest(newPr, g3ops.RepoID)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			fmt.Printf("Created PR for release: %s\n", *pr.HTMLURL)
 		}
-
-		fmt.Printf("Created PR for release: %s\n", *pr.HTMLURL)
 	}
 }

@@ -9,7 +9,13 @@ import (
 )
 
 // CurrentSha - returns the short form version of git rev-parse HEAD
-func CurrentSha() string {
+func CurrentSha(repoDir string) string {
+	if repoDir != "" {
+		os.Setenv("GIT_DIR", filepath.Join(repoDir, ".git"))
+		os.Setenv("GIT_WORK_TREE", repoDir)
+		defer os.Setenv("GIT_DIR", "")
+		defer os.Setenv("GIT_WORK_TREE", "")
+	}
 	out, err := exec.Command("git", "rev-parse", "--short", "HEAD").Output()
 	if err != nil {
 		panic(err)
@@ -18,7 +24,13 @@ func CurrentSha() string {
 }
 
 // CurrentBranch - returns the current git branch
-func CurrentBranch() string {
+func CurrentBranch(repoDir string) string {
+	if repoDir != "" {
+		os.Setenv("GIT_DIR", filepath.Join(repoDir, ".git"))
+		os.Setenv("GIT_WORK_TREE", repoDir)
+		defer os.Setenv("GIT_DIR", "")
+		defer os.Setenv("GIT_WORK_TREE", "")
+	}
 	out, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
 	if err != nil {
 		panic(err)
