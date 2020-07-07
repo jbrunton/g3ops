@@ -5,8 +5,8 @@
     "needs":
     - "check_workflows"
     "outputs":
-      "releaseName": "${{ steps.check.outputs.releaseName }}"
-      "releaseRequired": "${{ steps.check.outputs.releaseRequired }}"
+      "releaseName": "${{ steps.check_release.outputs.releaseName }}"
+      "releaseRequired": "${{ steps.check_release.outputs.releaseRequired }}"
     "runs-on": "ubuntu-latest"
     "steps":
     - "uses": "actions/checkout@v2"
@@ -17,8 +17,9 @@
       "run": "go get github.com/jbrunton/g3ops"
     - "env":
         "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
-      "id": "check"
-      "name": "check manifest"
+      "id": "check_release"
+      "if": "github.event_name == 'push' && github.event.ref == format('refs/heads/{0}', 'master')"
+      "name": "check release manifest"
       "run": "g3ops ci check release-manifest"
   "check_workflows":
     "name": "check-workflows"
