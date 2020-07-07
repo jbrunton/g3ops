@@ -44,7 +44,10 @@ local workflow = {
   on: {
     push: {
       branches: ["master"]
-    }
+    },
+    pull_request: {
+      branches: ["master"]
+    },
   },
   jobs: {
     check_manifest: check_manifest_job,
@@ -53,39 +56,3 @@ local workflow = {
 };
 
 std.manifestYamlDoc(workflow)
-
-// jobs:
-//   check_manifest:
-//     runs-on: "ubuntu-latest"
-//     outputs:
-//       releaseRequired: ${{ steps.check.outputs.releaseRequired }}
-//       releaseName: ${{ steps.check.outputs.releaseName }}
-//     steps:
-//     - uses: "actions/checkout@v2"
-//     - uses: "actions/setup-go@v2"
-//       with:
-//         go-version: "^1.14.4"
-//     - name: "install g3ops"
-//       run: "go get github.com/jbrunton/g3ops"
-//     - name: check manifest
-//       id: check
-//       env:
-//         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-//       run: "g3ops ci check release-manifest"
-
-//   release:
-//     needs: check_manifest
-//     if: ${{ needs.check_manifest.outputs.releaseRequired == true }}
-//     runs-on: "ubuntu-latest"
-//     steps:
-//     - uses: "actions/checkout@v2"
-//     - run: git config --global user.name "jbrunton-ci-minion"
-//     - run: git config --global user.email "jbrunton-ci-minion@outlook.com"
-//     - run: git fetch --unshallow
-//     - run: go build
-//     - run: npm install
-//     - run: npm run release -- $RELEASE_NAME
-//       env:
-//         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-//         RELEASE_NAME: ${{ steps.check_manifest.outputs.releaseName }}
-// # jobs:
