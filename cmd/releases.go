@@ -71,9 +71,15 @@ func newCreateReleaseCmd(container *lib.Container) *cobra.Command {
 				panic(err)
 			}
 
-			lib.CreateNewRelease(fs, container.Executor, container.GitHubService, container.Clock, g3ops)
+			builder := lib.NewReleaseBuilder(container, g3ops)
+			increment, error := cmd.Flags().GetString("increment")
+			if error != nil {
+				panic(error)
+			}
+			builder.CreateNewRelease(increment)
 		},
 	}
+	cmd.Flags().String("increment", "", "The semver increment type: major, minor or patch")
 	return cmd
 }
 

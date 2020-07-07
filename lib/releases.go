@@ -10,9 +10,33 @@ import (
 	"github.com/spf13/afero"
 )
 
+// ReleaseBuilder - struct for creating releases
+type ReleaseBuilder struct {
+	fileSystem    *afero.Afero
+	executor      Executor
+	gitHubService services.GitHubService
+	clock         Clock
+	g3ops         *G3opsContext
+}
+
+// NewReleaseBuilder - constructor for ReleaseBuilder
+func NewReleaseBuilder(container *Container, g3ops *G3opsContext) *ReleaseBuilder {
+	return &ReleaseBuilder{
+		fileSystem:    container.FileSystem,
+		executor:      container.Executor,
+		gitHubService: container.GitHubService,
+		clock:         container.Clock,
+		g3ops:         g3ops,
+	}
+}
+
 // CreateNewRelease - creates a new release
-func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService services.GitHubService, clock Clock, g3ops *G3opsContext) {
-	dir, newContext := CloneTempRepo(fs, executor, g3ops)
+func (builder *ReleaseBuilder) CreateNewRelease(increment string) {
+	fs := builder.fileSystem
+	g3ops := builder.g3ops
+	gitHubService := builder.gitHubService
+
+	dir, newContext := CloneTempRepo(fs, builder.executor, g3ops)
 	defer os.RemoveAll(dir)
 
 	manifest, err := newContext.GetReleaseManifest(fs)
@@ -26,7 +50,19 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService services
 	}
 	fmt.Println("Current version:", version.String())
 
-	version.IncrementPatch()
+	switch increment {
+	case "":
+		version.IncrementPatch()
+	case "patch":
+		version.IncrementPatch()
+	case "minor":
+		version.IncrementMinor()
+	case "major":
+		version.IncrementMajor()
+	default:
+		panic(fmt.Errorf("Unexpected increment type: %q", increment))
+	}
+
 	fmt.Println("New version:", version.String())
 	manifest.Version = version.String()
 	err = newContext.SaveReleaseManifest(fs, manifest)
@@ -37,12 +73,12 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService services
 	commitMessage := fmt.Sprintf("Update version to %s", version.String())
 	var branchName string
 	if g3ops.Config.Releases.CreatePullRequest {
-		branchName = fmt.Sprintf("release-%s-%s", version.String(), strconv.Itoa(int(clock.Now().UTC().Unix())))
+		branchName = fmt.Sprintf("release-%s-%s", version.String(), strconv.Itoa(int(builder.clock.Now().UTC().Unix())))
 	} else {
 		branchName = CurrentBranch(dir)
 	}
 
-	CommitChanges(dir, []string{"manifest.yml"}, commitMessage, branchName, newContext, executor)
+	CommitChanges(dir, []string{"manifest.yml"}, commitMessage, branchName, newContext, builder.executor)
 
 	if g3ops.Config.Releases.CreatePullRequest {
 		repo, err := gitHubService.GetRepository(g3ops.RepoID)
