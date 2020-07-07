@@ -17,6 +17,16 @@ func CurrentSha() string {
 	return strings.TrimSpace(string(out))
 }
 
+// CurrentBranch - returns the current git branch
+func CurrentBranch() string {
+	out, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
+	if err != nil {
+		panic(err)
+	}
+	return strings.TrimSpace(string(out))
+
+}
+
 // CommitChanges - commits and pushes changes to the filesystem
 func CommitChanges(repoDir string, files []string, message string, branchName string, g3ops *G3opsContext, executor Executor) {
 	os.Setenv("GIT_DIR", filepath.Join(repoDir, ".git"))
