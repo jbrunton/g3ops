@@ -1,21 +1,41 @@
 name: ci-release
 
 on:
-  deployment
+  push:
+    branches:
+    - "master"
+  pull_request:
+    branches:
+    - "master"
 
 jobs:
-
-  release:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.deployment.task == 'release' }}
+  check_manifest:
+    runs-on: "ubuntu-latest"
     steps:
-    - uses: actions/checkout@v2
-    - run: git config --global user.name "jbrunton-ci-minion"
-    - run: git config --global user.email "jbrunton-ci-minion@outlook.com"
-    - run: git fetch --unshallow
-    - run: go build
-    - run: npm install
-    - run: npm run release -- ${INCREMENT:-patch}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        INCREMENT: ${{ github.event.deployment.payload.increment }}
+    - uses: "actions/checkout@v2"
+    - uses: "actions/setup-go@v2"
+      with:
+        go-version: "^1.14.4"
+    - name: "install g3ops"
+      run: "go get github.com/jbrunton/g3ops"
+    - name: "validate g3ops workflows"
+      run: "g3ops workflows check"
+    - name: check manifest
+      run: "g3ops ci check release-manifest"
+
+# jobs:
+
+#   release:
+#     runs-on: ubuntu-latest
+#     if: ${{ github.event.deployment.task == 'release' }}
+#     steps:
+#     - uses: actions/checkout@v2
+#     - run: git config --global user.name "jbrunton-ci-minion"
+#     - run: git config --global user.email "jbrunton-ci-minion@outlook.com"
+#     - run: git fetch --unshallow
+#     - run: go build
+#     - run: npm install
+#     - run: npm run release -- ${INCREMENT:-patch}
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         INCREMENT: ${{ github.event.deployment.payload.increment }}
