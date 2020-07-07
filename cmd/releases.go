@@ -62,8 +62,9 @@ func newListReleasesCmd(container *lib.Container) *cobra.Command {
 
 func newCreateReleaseCmd(container *lib.Container) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create",
+		Use:   "create [version]",
 		Short: "Updates manifest to trigger to a new release",
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			fs := lib.CreateOsFs()
 			g3ops, err := lib.GetContext(fs, cmd)
@@ -71,9 +72,24 @@ func newCreateReleaseCmd(container *lib.Container) *cobra.Command {
 				panic(err)
 			}
 
-			lib.CreateNewRelease(fs, container.Executor, container.GitHubService, container.Clock, g3ops)
+			builder := lib.NewReleaseBuilder(container, g3ops)
+
+			if len(args) > 0 {
+				err = builder.CreateNewRelease(args[0], "")
+			} else {
+				increment, error := cmd.Flags().GetString("increment")
+				if error != nil {
+					panic(error)
+				}
+				err = builder.CreateNewRelease("", increment)
+			}
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
 		},
 	}
+	cmd.Flags().String("increment", "", "The semver increment type: major, minor or patch")
 	return cmd
 }
 

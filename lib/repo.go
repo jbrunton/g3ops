@@ -16,7 +16,7 @@ func CloneTempRepo(fs *afero.Afero, executor Executor, g3ops *G3opsContext) (str
 		log.Fatal(err)
 	}
 
-	executor.ExecCommand(fmt.Sprintf("git clone --depth 1 git@github.com:%s.git %s", g3ops.Config.Repo, dir), ExecOptions{DryRun: g3ops.DryRun})
+	executor.ExecCommand(fmt.Sprintf("git clone --depth 1 git@github.com:%s.git %s", g3ops.Config.Repo, dir), ExecOptions{})
 
 	// TODO: specify context, not config, and require .g3ops directory in context
 	newContext, err := NewContext(fs, filepath.Join(dir, ".g3ops", "config.yml"), g3ops.DryRun)

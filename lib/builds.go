@@ -88,7 +88,7 @@ func createBuild(service string, version string) (G3opsBuild, error) {
 
 	buildVersion := version
 	buildID := uuid.New().String()
-	buildSha := CurrentSha()
+	buildSha := CurrentSha("")
 	buildTimestamp := time.Now().UTC()
 
 	return G3opsBuild{
