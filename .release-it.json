@@ -1,7 +1,8 @@
 {
   "github": {
     "release": true,
-    "assets": ["g3ops"]
+    "assets": ["g3ops"],
+    "draft": true
   },
   "npm": false
 }
