@@ -11,6 +11,8 @@ on:
 jobs:
   check_manifest:
     runs-on: "ubuntu-latest"
+    outputs:
+      buildRequired: ${{ steps.check.outputs.releaseRequired }}
     steps:
     - uses: "actions/checkout@v2"
     - uses: "actions/setup-go@v2"
@@ -21,10 +23,26 @@ jobs:
     - name: "validate g3ops workflows"
       run: "g3ops workflows check"
     - name: check manifest
+      id: check
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: "g3ops ci check release-manifest"
 
+  release:
+    needs: check_manifest
+    if: ${{ needs.check_manifest.outputs.releaseRequired == true }}
+    runs-on: "ubuntu-latest"
+    steps:
+    - uses: "actions/checkout@v2"
+    - run: git config --global user.name "jbrunton-ci-minion"
+    - run: git config --global user.email "jbrunton-ci-minion@outlook.com"
+    - run: git fetch --unshallow
+    - run: go build
+    - run: npm install
+    - run: npm run release -- $RELEASE_NAME
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_NAME: ${{ steps.check_manifest.outputs.releaseName }}
 # jobs:
 
 #   release:
