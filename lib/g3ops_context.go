@@ -132,11 +132,11 @@ func (context *G3opsContext) GetReleaseManifest(fs *afero.Afero) (G3opsReleaseMa
 }
 
 // SaveReleaseManifest - updates the release manifest
-func (context *G3opsContext) SaveReleaseManifest(manifest G3opsReleaseManifest) error {
+func (context *G3opsContext) SaveReleaseManifest(fs *afero.Afero, manifest G3opsReleaseManifest) error {
 	out, err := yaml.Marshal(&manifest)
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(filepath.Dir(context.Dir), "manifest.yml"), out, 0644) // TODO: read config
+	err = fs.WriteFile(filepath.Join(filepath.Dir(context.Dir), "manifest.yml"), out, 0644) // TODO: read config
 	return err
 }
