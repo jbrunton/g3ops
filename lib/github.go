@@ -13,6 +13,7 @@ import (
 type GitHubService interface {
 	GetRepository(g3ops *G3opsContext) (*github.Repository, error)
 	CreatePullRequest(newPr *NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error)
+	ListReleases(g3ops *G3opsContext) ([]*github.RepositoryRelease, error)
 }
 
 // NewPullRequest - represents a new pull request
@@ -45,6 +46,12 @@ func (service *HTTPGitHubService) GetRepository(g3ops *G3opsContext) (*github.Re
 func (service *HTTPGitHubService) CreatePullRequest(newPr *NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error) {
 	pr, _, err := service.client.PullRequests.Create(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, newPr.toArg())
 	return pr, err
+}
+
+// ListReleases - list the releases in the repo
+func (service *HTTPGitHubService) ListReleases(g3ops *G3opsContext) ([]*github.RepositoryRelease, error) {
+	releases, _, err := service.client.Repositories.ListReleases(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, nil)
+	return releases, err
 }
 
 // NewGitHubService - creates a new instance of an HTTPGitHubService

@@ -9,8 +9,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func checkServiceManifests(fs *afero.Afero, g3ops *lib.G3opsContext, cmd *cobra.Command) {
+func checkReleaseManifest(fs *afero.Afero, gitHubService lib.GitHubService, g3ops *lib.G3opsContext, cmd *cobra.Command) {
+	releaseManifest, err := g3ops.GetReleaseManifest(fs)
+	if err != nil {
+		panic(err)
+	}
+	expectedVersion := releaseManifest.Version
 
+	releases, err := gitHubService.ListReleases(g3ops)
+
+	currentVersion := *releases[0].Name
+
+	if currentVersion == expectedVersion {
+		fmt.Fprintf(cmd.OutOrStdout(), "Release %q already exists\n", expectedVersion)
+		fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildRequired::0\n")
+	} else {
+		fmt.Fprintf(cmd.OutOrStdout(), "Release %q not found, build required\n", expectedVersion)
+		fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildRequired::1\n")
+	}
+}
+
+func checkServiceManifests(fs *afero.Afero, g3ops *lib.G3opsContext, cmd *cobra.Command) {
 	buildTasks := []map[string]string{}
 	for serviceName := range g3ops.Config.Services {
 		serviceManifest, err := g3ops.LoadServiceManifest(serviceName)
@@ -56,6 +75,7 @@ func newBuildMatrixCmd(container *lib.Container) *cobra.Command {
 
 			switch args[0] {
 			case "release-manifest":
+				checkReleaseManifest(fs, container.GitHubService, g3ops, cmd)
 			case "service-manifests":
 				checkServiceManifests(fs, g3ops, cmd)
 			default:
