@@ -1,4 +1,4 @@
-local git_config = import '../../../../../.g3ops/workflows/common/git.libsonnet';
+local git_config = import '../../../../../.g3ops/workflows/config/git.libsonnet';
 
 // local build_job = {
 //   steps: [
