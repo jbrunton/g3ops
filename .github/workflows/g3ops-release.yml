@@ -14,7 +14,7 @@
     - "name": "install g3ops"
       "run": "go get github.com/jbrunton/g3ops"
     - "env":
-        "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+        "GITHUB_TOKEN": "${{ secrets.G3OPS_ADMIN_ACCESS_TOKEN }}"
       "id": "check"
       "name": "check manifest"
       "run": "g3ops ci check release-manifest"
