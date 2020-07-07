@@ -21,6 +21,8 @@ jobs:
     - name: "validate g3ops workflows"
       run: "g3ops workflows check"
     - name: check manifest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: "g3ops ci check release-manifest"
 
 # jobs:
