@@ -23,10 +23,11 @@ func checkReleaseManifest(fs *afero.Afero, gitHubService services.GitHubService,
 
 	if currentVersion == expectedVersion {
 		fmt.Fprintf(cmd.OutOrStdout(), "Release %q already exists\n", expectedVersion)
-		fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildRequired::0\n")
+		fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=releaseRequired::0\n")
 	} else {
-		fmt.Fprintf(cmd.OutOrStdout(), "Release %q not found, build required\n", expectedVersion)
-		fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=buildRequired::1\n")
+		fmt.Fprintf(cmd.OutOrStdout(), "Release %q not found, release required\n", expectedVersion)
+		fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=releaseRequired::1\n")
+		fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=releaseName::%s\n", expectedVersion)
 	}
 }
 
