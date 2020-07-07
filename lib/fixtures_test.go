@@ -109,6 +109,11 @@ func (service *MockGitHubService) CreatePullRequest(newPr *NewPullRequest, g3ops
 	return args.Get(0).(*github.PullRequest), args.Error(1)
 }
 
+func (service *MockGitHubService) ListReleases(g3ops *G3opsContext) ([]*github.RepositoryRelease, error) {
+	args := service.Called(g3ops)
+	return args.Get(0).([]*github.RepositoryRelease), args.Error(1)
+}
+
 type TestClock struct {
 	time time.Time
 }
