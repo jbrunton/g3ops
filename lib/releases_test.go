@@ -7,15 +7,22 @@ import (
 	"time"
 
 	"github.com/google/go-github/github"
+	"github.com/jbrunton/g3ops/services"
+	"github.com/jbrunton/g3ops/test"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestCreateRelease(t *testing.T) {
 	// arrange
 	_, g3ops := newTestContext()
+	repoID := services.GitHubRepoID{
+		Owner: "my",
+		Name:  "repo",
+	}
 	g3ops.Config = &G3opsConfig{
 		Repo: "my/repo",
 	}
+	g3ops.RepoID = repoID
 	container := NewTestContainer(g3ops)
 	container.Executor.(*TestExecutor).On("ExecCommand", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
 		command := args.Get(0).(string)
@@ -27,13 +34,13 @@ func TestCreateRelease(t *testing.T) {
 			container.FileSystem.WriteFile(filepath.Join(dir, ".g3ops/config.yml"), []byte("repo: my/repo"), 0644)
 		}
 	})
-	container.GitHubService.(*MockGitHubService).On("GetRepository", g3ops).Return(&github.Repository{DefaultBranch: github.String("develop")}, nil)
-	expectedPullRequest := NewPullRequest{
+	container.GitHubService.(*test.MockGitHubService).On("GetRepository", repoID).Return(&github.Repository{DefaultBranch: github.String("develop")}, nil)
+	expectedPullRequest := services.NewPullRequest{
 		Title: "Update version to 1.2.4",
 		Head:  "release-1.2.4-123456789",
 		Base:  "develop",
 	}
-	container.GitHubService.(*MockGitHubService).On("CreatePullRequest", &expectedPullRequest, g3ops).
+	container.GitHubService.(*test.MockGitHubService).On("CreatePullRequest", &expectedPullRequest, repoID).
 		Return(&github.PullRequest{
 			HTMLURL: github.String("https://github.com/my/repo/pull/101"),
 		}, nil)
@@ -43,5 +50,5 @@ func TestCreateRelease(t *testing.T) {
 	CreateNewRelease(container.FileSystem, container.Executor, container.GitHubService, clock, g3ops)
 
 	// assert
-	container.GitHubService.(*MockGitHubService).AssertExpectations(t)
+	container.GitHubService.(*test.MockGitHubService).AssertExpectations(t)
 }

@@ -22,7 +22,7 @@ func newListReleasesCmd(container *lib.Container) *cobra.Command {
 				panic(err)
 			}
 
-			releases, err := container.GitHubService.ListReleases(g3ops)
+			releases, err := container.GitHubService.ListReleases(g3ops.RepoID)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)

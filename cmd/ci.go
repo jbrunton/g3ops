@@ -5,18 +5,19 @@ import (
 	"fmt"
 
 	"github.com/jbrunton/g3ops/lib"
+	"github.com/jbrunton/g3ops/services"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
-func checkReleaseManifest(fs *afero.Afero, gitHubService lib.GitHubService, g3ops *lib.G3opsContext, cmd *cobra.Command) {
+func checkReleaseManifest(fs *afero.Afero, gitHubService services.GitHubService, g3ops *lib.G3opsContext, cmd *cobra.Command) {
 	releaseManifest, err := g3ops.GetReleaseManifest(fs)
 	if err != nil {
 		panic(err)
 	}
 	expectedVersion := releaseManifest.Version
 
-	releases, err := gitHubService.ListReleases(g3ops)
+	releases, err := gitHubService.ListReleases(g3ops.RepoID)
 
 	currentVersion := *releases[0].Name
 
@@ -60,7 +61,7 @@ func checkServiceManifests(fs *afero.Afero, g3ops *lib.G3opsContext, cmd *cobra.
 	}
 }
 
-func newBuildMatrixCmd(container *lib.Container) *cobra.Command {
+func newCiCheckCmd(container *lib.Container) *cobra.Command {
 	return &cobra.Command{
 		Use:       "check",
 		Short:     "Sets buildMatrix output describing any builds required",
@@ -91,6 +92,6 @@ func newCiCmd(container *lib.Container) *cobra.Command {
 		Short:  "Commands used by CI pipelines",
 		Hidden: true,
 	}
-	cmd.AddCommand(newBuildMatrixCmd(container))
+	cmd.AddCommand(newCiCheckCmd(container))
 	return cmd
 }
