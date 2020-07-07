@@ -18,10 +18,14 @@ func checkReleaseManifest(fs *afero.Afero, gitHubService services.GitHubService,
 	expectedVersion := releaseManifest.Version
 
 	releases, err := gitHubService.ListReleases(g3ops.RepoID)
+	releaseExists := false
+	for _, release := range releases {
+		if *release.TagName == expectedVersion {
+			releaseExists = true
+		}
+	}
 
-	currentVersion := *releases[0].Name
-
-	if currentVersion == expectedVersion {
+	if releaseExists {
 		fmt.Fprintf(cmd.OutOrStdout(), "Release %q already exists\n", expectedVersion)
 		fmt.Fprintf(cmd.OutOrStdout(), "::set-output name=releaseRequired::0\n")
 	} else {
