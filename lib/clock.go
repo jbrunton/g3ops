@@ -14,3 +14,8 @@ type SystemClock struct{}
 func (clock *SystemClock) Now() time.Time {
 	return time.Now()
 }
+
+// NewSystemClock - returns a new concrete clock instance
+func NewSystemClock() *SystemClock {
+	return &SystemClock{}
+}
