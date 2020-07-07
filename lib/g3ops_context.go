@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 
+	"github.com/jbrunton/g3ops/services"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -14,13 +14,12 @@ import (
 
 // G3opsContext - current command context
 type G3opsContext struct {
-	Dir           string
-	ConfigPath    string
-	GitHubDir     string
-	Config        *G3opsConfig
-	DryRun        bool
-	RepoOwnerName string
-	RepoName      string
+	Dir        string
+	ConfigPath string
+	GitHubDir  string
+	Config     *G3opsConfig
+	DryRun     bool
+	RepoID     services.GitHubRepoID
 }
 
 var contextCache map[*cobra.Command]*G3opsContext
@@ -51,15 +50,12 @@ func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext,
 	}
 
 	if config.Repo != "" {
-		regex := regexp.MustCompile(`^(\w+)/(\w+)$`)
-		matches := regex.FindStringSubmatch(config.Repo)
-		if len(matches) > 0 {
-			context.RepoOwnerName = matches[1]
-			context.RepoName = matches[2]
-		} else {
-			fmt.Printf("Invalid repo name: %s\n", config.Repo)
+		repoID, err := services.ParseRepoID(config.Repo)
+		if err != nil {
+			fmt.Println(err)
 			os.Exit(1)
 		}
+		context.RepoID = repoID
 	}
 	return context, nil
 }

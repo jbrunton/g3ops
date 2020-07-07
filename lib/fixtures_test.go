@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/go-github/github"
+	"github.com/jbrunton/g3ops/test"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/mock"
 )
@@ -91,22 +91,8 @@ func NewTestContainer(g3ops *G3opsContext) Container {
 	return Container{
 		FileSystem:    CreateMemFs(),
 		Executor:      &TestExecutor{},
-		GitHubService: &MockGitHubService{},
+		GitHubService: test.NewMockGitHubService(),
 	}
-}
-
-type MockGitHubService struct {
-	mock.Mock
-}
-
-func (service *MockGitHubService) GetRepository(g3ops *G3opsContext) (*github.Repository, error) {
-	args := service.Called(g3ops)
-	return args.Get(0).(*github.Repository), args.Error(1)
-}
-
-func (service *MockGitHubService) CreatePullRequest(newPr *NewPullRequest, g3ops *G3opsContext) (*github.PullRequest, error) {
-	args := service.Called(newPr, g3ops)
-	return args.Get(0).(*github.PullRequest), args.Error(1)
 }
 
 type TestClock struct {

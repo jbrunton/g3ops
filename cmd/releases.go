@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -23,8 +22,7 @@ func newListReleasesCmd(container *lib.Container) *cobra.Command {
 				panic(err)
 			}
 
-			client := lib.NewGitHubClient()
-			releases, _, err := client.Repositories.ListReleases(context.Background(), g3ops.RepoOwnerName, g3ops.RepoName, nil)
+			releases, err := container.GitHubService.ListReleases(g3ops.RepoID)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)

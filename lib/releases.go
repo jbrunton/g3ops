@@ -6,11 +6,12 @@ import (
 	"strconv"
 
 	"github.com/blang/semver/v4"
+	"github.com/jbrunton/g3ops/services"
 	"github.com/spf13/afero"
 )
 
 // CreateNewRelease - creates a new release
-func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService GitHubService, clock Clock, g3ops *G3opsContext) {
+func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService services.GitHubService, clock Clock, g3ops *G3opsContext) {
 	dir, newContext := CloneTempRepo(fs, executor, g3ops)
 	defer os.RemoveAll(dir)
 
@@ -37,18 +38,18 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService GitHubSe
 	commitMessage := fmt.Sprintf("Update version to %s", version.String())
 	CommitChanges(dir, []string{"manifest.yml"}, commitMessage, branchName, newContext, executor)
 
-	repo, err := gitHubService.GetRepository(g3ops)
+	repo, err := gitHubService.GetRepository(g3ops.RepoID)
 	if err != nil {
 		panic(err)
 	}
 
 	// TODO: only create PR if config.releases.createPullRequest is true
-	newPr := &NewPullRequest{
+	newPr := &services.NewPullRequest{
 		Title: commitMessage,
 		Head:  branchName,
 		Base:  *repo.DefaultBranch,
 	}
-	pr, err := gitHubService.CreatePullRequest(newPr, g3ops)
+	pr, err := gitHubService.CreatePullRequest(newPr, g3ops.RepoID)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

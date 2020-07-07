@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"github.com/jbrunton/g3ops/services"
 	"github.com/spf13/afero"
 )
 
@@ -8,7 +9,7 @@ import (
 type Container struct {
 	FileSystem    *afero.Afero
 	Executor      Executor
-	GitHubService GitHubService
+	GitHubService services.GitHubService
 	Clock         Clock
 }
 
@@ -26,6 +27,6 @@ func NewContainer() *Container {
 	return &Container{
 		FileSystem:    CreateOsFs(),
 		Executor:      &CommandExecutor{},
-		GitHubService: NewGitHubService(),
+		GitHubService: services.NewGitHubService(),
 	}
 }
