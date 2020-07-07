@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/jbrunton/g3ops/services"
@@ -35,7 +36,11 @@ func TestCheckReleaseManifestExistingVersion(t *testing.T) {
 	result := test.ExecCommand(cmd)
 
 	// assert
-	assert.Equal(t, "Release \"1.1.1\" already exists\n::set-output name=buildRequired::0\n", result.Out)
+	expectedOutput := strings.Join([]string{
+		"Release \"1.1.1\" already exists",
+		"::set-output name=releaseRequired::0\n",
+	}, "\n")
+	assert.Equal(t, expectedOutput, result.Out)
 }
 
 func TestCheckReleaseManifestNewVersion(t *testing.T) {
@@ -61,5 +66,10 @@ func TestCheckReleaseManifestNewVersion(t *testing.T) {
 	result := test.ExecCommand(cmd)
 
 	// assert
-	assert.Equal(t, "Release \"1.1.2\" not found, build required\n::set-output name=buildRequired::1\n", result.Out)
+	expectedOutput := strings.Join([]string{
+		"Release \"1.1.2\" not found, release required",
+		"::set-output name=releaseRequired::1",
+		"::set-output name=releaseName::1.1.2\n",
+	}, "\n")
+	assert.Equal(t, expectedOutput, result.Out)
 }
