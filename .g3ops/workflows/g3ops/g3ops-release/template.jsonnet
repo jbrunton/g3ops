@@ -1,3 +1,4 @@
+local config = import 'config.libsonnet';
 local git_config = import '../../config/git.libsonnet';
 
 local check_manifest_job = {
@@ -15,7 +16,7 @@ local check_manifest_job = {
     { name: "check manifest",
       id: "check",
       env: {
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.%(token_name)s }}" % config.jobs.check_manifest
       },
       run: "g3ops ci check release-manifest" }
   ]
@@ -34,7 +35,7 @@ local release_job = {
     { run: "npm install" },
     { run: "npm run release -- $RELEASE_NAME",
       env: {
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+        GITHUB_TOKEN: "${{ secrets.%(token_name)s }}" % config.jobs.release,
         RELEASE_NAME: "${{ steps.check_manifest.outputs.releaseName }}"
       }
     }
