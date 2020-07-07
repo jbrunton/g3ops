@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestCreateRelease(t *testing.T) {
+func TestCreateReleasePR(t *testing.T) {
 	// arrange
 	_, g3ops := newTestContext()
 	repoID := services.GitHubRepoID{
@@ -20,7 +20,8 @@ func TestCreateRelease(t *testing.T) {
 		Name:  "repo",
 	}
 	g3ops.Config = &G3opsConfig{
-		Repo: "my/repo",
+		Repo:     "my/repo",
+		Releases: g3opsReleasesConfig{CreatePullRequest: true},
 	}
 	g3ops.RepoID = repoID
 	container := NewTestContainer(g3ops)
