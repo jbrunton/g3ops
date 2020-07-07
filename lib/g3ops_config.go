@@ -15,6 +15,7 @@ type G3opsConfig struct {
 	Ci           g3opsCiConfig
 	Workflows    g3opsWorkflowsConfig
 	Repo         string
+	Releases     g3opsReleasesConfig
 }
 
 type g3opsWorkflowsConfig struct {
@@ -27,6 +28,10 @@ type g3opsEnvironmentConfig struct {
 
 type g3opsServiceConfig struct {
 	Manifest string
+}
+
+type g3opsReleasesConfig struct {
+	CreatePullRequest bool `yaml:"createPullRequest"`
 }
 
 type g3opsCiConfig struct {

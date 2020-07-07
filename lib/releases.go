@@ -34,26 +34,33 @@ func CreateNewRelease(fs *afero.Afero, executor Executor, gitHubService services
 		panic(err)
 	}
 
-	branchName := fmt.Sprintf("release-%s-%s", version.String(), strconv.Itoa(int(clock.Now().UTC().Unix())))
 	commitMessage := fmt.Sprintf("Update version to %s", version.String())
+	var branchName string
+	if g3ops.Config.Releases.CreatePullRequest {
+		branchName = fmt.Sprintf("release-%s-%s", version.String(), strconv.Itoa(int(clock.Now().UTC().Unix())))
+	} else {
+		branchName = CurrentBranch()
+	}
+
 	CommitChanges(dir, []string{"manifest.yml"}, commitMessage, branchName, newContext, executor)
 
-	repo, err := gitHubService.GetRepository(g3ops.RepoID)
-	if err != nil {
-		panic(err)
-	}
+	if g3ops.Config.Releases.CreatePullRequest {
+		repo, err := gitHubService.GetRepository(g3ops.RepoID)
+		if err != nil {
+			panic(err)
+		}
 
-	// TODO: only create PR if config.releases.createPullRequest is true
-	newPr := &services.NewPullRequest{
-		Title: commitMessage,
-		Head:  branchName,
-		Base:  *repo.DefaultBranch,
-	}
-	pr, err := gitHubService.CreatePullRequest(newPr, g3ops.RepoID)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+		newPr := &services.NewPullRequest{
+			Title: commitMessage,
+			Head:  branchName,
+			Base:  *repo.DefaultBranch,
+		}
+		pr, err := gitHubService.CreatePullRequest(newPr, g3ops.RepoID)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
-	fmt.Printf("Created PR for release: %s\n", *pr.HTMLURL)
+		fmt.Printf("Created PR for release: %s\n", *pr.HTMLURL)
+	}
 }
