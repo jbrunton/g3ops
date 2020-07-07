@@ -13,6 +13,7 @@ jobs:
     runs-on: "ubuntu-latest"
     outputs:
       releaseRequired: ${{ steps.check.outputs.releaseRequired }}
+      releaseName: ${{ steps.check.outputs.releaseName }}
     steps:
     - uses: "actions/checkout@v2"
     - uses: "actions/setup-go@v2"
