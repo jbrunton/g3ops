@@ -1,5 +1,5 @@
 on:
-  status
+  workflow_dispatch
   
 jobs:
   event:
