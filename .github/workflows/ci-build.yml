@@ -24,7 +24,7 @@ jobs:
           ./verify-statik-content.sh
 
       - name: build
-        run: make build
+        run: make build-release
 
       - name: configure environment for pull request
         if: github.event_name == 'pull_request'
