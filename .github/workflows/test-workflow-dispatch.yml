@@ -1,8 +1,11 @@
 name: test-workflow-dispatch
 
 on:
-  workflow_dispatch
-  
+  workflow_dispatch:
+    inputs:
+      foo:
+        description: 'Test input' 
+
 jobs:
   event:
     runs-on: ubuntu-latest
