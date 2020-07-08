@@ -1,7 +1,7 @@
 {
   "github": {
     "release": true,
-    "assets": ["g3ops"],
+    "assets": ["g3ops", "g3ops-darwin-amd64"],
     "draft": true
   },
   "npm": false
