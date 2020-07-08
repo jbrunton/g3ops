@@ -1,3 +1,5 @@
+name: test-workflow-dispatch
+
 on:
   workflow_dispatch
   
