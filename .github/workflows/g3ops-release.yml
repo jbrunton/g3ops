@@ -27,6 +27,7 @@
     - "run": "git config --global user.name 'jbrunton-ci-minion'"
     - "run": "git config --global user.email 'jbrunton-ci-minion@outlook.com'"
     - "run": "git fetch --unshallow"
+    - "run": "go get github.com/rakyll/statik"
     - "run": "make build-release"
     - "run": "npm install"
     - "env":
