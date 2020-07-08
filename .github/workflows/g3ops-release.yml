@@ -27,7 +27,7 @@
     - "run": "git config --global user.name 'jbrunton-ci-minion'"
     - "run": "git config --global user.email 'jbrunton-ci-minion@outlook.com'"
     - "run": "git fetch --unshallow"
-    - "run": "go build"
+    - "run": "make build-release"
     - "run": "npm install"
     - "env":
         "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"

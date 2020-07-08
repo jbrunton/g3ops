@@ -30,7 +30,7 @@ local release_job = {
     { run: "git config --global user.name '%(user)s'" % git_config },
     { run: "git config --global user.email '%(email)s'" % git_config },
     { run: "git fetch --unshallow" },
-    { run: "go build" },
+    { run: "make build-release" },
     { run: "npm install" },
     { run: "npm run release -- $RELEASE_NAME",
       env: {
