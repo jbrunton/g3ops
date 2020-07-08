@@ -1,7 +1,7 @@
 {
   "github": {
     "release": true,
-    "assets": ["g3ops", "g3ops-darwin-amd64"],
+    "assets": ["g3ops-darwin-amd64", "g3ops-linux-amd64", "g3ops-windows-amd64.exe"],
     "draft": true
   },
   "npm": false
