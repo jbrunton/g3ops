@@ -23,9 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/jbrunton/g3ops/cmd/commit"
 	"github.com/jbrunton/g3ops/cmd/context"
-	"github.com/jbrunton/g3ops/cmd/service"
 	"github.com/jbrunton/g3ops/cmd/styles"
 )
 
@@ -81,8 +79,5 @@ func init() {
 
 	container := lib.NewContainer()
 	rootCmd.AddCommand(context.ContextCmd)
-	rootCmd.AddCommand(service.NewServiceCmd(container))
-	rootCmd.AddCommand(newCiCmd(container))
-	rootCmd.AddCommand(commit.NewCommitCmd(container))
-	rootCmd.AddCommand(newReleasesCmd(container))
+	rootCmd.AddCommand(newManifestCmd(container))
 }
