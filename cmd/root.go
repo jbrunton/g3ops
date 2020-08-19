@@ -27,7 +27,6 @@ import (
 	"github.com/jbrunton/g3ops/cmd/context"
 	"github.com/jbrunton/g3ops/cmd/service"
 	"github.com/jbrunton/g3ops/cmd/styles"
-	"github.com/jbrunton/g3ops/cmd/workflows"
 )
 
 var cfgFile string
@@ -85,6 +84,5 @@ func init() {
 	rootCmd.AddCommand(service.NewServiceCmd(container))
 	rootCmd.AddCommand(newCiCmd(container))
 	rootCmd.AddCommand(commit.NewCommitCmd(container))
-	rootCmd.AddCommand(workflows.WorkflowsCmd)
 	rootCmd.AddCommand(newReleasesCmd(container))
 }
