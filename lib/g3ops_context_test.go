@@ -63,7 +63,7 @@ func TestGetContextConfigEnvArg(t *testing.T) {
 
 func TestGetContextRelGitHubDir(t *testing.T) {
 	fs := CreateMemFs()
-	fs.WriteFile(".g3ops/config.yml", []byte("workflows:\n  githubDir: ../path/to/.github"), 0644)
+	fs.WriteFile(".g3ops/config.yml", []byte("githubDir: ../path/to/.github"), 0644)
 	cmd := testCommand()
 
 	context, err := GetContext(fs, cmd)
@@ -74,7 +74,7 @@ func TestGetContextRelGitHubDir(t *testing.T) {
 
 func TestGetContextNestedRelGitHubDir(t *testing.T) {
 	fs := CreateMemFs()
-	fs.WriteFile("nested-app/.g3ops/config.yml", []byte("workflows:\n  githubDir: ../.github"), 0644)
+	fs.WriteFile("nested-app/.g3ops/config.yml", []byte("githubDir: ../.github"), 0644)
 	cmd := testCommand()
 	cmd.ParseFlags([]string{"--config", "nested-app/.g3ops/config.yml"})
 
@@ -86,7 +86,7 @@ func TestGetContextNestedRelGitHubDir(t *testing.T) {
 
 func TestGetContextAbsGitHubDir(t *testing.T) {
 	fs := CreateMemFs()
-	fs.WriteFile(".g3ops/config.yml", []byte("workflows:\n  githubDir: /path/to/github-dir"), 0644)
+	fs.WriteFile(".g3ops/config.yml", []byte("githubDir: /path/to/github-dir"), 0644)
 	cmd := testCommand()
 
 	context, err := GetContext(fs, cmd)

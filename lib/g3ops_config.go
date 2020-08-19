@@ -10,16 +10,12 @@ import (
 // G3opsConfig - type of current g3ops context
 type G3opsConfig struct {
 	Name         string
+	GitHubDir    string `yaml:"githubDir"`
 	Environments map[string]g3opsEnvironmentConfig
 	Services     map[string]g3opsServiceConfig
 	Ci           g3opsCiConfig
-	Workflows    g3opsWorkflowsConfig
 	Repo         string
 	Releases     g3opsReleasesConfig
-}
-
-type g3opsWorkflowsConfig struct {
-	GitHubDir string `yaml:"githubDir"`
 }
 
 type g3opsEnvironmentConfig struct {

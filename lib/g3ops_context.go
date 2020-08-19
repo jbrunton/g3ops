@@ -33,7 +33,7 @@ func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext,
 		return nil, err
 	}
 
-	githubDir := config.Workflows.GitHubDir
+	githubDir := config.GitHubDir
 	if githubDir == "" {
 		githubDir = ".github/"
 	}
