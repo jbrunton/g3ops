@@ -16,9 +16,10 @@ jobs:
       buildRequired: ${{ steps.check.outputs.buildRequired }}
     steps:
       - name: install g3ops
-        run: go get github.com/jbrunton/g3ops
+        # TODO: use setup-g3ops action
+        run: go build main.go
       - name: check
-        run: g3ops manifest check
+        run: ./main manifest check
 
   build:
     needs: manifest-check
