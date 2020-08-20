@@ -48,11 +48,11 @@ func Build(version string, context *G3opsContext, executor Executor) {
 	}
 
 	envMap := map[string]string{
-		"BUILD_VERSION":        build.Version,
-		"BUILD_SHA":            build.BuildSha,
-		"BUILD_ID":             build.ID,
-		"BUILD_TIMESTAMP":      build.FormatTimestamp(),
-		"BUILD_TIMESTAMP_UNIX": string(build.Timestamp.Unix()),
+		"BUILD_VERSION":   build.Version,
+		"BUILD_SHA":       build.BuildSha,
+		"BUILD_ID":        build.ID,
+		"BUILD_TIMESTAMP": build.FormatTimestamp(),
+		//"BUILD_TIMESTAMP_UNIX": string(build.Timestamp.Unix()),
 	}
 
 	fmt.Println("Configuring environment for build:")
