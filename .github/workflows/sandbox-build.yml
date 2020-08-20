@@ -5,6 +5,8 @@ name: sandbox-build
   workflow_run:
     workflows:
     - sandbox-test
+    branches:
+    - g3ops-55
     types:
     - completed
 jobs:
