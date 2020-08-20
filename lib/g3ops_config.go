@@ -1,21 +1,19 @@
 package lib
 
 import (
-	"path/filepath"
-
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
 )
 
 // G3opsConfig - type of current g3ops context
 type G3opsConfig struct {
-	Name         string
-	GitHubDir    string `yaml:"githubDir"`
-	Environments map[string]g3opsEnvironmentConfig
-	Services     map[string]g3opsServiceConfig
-	Ci           g3opsCiConfig
-	Repo         string
-	Releases     g3opsReleasesConfig
+	Name      string
+	GitHubDir string `yaml:"githubDir"`
+	//Environments map[string]g3opsEnvironmentConfig
+	//Services     map[string]g3opsServiceConfig
+	//Ci           g3opsCiConfig
+	Repo string
+	//Releases     g3opsReleasesConfig
 }
 
 type g3opsEnvironmentConfig struct {
@@ -67,23 +65,23 @@ func parseConfig(input []byte) (*G3opsConfig, error) {
 		panic(err)
 	}
 
-	for envName, env := range config.Environments {
-		path, err := filepath.Abs(env.Manifest)
-		if err != nil {
-			panic(err)
-		}
-		env.Manifest = path
-		config.Environments[envName] = env
-	}
+	// for envName, env := range config.Environments {
+	// 	path, err := filepath.Abs(env.Manifest)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	env.Manifest = path
+	// 	config.Environments[envName] = env
+	// }
 
-	for serviceName, service := range config.Services {
-		path, err := filepath.Abs(service.Manifest)
-		if err != nil {
-			panic(err)
-		}
-		service.Manifest = path
-		config.Services[serviceName] = service
-	}
+	// for serviceName, service := range config.Services {
+	// 	path, err := filepath.Abs(service.Manifest)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	service.Manifest = path
+	// 	config.Services[serviceName] = service
+	// }
 
 	return &config, nil
 }

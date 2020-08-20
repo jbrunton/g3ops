@@ -2,7 +2,6 @@ package lib
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -20,6 +19,7 @@ type G3opsContext struct {
 	Config     *G3opsConfig
 	DryRun     bool
 	RepoID     services.GitHubRepoID
+	Manifest   *G3opsManifest
 }
 
 var contextCache map[*cobra.Command]*G3opsContext
@@ -62,11 +62,6 @@ func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext,
 
 // GetContext - returns the current command context
 func GetContext(fs *afero.Afero, cmd *cobra.Command) (*G3opsContext, error) {
-	context := contextCache[cmd]
-	if context != nil {
-		return context, nil
-	}
-
 	dryRun, err := cmd.Flags().GetBool("dry-run")
 	if err != nil {
 		panic(err)
@@ -88,37 +83,37 @@ func GetContext(fs *afero.Afero, cmd *cobra.Command) (*G3opsContext, error) {
 }
 
 // LoadServiceManifest - finds and returns the G3opsService for the given service
-func (context *G3opsContext) LoadServiceManifest(name string) (G3opsService, error) {
-	serviceContext := context.Config.Services[name]
+// func (context *G3opsContext) LoadServiceManifest(name string) (G3opsService, error) {
+// 	serviceContext := context.Config.Services[name]
 
-	data, err := ioutil.ReadFile(serviceContext.Manifest)
+// 	data, err := ioutil.ReadFile(serviceContext.Manifest)
 
-	if err != nil {
-		return G3opsService{}, err
-	}
+// 	if err != nil {
+// 		return G3opsService{}, err
+// 	}
 
-	service := G3opsService{}
-	err = yaml.Unmarshal(data, &service)
-	if err != nil {
-		panic(err)
-	}
+// 	service := G3opsService{}
+// 	err = yaml.Unmarshal(data, &service)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	return service, nil
-}
+// 	return service, nil
+// }
 
 func init() {
 	contextCache = make(map[*cobra.Command]*G3opsContext)
 }
 
-// GetReleaseManifest - returns the release manifest (if it exists)
-func (context *G3opsContext) GetReleaseManifest(fs *afero.Afero) (G3opsReleaseManifest, error) {
+// GetManifest - returns the manifest (if it exists)
+func (context *G3opsContext) GetManifest(fs *afero.Afero) (G3opsManifest, error) {
 	data, err := fs.ReadFile(filepath.Join(filepath.Dir(context.Dir), "manifest.yml")) // TODO: read config
 
 	if err != nil {
-		return G3opsReleaseManifest{}, err
+		return G3opsManifest{}, err
 	}
 
-	manifest := G3opsReleaseManifest{}
+	manifest := G3opsManifest{}
 	err = yaml.Unmarshal(data, &manifest)
 	if err != nil {
 		panic(err)
@@ -128,11 +123,11 @@ func (context *G3opsContext) GetReleaseManifest(fs *afero.Afero) (G3opsReleaseMa
 }
 
 // SaveReleaseManifest - updates the release manifest
-func (context *G3opsContext) SaveReleaseManifest(fs *afero.Afero, manifest G3opsReleaseManifest) error {
-	out, err := yaml.Marshal(&manifest)
-	if err != nil {
-		return err
-	}
-	err = fs.WriteFile(filepath.Join(filepath.Dir(context.Dir), "manifest.yml"), out, 0644) // TODO: read config
-	return err
-}
+// func (context *G3opsContext) SaveReleaseManifest(fs *afero.Afero, manifest G3opsReleaseManifest) error {
+// 	out, err := yaml.Marshal(&manifest)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	err = fs.WriteFile(filepath.Join(filepath.Dir(context.Dir), "manifest.yml"), out, 0644) // TODO: read config
+// 	return err
+// }

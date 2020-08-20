@@ -1,0 +1,8 @@
+version: 1.2
+environments:
+  production:
+    host: www.sandbox.example.com
+    version: 1.0
+  staging:
+    host: staging.sandbox.example.com
+    version: 1.1

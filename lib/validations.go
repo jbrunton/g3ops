@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/jbrunton/g3ops/cmd/styles"
@@ -31,21 +30,21 @@ func ValidateArgs(argValidators []ArgValidator) cobra.PositionalArgs {
 }
 
 // ServiceValidator - validates the name of a service
-func ServiceValidator(cmd *cobra.Command, arg string) error {
-	fs := CreateOsFs()
-	context, err := GetContext(fs, cmd)
-	if err != nil {
-		panic(err)
-	}
+// func ServiceValidator(cmd *cobra.Command, arg string) error {
+// 	fs := CreateOsFs()
+// 	context, err := GetContext(fs, cmd)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	var serviceNames []string
+// 	var serviceNames []string
 
-	for serviceName := range context.Config.Services {
-		if serviceName == arg {
-			return nil
-		}
-		serviceNames = append(serviceNames, serviceName)
-	}
+// 	for serviceName := range context.Config.Services {
+// 		if serviceName == arg {
+// 			return nil
+// 		}
+// 		serviceNames = append(serviceNames, serviceName)
+// 	}
 
-	return errors.New(styles.StyleError(`Unknown service "` + arg + `". Valid options: ` + styles.StyleEnumOptions(serviceNames) + "."))
-}
+// 	return errors.New(styles.StyleError(`Unknown service "` + arg + `". Valid options: ` + styles.StyleEnumOptions(serviceNames) + "."))
+// }

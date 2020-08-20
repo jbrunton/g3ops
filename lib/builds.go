@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"time"
 
 	"github.com/Masterminds/semver"
@@ -32,27 +33,26 @@ type G3opsBuildCatalog struct {
 	Builds []G3opsBuild
 }
 
-func getCatalogFileName(service string) string {
-	return fmt.Sprintf(".g3ops/builds/%s.yml", service)
+func getCatalogFileName(context *G3opsContext) string {
+	return path.Join(context.Dir, "builds/catalog.yml")
 }
 
 const buildsDir = ".g3ops/builds"
 
 // Build - creates a build for the service and updates the catalog
-func Build(service string, version string, context *G3opsContext, executor Executor) {
-	build, err := createBuild(service, version)
+func Build(version string, context *G3opsContext, executor Executor) {
+	build, err := createBuild(version, context)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	envMap := map[string]string{
-		"BUILD_SERVICE":        service,
-		"BUILD_VERSION":        build.Version,
-		"BUILD_SHA":            build.BuildSha,
-		"BUILD_ID":             build.ID,
-		"BUILD_TIMESTAMP":      build.FormatTimestamp(),
-		"BUILD_TIMESTAMP_UNIX": string(build.Timestamp.Unix()),
+		"BUILD_VERSION":   build.Version,
+		"BUILD_SHA":       build.BuildSha,
+		"BUILD_ID":        build.ID,
+		"BUILD_TIMESTAMP": build.FormatTimestamp(),
+		//"BUILD_TIMESTAMP_UNIX": string(build.Timestamp.Unix()),
 	}
 
 	fmt.Println("Configuring environment for build:")
@@ -60,11 +60,11 @@ func Build(service string, version string, context *G3opsContext, executor Execu
 	funk.ForEach(envMap, func(envvar string, envval string) {
 		os.Setenv(envvar, envval)
 	})
-	funk.ForEach(context.Config.Ci.Defaults.Build.Env, func(envvar string, envtemplate string) {
-		envval := os.ExpandEnv(envtemplate)
-		envMap[envvar] = envval
-		os.Setenv(envvar, envval)
-	})
+	// funk.ForEach(context.Config.Ci.Defaults.Build.Env, func(envvar string, envtemplate string) {
+	// 	envval := os.ExpandEnv(envtemplate)
+	// 	envMap[envvar] = envval
+	// 	os.Setenv(envvar, envval)
+	// })
 	funk.ForEach(envMap, func(envvar string, envval string) {
 		fmt.Printf("  %s=%s\n", envvar, envval)
 	})
@@ -75,13 +75,13 @@ func Build(service string, version string, context *G3opsContext, executor Execu
 	}
 	build.ImageTag = tag
 
-	executor.ExecCommand(context.Config.Ci.Defaults.Build.Command, ExecOptions{DryRun: context.DryRun})
+	//executor.ExecCommand(context.Config.Ci.Defaults.Build.Command, ExecOptions{DryRun: context.DryRun})
 
-	saveBuild(service, build, context)
+	saveBuild(build, context)
 }
 
-func createBuild(service string, version string) (G3opsBuild, error) {
-	err := validateVersion(service, version)
+func createBuild(version string, context *G3opsContext) (G3opsBuild, error) {
+	err := validateVersion(version, context)
 	if err != nil {
 		return G3opsBuild{}, err
 	}
@@ -100,10 +100,10 @@ func createBuild(service string, version string) (G3opsBuild, error) {
 }
 
 // SaveBuild - saves a new build to the catalog for the given service
-func saveBuild(service string, build G3opsBuild, context *G3opsContext) {
-	catalog := LoadBuildCatalog(service)
+func saveBuild(build G3opsBuild, context *G3opsContext) {
+	catalog := LoadBuildCatalog(context)
 	catalog.Builds = append([]G3opsBuild{build}, catalog.Builds...)
-	fileName := getCatalogFileName(service)
+	fileName := getCatalogFileName(context)
 	data, err := yaml.Marshal(&catalog)
 	if err != nil {
 		panic(err)
@@ -128,8 +128,8 @@ func saveBuild(service string, build G3opsBuild, context *G3opsContext) {
 }
 
 // LoadBuildCatalog - loads a build catalog for the given service
-func LoadBuildCatalog(service string) G3opsBuildCatalog {
-	fileName := getCatalogFileName(service)
+func LoadBuildCatalog(context *G3opsContext) G3opsBuildCatalog {
+	fileName := getCatalogFileName(context)
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -147,13 +147,13 @@ func LoadBuildCatalog(service string) G3opsBuildCatalog {
 	return catalog
 }
 
-func validateVersion(service string, version string) error {
+func validateVersion(version string, context *G3opsContext) error {
 	_, err := semver.NewVersion(version)
 	if err != nil {
 		return fmt.Errorf("Invalid version name %q, must be a semantic version", version)
 	}
 
-	if BuildExists(service, version) {
+	if BuildExists(version, context) {
 		return fmt.Errorf("Build already exists for version %q", version)
 	}
 
@@ -161,12 +161,17 @@ func validateVersion(service string, version string) error {
 }
 
 // BuildExists - returns whether a build already exists for the given version name and service
-func BuildExists(service string, version string) bool {
-	catalog := LoadBuildCatalog(service)
+func BuildExists(version string, context *G3opsContext) bool {
+	return FindBuild(version, context) != nil
+}
+
+// FindBuild - finds and returns the build (if it exists)
+func FindBuild(version string, context *G3opsContext) *G3opsBuild {
+	catalog := LoadBuildCatalog(context)
 	for _, build := range catalog.Builds {
 		if build.Version == version {
-			return true
+			return &build
 		}
 	}
-	return false
+	return nil
 }
