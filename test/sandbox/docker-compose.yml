@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+
+  hello:
+    image: "jbrunton/g3ops-sandbox-hello:${TAG?}"
+    build:
+      context: ./services/hello
+    ports:
+      - 3000:3000
+
+  ping:
+    image: "jbrunton/g3ops-sandbox-ping:${TAG}"
+    build:
+      context: ./services/ping
