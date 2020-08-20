@@ -20,5 +20,11 @@ jobs:
     - uses: jbrunton/setup-gflows@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-    - name: validate workflows
+    - name: Check g3ops workflows
+      env:
+        GFLOWS_CONFIG: .gflows/config.yml
+      run: gflows check
+    - name: Check sandbox workflows
+      env:
+        GFLOWS_CONFIG: test/sandbox/.gflows/config.yml
       run: gflows check

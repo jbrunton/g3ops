@@ -1,3 +1,4 @@
+#@ load("@ytt:data", "data")
 #@ load("workflows.lib.yml", "pull_request_defaults")
 #@ load("steps.lib.yml", "setup_go")
 
@@ -15,5 +16,8 @@ jobs:
     - uses: jbrunton/setup-gflows@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-    - name: validate workflows
+    #@ for/end context in data.values.g3ops.contexts:
+    - name: #@ "Check " + context.name + " workflows"
+      env:
+        GFLOWS_CONFIG: #@ context.config
       run: gflows check
