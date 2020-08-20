@@ -60,11 +60,11 @@ func Build(version string, context *G3opsContext, executor Executor) {
 	funk.ForEach(envMap, func(envvar string, envval string) {
 		os.Setenv(envvar, envval)
 	})
-	// funk.ForEach(context.Config.Ci.Defaults.Build.Env, func(envvar string, envtemplate string) {
-	// 	envval := os.ExpandEnv(envtemplate)
-	// 	envMap[envvar] = envval
-	// 	os.Setenv(envvar, envval)
-	// })
+	funk.ForEach(context.Config.Build.Env, func(envvar string, envtemplate string) {
+		envval := os.ExpandEnv(envtemplate)
+		envMap[envvar] = envval
+		os.Setenv(envvar, envval)
+	})
 	funk.ForEach(envMap, func(envvar string, envval string) {
 		fmt.Printf("  %s=%s\n", envvar, envval)
 	})
@@ -75,9 +75,10 @@ func Build(version string, context *G3opsContext, executor Executor) {
 	}
 	build.ImageTag = tag
 
-	//executor.ExecCommand(context.Config.Ci.Defaults.Build.Command, ExecOptions{DryRun: context.DryRun})
+	//fmt.Printf("Running command:\n%s", context.Config.Build.Command)
+	executor.ExecCommand(context.Config.Build.Command, ExecOptions{DryRun: context.DryRun})
 
-	saveBuild(build, context)
+	//saveBuild(build, context)
 }
 
 func createBuild(version string, context *G3opsContext) (G3opsBuild, error) {
