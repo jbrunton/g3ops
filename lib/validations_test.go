@@ -2,7 +2,6 @@ package lib
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/jbrunton/g3ops/cmd/styles"
@@ -80,45 +79,45 @@ func TestValidateValidArg(t *testing.T) {
 	}
 }
 
-func TestServiceValidatorInvalidService(t *testing.T) {
-	cmd := &cobra.Command{
-		Use:  "a",
-		Args: ValidateArgs([]ArgValidator{ServiceValidator}),
-		Run:  test.EmptyRun,
-	}
-	contextCache[cmd] = &G3opsContext{
-		Config: &G3opsConfig{
-			Services: map[string]g3opsServiceConfig{
-				"foo": g3opsServiceConfig{},
-			},
-		},
-	}
-	cmd.SetArgs([]string{"bar"})
-	result := test.ExecCommand(cmd)
+// func TestServiceValidatorInvalidService(t *testing.T) {
+// 	cmd := &cobra.Command{
+// 		Use:  "a",
+// 		Args: ValidateArgs([]ArgValidator{ServiceValidator}),
+// 		Run:  test.EmptyRun,
+// 	}
+// 	contextCache[cmd] = &G3opsContext{
+// 		Config: &G3opsConfig{
+// 			Services: map[string]g3opsServiceConfig{
+// 				"foo": g3opsServiceConfig{},
+// 			},
+// 		},
+// 	}
+// 	cmd.SetArgs([]string{"bar"})
+// 	result := test.ExecCommand(cmd)
 
-	expectedErr := `Unknown service "bar"`
-	if !strings.Contains(result.Err.Error(), expectedErr) {
-		t.Fatalf("expected error to contain \"%s\", was \"%s\"", expectedErr, result.Err.Error())
-	}
-}
+// 	expectedErr := `Unknown service "bar"`
+// 	if !strings.Contains(result.Err.Error(), expectedErr) {
+// 		t.Fatalf("expected error to contain \"%s\", was \"%s\"", expectedErr, result.Err.Error())
+// 	}
+// }
 
-func TestServiceValidatorValidService(t *testing.T) {
-	cmd := &cobra.Command{
-		Use:  "a",
-		Args: ValidateArgs([]ArgValidator{ServiceValidator}),
-		Run:  test.EmptyRun,
-	}
-	contextCache[cmd] = &G3opsContext{
-		Config: &G3opsConfig{
-			Services: map[string]g3opsServiceConfig{
-				"foo": g3opsServiceConfig{},
-			},
-		},
-	}
-	cmd.SetArgs([]string{"foo"})
-	result := test.ExecCommand(cmd)
+// func TestServiceValidatorValidService(t *testing.T) {
+// 	cmd := &cobra.Command{
+// 		Use:  "a",
+// 		Args: ValidateArgs([]ArgValidator{ServiceValidator}),
+// 		Run:  test.EmptyRun,
+// 	}
+// 	contextCache[cmd] = &G3opsContext{
+// 		Config: &G3opsConfig{
+// 			Services: map[string]g3opsServiceConfig{
+// 				"foo": g3opsServiceConfig{},
+// 			},
+// 		},
+// 	}
+// 	cmd.SetArgs([]string{"foo"})
+// 	result := test.ExecCommand(cmd)
 
-	if result.Err != nil {
-		t.Fatalf("expected nil got \"%s\"", result.Err.Error())
-	}
-}
+// 	if result.Err != nil {
+// 		t.Fatalf("expected nil got \"%s\"", result.Err.Error())
+// 	}
+// }
