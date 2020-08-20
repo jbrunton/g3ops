@@ -62,11 +62,6 @@ func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext,
 
 // GetContext - returns the current command context
 func GetContext(fs *afero.Afero, cmd *cobra.Command) (*G3opsContext, error) {
-	context := contextCache[cmd]
-	if context != nil {
-		return context, nil
-	}
-
 	dryRun, err := cmd.Flags().GetBool("dry-run")
 	if err != nil {
 		panic(err)
