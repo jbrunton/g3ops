@@ -7,7 +7,6 @@ name: sandbox-build
     - sandbox-test
     branches:
     - develop
-    - g3ops-55
     types:
     - completed
 env:
@@ -17,11 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       buildRequired: ${{ steps.check.outputs.buildRequired }}
-      steps:
-      - name: install g3ops
-        run: go get github.com/jbrunton/g3ops
-      - name: check
-        run: g3ops manifest check
+    steps:
+    - name: install g3ops
+      run: go get github.com/jbrunton/g3ops
+    - name: check
+      run: g3ops manifest check
   build:
     needs: manifest-check
     if: needs.manifest_check.outputs.buildRequired == true
