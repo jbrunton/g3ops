@@ -6,7 +6,6 @@ name: sandbox-build
     workflows:
     - sandbox-test
     branches:
-    - g3ops-55
     - develop
     types:
     - completed
