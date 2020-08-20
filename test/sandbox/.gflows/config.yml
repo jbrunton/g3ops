@@ -7,3 +7,9 @@ templates:
     libs:
       - ../../../.gflows/workflows/common
       - ../../../.gflows/workflows/config
+workflows:
+  overrides:
+    sandbox-build:
+      checks:
+        schema:
+          enabled: false

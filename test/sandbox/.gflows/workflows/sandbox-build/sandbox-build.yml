@@ -1,0 +1,12 @@
+name: sandbox-build
+"on":
+  workflow_run:
+    workflows: ["sandbox-test"]
+    types: 
+      - completed
+
+jobs:
+  manifest-check:
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo "Checking manifest!"
