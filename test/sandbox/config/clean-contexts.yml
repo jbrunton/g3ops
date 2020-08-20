@@ -1,0 +1,9 @@
+#@ load("@ytt:overlay", "overlay")
+#@overlay/match by=overlay.all
+---
+services:
+  #@overlay/match by=overlay.all,expects="1+"
+  _:
+    #@overlay/match missing_ok=True
+    #@overlay/remove
+    build:

@@ -1,26 +1,16 @@
 name: sandbox
 
-environments:
-  production:
-    manifest: ../manifests/production.yml
-  staging:
-    manifest: ../manifests/staging.yml
+build:
+  env:
+    COMPOSE_FILE: docker-compose.yml
+    TAG: $BUILD_VERSION-$BUILD_ID
 
-services:
-  ping:
-    manifest: ../services/ping/manifest.yml
-  hello:
-    manifest: ../services/hello/manifest.yml
+  command: |
+    echo "$G3OPS_DOCKER_ACCESS_TOKEN" | docker login -u "$G3OPS_DOCKER_USERNAME" --password-stdin
+    docker-compose build $BUILD_SERVICE
+    docker-compose push $BUILD_SERVICE
+    docker-compose config | kbld --images-annotation=false -f - | ytt -f - -f config/clean-contexts.yml > config/docker-compose.yml
 
-ci:
-  defaults:
-    build:
-      env:
-        TAG: $BUILD_VERSION-$BUILD_ID
-      command: |
-        echo "$G3OPS_DOCKER_ACCESS_TOKEN" | docker login -u "$G3OPS_DOCKER_USERNAME" --password-stdin
-        docker-compose build $BUILD_SERVICE
-        docker-compose push $BUILD_SERVICE
-
-workflows:
-  githubDir: ../../.github
+  commit:
+    files: [config/docker-compose.yml]
+    message: "Build $BUILD_VERSION"
