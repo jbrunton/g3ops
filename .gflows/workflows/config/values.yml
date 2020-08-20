@@ -1,0 +1,11 @@
+#@data/values
+---
+git:
+  main_branch: develop
+g3ops:
+  contexts:
+    - name: g3ops
+      config: .gflows/config.yml
+    - name: sandbox
+      config: test/sandbox/.gflows/config.yml
+
