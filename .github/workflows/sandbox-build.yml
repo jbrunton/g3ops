@@ -12,7 +12,7 @@ name: sandbox-build
 env:
   CI: 1
 jobs:
-  manifest-check:
+  manifest_check:
     runs-on: ubuntu-latest
     outputs:
       buildRequired: ${{ steps.check.outputs.buildRequired }}
@@ -21,9 +21,10 @@ jobs:
     - name: install g3ops
       run: go build main.go
     - name: check
+      id: check
       run: ./main manifest check
   build:
-    needs: manifest-check
+    needs: manifest_check
     if: needs.manifest_check.outputs.buildRequired == true
     runs-on: ubuntu-latest
     steps:

@@ -23,6 +23,11 @@ func newManifestCheckCmd(container *lib.Container) *cobra.Command {
 			}
 			container.Logger.Printfln("Manifest version: %s", manifest.Version)
 			build := lib.FindBuild(manifest.Version, context)
+			if os.Getenv("CI") == "1" {
+				container.Logger.Printfln("Running in CI environment")
+			} else {
+				container.Logger.Printfln("Not a CI environment")
+			}
 			if build != nil {
 				container.Logger.Printfln("Build %s found for version %s", build.ID, manifest.Version)
 				if os.Getenv("CI") == "1" {
