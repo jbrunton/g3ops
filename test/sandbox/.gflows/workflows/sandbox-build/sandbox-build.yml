@@ -15,6 +15,7 @@ jobs:
     outputs:
       buildRequired: ${{ steps.check.outputs.buildRequired }}
     steps:
+      - uses: actions/checkout@v2
       - name: install g3ops
         # TODO: use setup-g3ops action
         run: go build main.go

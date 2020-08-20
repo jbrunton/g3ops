@@ -17,6 +17,7 @@ jobs:
     outputs:
       buildRequired: ${{ steps.check.outputs.buildRequired }}
     steps:
+    - uses: actions/checkout@v2
     - name: install g3ops
       run: go build main.go
     - name: check
