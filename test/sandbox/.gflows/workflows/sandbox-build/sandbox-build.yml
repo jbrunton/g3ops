@@ -2,8 +2,8 @@ name: sandbox-build
 "on":
   workflow_run:
     workflows: ["sandbox-test"]
-    branches: ["g3ops-55"]
-    types: 
+    branches: ["g3ops-55", "develop"]
+    types:
       - completed
 
 jobs:
