@@ -16,12 +16,10 @@ jobs:
       buildRequired: ${{ steps.check.outputs.buildRequired }}
     steps:
       - uses: actions/checkout@v2
-      - name: install g3ops
-        # TODO: use setup-g3ops action
-        run: go build main.go
       - name: check
         id: check
-        run: ./main manifest check
+        # TODO: use setup-g3ops action
+        run: go run main.go manifest check
 
   build:
     needs: manifest_check
@@ -30,4 +28,5 @@ jobs:
     env:
       G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
     steps:
+      - uses: actions/checkout@v2
       - run: go run main.go build
