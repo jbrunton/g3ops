@@ -84,7 +84,7 @@ func Build(version string, fs *afero.Afero, context *G3opsContext, executor Exec
 
 	gitCommand := strings.Join([]string{
 		strings.Join(append([]string{"git add"}, context.Config.Build.Commit.Files...), " "),
-		fmt.Sprintf(`git commit -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
+		fmt.Sprintf(`git commit --allow-empty -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
 		fmt.Sprintf("git push origin HEAD:%s", context.Config.Build.Commit.Branch),
 	}, "\n")
 	//fmt.Printf("Running command:\n%s\n", gitCommand)
