@@ -5,5 +5,5 @@ services:
     - published: 3000
       target: 3000
   ping:
-    image: index.docker.io/jbrunton/g3ops-sandbox-ping@sha256:e5ca591e9322c9394f5752f4fabb95019fd00c5893de3f5f511f1c11b084bf3e
+    image: index.docker.io/jbrunton/g3ops-sandbox-ping@sha256:72b037286bf3dbc84817a7e15ea76df8a4cd7ec15c553b548cd31d575e4af204
 version: "3.8"
