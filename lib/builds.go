@@ -87,8 +87,8 @@ func Build(version string, fs *afero.Afero, context *G3opsContext, executor Exec
 		fmt.Sprintf(`git commit -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
 		fmt.Sprintf("git push origin HEAD:%s", context.Config.Build.Commit.Branch),
 	}, "\n")
-	fmt.Printf("Running command:\n%s\n", gitCommand)
-	//executor.ExecCommand(gitCommand, opts)
+	//fmt.Printf("Running command:\n%s\n", gitCommand)
+	executor.ExecCommand(gitCommand, opts)
 
 	tmp, err := fs.TempDir("", "build-img")
 	if err != nil {
