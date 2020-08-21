@@ -14,7 +14,7 @@ build:
   commit:
     message: "Build $BUILD_VERSION"
     files: [config/docker-compose.yml]
-    branch: g3ops-56
+    branch: develop
 
   package:
     image: jbrunton/g3ops-sandbox-config:$BUILD_VERSION
