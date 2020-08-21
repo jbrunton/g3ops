@@ -27,5 +27,7 @@ jobs:
     needs: manifest_check
     if: needs.manifest_check.outputs.buildRequired == true
     runs-on: ubuntu-latest
+    env:
+      G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
     steps:
-      - run: echo "Build required!"
+      - run: go run main.go build
