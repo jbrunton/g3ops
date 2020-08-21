@@ -10,6 +10,6 @@ services:
       - 3000:3000
 
   ping:
-    image: "jbrunton/g3ops-sandbox-ping:${TAG}"
+    image: "jbrunton/g3ops-sandbox-ping:${TAG?}"
     build:
       context: ./services/ping

@@ -80,4 +80,5 @@ func init() {
 	container := lib.NewContainer()
 	rootCmd.AddCommand(context.ContextCmd)
 	rootCmd.AddCommand(newManifestCmd(container))
+	rootCmd.AddCommand(newBuildCmd(container))
 }

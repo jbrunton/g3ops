@@ -14,6 +14,7 @@ import (
 // G3opsContext - current command context
 type G3opsContext struct {
 	Dir        string
+	ProjectDir string
 	ConfigPath string
 	GitHubDir  string
 	Config     *G3opsConfig
@@ -27,6 +28,7 @@ var contextCache map[*cobra.Command]*G3opsContext
 // NewContext - returns a context for the given config
 func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext, error) {
 	contextDir := filepath.Dir(configPath)
+	projectDir := filepath.Dir(contextDir)
 
 	config, err := GetContextConfig(fs, configPath)
 	if err != nil {
@@ -47,6 +49,7 @@ func NewContext(fs *afero.Afero, configPath string, dryRun bool) (*G3opsContext,
 		ConfigPath: configPath,
 		GitHubDir:  githubDir,
 		Dir:        contextDir,
+		ProjectDir: projectDir,
 	}
 
 	if config.Repo != "" {

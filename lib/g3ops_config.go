@@ -12,33 +12,43 @@ type G3opsConfig struct {
 	//Environments map[string]g3opsEnvironmentConfig
 	//Services     map[string]g3opsServiceConfig
 	//Ci           g3opsCiConfig
-	Repo string
+	Repo  string
+	Build g3opsBuildConfig
 	//Releases     g3opsReleasesConfig
 }
 
-type g3opsEnvironmentConfig struct {
-	Manifest string
-}
+// type g3opsEnvironmentConfig struct {
+// 	Manifest string
+// }
 
-type g3opsServiceConfig struct {
-	Manifest string
-}
+// type g3opsServiceConfig struct {
+// 	Manifest string
+// }
 
-type g3opsReleasesConfig struct {
-	CreatePullRequest bool `yaml:"createPullRequest"`
-}
+// type g3opsReleasesConfig struct {
+// 	CreatePullRequest bool `yaml:"createPullRequest"`
+// }
 
-type g3opsCiConfig struct {
-	Defaults g3opsCiDefaultsConfig
-}
+// type g3opsCiConfig struct {
+// 	Defaults g3opsCiDefaultsConfig
+// }
 
-type g3opsCiDefaultsConfig struct {
-	Build g3opsBuildConfig
-}
+// type g3opsCiDefaultsConfig struct {
+// 	Build g3opsBuildConfig
+// }
 
 type g3opsBuildConfig struct {
 	Env     map[string]string
 	Command string
+	Commit  struct {
+		Message string
+		Branch  string
+		Files   []string
+	}
+	Package struct {
+		Image string
+		Files []string
+	}
 }
 
 // GetContextConfig - finds and returns the G3opsConfig
