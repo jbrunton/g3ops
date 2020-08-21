@@ -5,11 +5,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/Masterminds/semver"
 	"github.com/google/uuid"
 	"github.com/logrusorgru/aurora"
+	"github.com/spf13/afero"
 	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v2"
 )
@@ -40,7 +42,7 @@ func getCatalogFileName(context *G3opsContext) string {
 const buildsDir = ".g3ops/builds"
 
 // Build - creates a build for the service and updates the catalog
-func Build(version string, context *G3opsContext, executor Executor) {
+func Build(version string, fs *afero.Afero, context *G3opsContext, executor Executor) {
 	build, err := createBuild(version, context)
 	if err != nil {
 		fmt.Println(err)
@@ -75,8 +77,42 @@ func Build(version string, context *G3opsContext, executor Executor) {
 	}
 	build.ImageTag = tag
 
-	//fmt.Printf("Running command:\n%s", context.Config.Build.Command)
-	executor.ExecCommand(context.Config.Build.Command, ExecOptions{DryRun: context.DryRun})
+	opts := ExecOptions{DryRun: context.DryRun, Dir: context.ProjectDir}
+
+	//fmt.Printf("Running command:\n%s\n", context.Config.Build.Command)
+	executor.ExecCommand(context.Config.Build.Command, opts)
+
+	gitCommand := strings.Join([]string{
+		strings.Join(append([]string{"git add"}, context.Config.Build.Commit.Files...), " "),
+		fmt.Sprintf(`git commit -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
+		fmt.Sprintf("git push origin HEAD:%s", context.Config.Build.Commit.Branch),
+	}, "\n")
+	fmt.Printf("Running command:\n%s\n", gitCommand)
+	//executor.ExecCommand(gitCommand, opts)
+
+	tmp, err := fs.TempDir("", "build-img")
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(tmp)
+
+	imgMetaFile := path.Join(tmp, "image-meta.yml")
+	pkgCommand := fmt.Sprintf("imgpkg push -i %s %s > %s",
+		os.ExpandEnv(context.Config.Build.Package.Image),
+		strings.Join(funk.Map(context.Config.Build.Package.Files, func(f string) string { return "-f " + f }).([]string), " "),
+		imgMetaFile,
+	)
+
+	//resolvedImage :=
+	//fmt.Printf("Running command:\n%s\n", pkgCommand)
+	executor.ExecCommand(pkgCommand, opts)
+
+	imageMeta, err := readImageMeta(fs, imgMetaFile)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("image: " + imageMeta.Image)
 
 	//saveBuild(build, context)
 }

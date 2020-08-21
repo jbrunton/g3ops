@@ -41,8 +41,13 @@ type g3opsBuildConfig struct {
 	Env     map[string]string
 	Command string
 	Commit  struct {
-		Files   []string
 		Message string
+		Branch  string
+		Files   []string
+	}
+	Package struct {
+		Image string
+		Files []string
 	}
 }
 

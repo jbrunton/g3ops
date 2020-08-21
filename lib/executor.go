@@ -25,6 +25,7 @@ type Executor interface {
 // ExecOptions - options for executing a command
 type ExecOptions struct {
 	Input  string
+	Dir    string
 	DryRun bool
 }
 
@@ -39,7 +40,7 @@ func (executor *CommandExecutor) ExecCommand(command string, opts ExecOptions) {
 		return
 	}
 
-	fmt.Println("Running", aurora.Green(command).Bold(), "...")
+	fmt.Println(aurora.Bold("Running"), aurora.Green(command).Bold(), "...")
 
 	process := exec.Command("bash", "-c", command)
 	if opts.Input != "" {
@@ -52,6 +53,7 @@ func (executor *CommandExecutor) ExecCommand(command string, opts ExecOptions) {
 	}
 	process.Stdout = os.Stdout
 	process.Stderr = os.Stderr
+	process.Dir = opts.Dir
 
 	err := process.Run()
 

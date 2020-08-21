@@ -24,7 +24,7 @@ func newBuildCmd(container *lib.Container) *cobra.Command {
 			if build != nil {
 				container.Logger.Printfln("Build %s found for version %s, skipping", build.ID, manifest.Version)
 			} else {
-				lib.Build(manifest.Version, context, container.Executor)
+				lib.Build(manifest.Version, container.FileSystem, context, container.Executor)
 			}
 			return nil
 		},
