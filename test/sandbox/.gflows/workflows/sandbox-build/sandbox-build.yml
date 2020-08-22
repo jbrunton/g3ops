@@ -10,6 +10,7 @@ name: sandbox-build
 
 env:
   CI: 1
+  G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
 
 jobs:
   manifest_check:
@@ -27,8 +28,6 @@ jobs:
     needs: manifest_check
     if: needs.manifest_check.outputs.buildRequired == true
     runs-on: ubuntu-latest
-    env:
-      G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
     steps:
       - #@ checkout_with_token("G3OPS_ADMIN_ACCESS_TOKEN")
       - #@ setup_git()
