@@ -116,14 +116,14 @@ func Build(context *G3opsContext, container *Container) error {
 
 	saveBuild(build, context)
 
-	// gitCommand := strings.Join([]string{
-	// 	strings.Join(append([]string{"git add", ".g3ops/builds/catalog.yml"}, context.Config.Build.Commit.Files...), " "),
-	// 	fmt.Sprintf(`git commit --allow-empty -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
-	// }, "\n")
-	// executor.ExecCommand(gitCommand, opts)
+	gitCommand := strings.Join([]string{
+		strings.Join(append([]string{"git add", ".g3ops/builds/catalog.yml"}, context.Config.Build.Commit.Files...), " "),
+		fmt.Sprintf(`git commit --allow-empty -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
+	}, "\n")
+	executor.ExecCommand(gitCommand, opts)
 
-	// pushCommand := fmt.Sprintf("git push origin HEAD:%s", context.Config.Build.Commit.Branch)
-	// executor.ExecCommand(pushCommand, opts)
+	pushCommand := fmt.Sprintf("git push origin HEAD:%s", context.Config.Build.Commit.Branch)
+	executor.ExecCommand(pushCommand, opts)
 	return nil
 }
 
