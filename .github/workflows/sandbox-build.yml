@@ -28,6 +28,9 @@ jobs:
     env:
       G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
     steps:
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.G3OPS_ADMIN_ACCESS_TOKEN }}
     - name: configure git
       run: |
         git config --global user.email "jbrunton-ci-minion@outlook.com"

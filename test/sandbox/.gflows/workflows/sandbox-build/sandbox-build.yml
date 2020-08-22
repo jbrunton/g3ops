@@ -30,6 +30,7 @@ jobs:
     env:
       G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
     steps:
+      - #@ checkout_with_token("G3OPS_ADMIN_ACCESS_TOKEN")
       - #@ setup_git()
       - uses: k14s/setup-k14s-action@v1
         with:
