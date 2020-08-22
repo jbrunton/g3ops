@@ -18,10 +18,6 @@ jobs:
       buildRequired: ${{ steps.check.outputs.buildRequired }}
     steps:
     - uses: actions/checkout@v2
-    - name: configure git
-      run: |
-        git config --global user.email "jbrunton-ci-minion@outlook.com"
-        git config --global user.name "jbrunton-ci-minion"
     - name: check
       id: check
       run: go run main.go manifest check
@@ -33,6 +29,10 @@ jobs:
       G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
     steps:
     - uses: actions/checkout@v2
+    - name: configure git
+      run: |
+        git config --global user.email "jbrunton-ci-minion@outlook.com"
+        git config --global user.name "jbrunton-ci-minion"
     - uses: k14s/setup-k14s-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}

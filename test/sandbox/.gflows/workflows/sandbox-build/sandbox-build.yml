@@ -18,7 +18,6 @@ jobs:
       buildRequired: ${{ steps.check.outputs.buildRequired }}
     steps:
       - uses: actions/checkout@v2
-      - #@ setup_git()
       - name: check
         id: check
         # TODO: use setup-g3ops action
@@ -32,6 +31,7 @@ jobs:
       G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
     steps:
       - uses: actions/checkout@v2
+      - #@ setup_git()
       - uses: k14s/setup-k14s-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
