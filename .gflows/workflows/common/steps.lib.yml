@@ -3,3 +3,10 @@
   with:
     go-version: "^1.14.4"
 #@ end
+
+#@ def setup_git():
+  name: configure git
+  run: |
+    git config --global user.email "jbrunton-ci-minion@outlook.com"
+    git config --global user.name "jbrunton-ci-minion"
+#@ end
