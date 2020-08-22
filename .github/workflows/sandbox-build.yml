@@ -11,6 +11,7 @@ name: sandbox-build
     - completed
 env:
   CI: 1
+  G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
 jobs:
   manifest_check:
     runs-on: ubuntu-latest
@@ -25,8 +26,6 @@ jobs:
     needs: manifest_check
     if: needs.manifest_check.outputs.buildRequired == true
     runs-on: ubuntu-latest
-    env:
-      G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
     steps:
     - uses: actions/checkout@v2
       with:
