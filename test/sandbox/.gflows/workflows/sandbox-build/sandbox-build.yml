@@ -1,4 +1,4 @@
-#@ load("steps.lib.yml", "setup_git")
+#@ load("steps.lib.yml", "setup_git", "checkout_with_token")
 
 name: sandbox-build
 "on":
@@ -30,7 +30,7 @@ jobs:
     env:
       G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
     steps:
-      - uses: actions/checkout@v2
+      - #@ checkout_with_token("G3OPS_ADMIN_ACCESS_TOKEN")
       - #@ setup_git()
       - uses: k14s/setup-k14s-action@v1
         with:
