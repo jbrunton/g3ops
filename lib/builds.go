@@ -11,17 +11,17 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/google/uuid"
 	"github.com/logrusorgru/aurora"
-	"github.com/spf13/afero"
 	"github.com/thoas/go-funk"
 	"gopkg.in/yaml.v2"
 )
 
 // G3opsBuild - represents information about a build
 type G3opsBuild struct {
-	ID      string // e.g. 0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
-	Version string // e.g. 0.2.22
+	ID           string // e.g. 0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
+	Version      string // e.g. 0.2.22
+	PackageImage string `yaml:"packageImage"` // image digest of the config image
 	//BuildSha  string    `yaml:"buildSha"` // git build sha, e.g. cc87c1c
-	ImageTag  string    `yaml:"imageTag"` // specified by user, but could be based on version + id, e.g. 0.2.22-0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
+	//ImageTag  string    `yaml:"imageTag"` // specified by user, but could be based on version + id, e.g. 0.2.22-0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
 	Timestamp time.Time // e.g. '2020-06-21T13:43:29.694Z'
 }
 
@@ -42,11 +42,16 @@ func getCatalogFileName(context *G3opsContext) string {
 const buildsDir = ".g3ops/builds"
 
 // Build - creates a build for the service and updates the catalog
-func Build(version string, fs *afero.Afero, context *G3opsContext, executor Executor) {
-	build, err := createBuild(version, context)
+func Build(context *G3opsContext, container *Container) error {
+	fs := container.FileSystem
+	manifest, err := context.GetManifest(fs)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
+	}
+	container.Logger.Printfln("Manifest version: %s", manifest.Version)
+	build, err := createBuild(manifest.Version, context)
+	if err != nil {
+		return err
 	}
 
 	envMap := map[string]string{
@@ -71,15 +76,16 @@ func Build(version string, fs *afero.Afero, context *G3opsContext, executor Exec
 		fmt.Printf("  %s=%s\n", envvar, envval)
 	})
 
-	tag := os.Getenv("TAG")
-	if tag == "" {
-		panic("TAG must be set")
-	}
-	build.ImageTag = tag
+	// tag := os.Getenv("TAG")
+	// if tag == "" {
+	// 	panic("TAG must be set")
+	// }
+	//build.ImageTag = tag
 
 	opts := ExecOptions{DryRun: context.DryRun, Dir: context.ProjectDir}
 
 	//fmt.Printf("Running command:\n%s\n", context.Config.Build.Command)
+	executor := container.Executor
 	executor.ExecCommand(context.Config.Build.Command, opts)
 
 	tmp, err := fs.TempDir("", "build-img")
@@ -106,17 +112,19 @@ func Build(version string, fs *afero.Afero, context *G3opsContext, executor Exec
 
 	fmt.Println("image: " + imageMeta.Image)
 
+	build.PackageImage = imageMeta.Image
+
 	saveBuild(build, context)
 
-	gitCommand := strings.Join([]string{
-		strings.Join(append([]string{"git add", ".g3ops/builds/catalog.yml"}, context.Config.Build.Commit.Files...), " "),
-		fmt.Sprintf(`git commit --allow-empty -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
-	}, "\n")
-	//fmt.Printf("Running command:\n%s\n", gitCommand)
-	executor.ExecCommand(gitCommand, opts)
+	// gitCommand := strings.Join([]string{
+	// 	strings.Join(append([]string{"git add", ".g3ops/builds/catalog.yml"}, context.Config.Build.Commit.Files...), " "),
+	// 	fmt.Sprintf(`git commit --allow-empty -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
+	// }, "\n")
+	// executor.ExecCommand(gitCommand, opts)
 
-	pushCommand := fmt.Sprintf("git push origin HEAD:%s", context.Config.Build.Commit.Branch)
-	executor.ExecCommand(pushCommand, opts)
+	// pushCommand := fmt.Sprintf("git push origin HEAD:%s", context.Config.Build.Commit.Branch)
+	// executor.ExecCommand(pushCommand, opts)
+	return nil
 }
 
 func createBuild(version string, context *G3opsContext) (G3opsBuild, error) {

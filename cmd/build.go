@@ -15,18 +15,7 @@ func newBuildCmd(container *lib.Container) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			manifest, err := context.GetManifest(fs)
-			if err != nil {
-				return err
-			}
-			container.Logger.Printfln("Manifest version: %s", manifest.Version)
-			build := lib.FindBuild(manifest.Version, context)
-			if build != nil {
-				container.Logger.Printfln("Build %s found for version %s, skipping", build.ID, manifest.Version)
-			} else {
-				lib.Build(manifest.Version, container.FileSystem, context, container.Executor)
-			}
-			return nil
+			return lib.Build(context, container)
 		},
 	}
 	return cmd
