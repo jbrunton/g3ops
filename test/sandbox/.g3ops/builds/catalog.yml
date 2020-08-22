@@ -1,9 +1,13 @@
 builds:
+- id: 90e3d2df-aaee-4478-b766-4f74576c9c36
+  version: "1.4"
+  packageImage: index.docker.io/jbrunton/g3ops-sandbox-config@sha256:782dcf6ead3aafeeaa7471e2abe741d1129dc680ca545533bf0bf77275bef329
+  timestamp: 2020-08-22T20:31:02.113567134Z
 - id: 1bcaa5ff-2bf6-45e0-a56e-527ae3970450
   version: "1.3"
-  imageTag: 1.3-1bcaa5ff-2bf6-45e0-a56e-527ae3970450
+  packageImage: ""
   timestamp: 2020-08-22T15:23:09.230442037Z
 - id: "123"
   version: "1.1"
-  imageTag: ""
+  packageImage: ""
   timestamp: 0001-01-01T00:00:00Z
