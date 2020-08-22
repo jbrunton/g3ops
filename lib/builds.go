@@ -18,9 +18,9 @@ import (
 
 // G3opsBuild - represents information about a build
 type G3opsBuild struct {
-	ID        string    // e.g. 0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
-	Version   string    // e.g. 0.2.22
-	BuildSha  string    `yaml:"buildSha"` // git build sha, e.g. cc87c1c
+	ID      string // e.g. 0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
+	Version string // e.g. 0.2.22
+	//BuildSha  string    `yaml:"buildSha"` // git build sha, e.g. cc87c1c
 	ImageTag  string    `yaml:"imageTag"` // specified by user, but could be based on version + id, e.g. 0.2.22-0c8bf7ef-2291-4dba-9e8e-f3d01093fd86
 	Timestamp time.Time // e.g. '2020-06-21T13:43:29.694Z'
 }
@@ -50,8 +50,8 @@ func Build(version string, fs *afero.Afero, context *G3opsContext, executor Exec
 	}
 
 	envMap := map[string]string{
-		"BUILD_VERSION":   build.Version,
-		"BUILD_SHA":       build.BuildSha,
+		"BUILD_VERSION": build.Version,
+		//"BUILD_SHA":       build.BuildSha,
 		"BUILD_ID":        build.ID,
 		"BUILD_TIMESTAMP": build.FormatTimestamp(),
 		//"BUILD_TIMESTAMP_UNIX": string(build.Timestamp.Unix()),
@@ -82,14 +82,6 @@ func Build(version string, fs *afero.Afero, context *G3opsContext, executor Exec
 	//fmt.Printf("Running command:\n%s\n", context.Config.Build.Command)
 	executor.ExecCommand(context.Config.Build.Command, opts)
 
-	gitCommand := strings.Join([]string{
-		strings.Join(append([]string{"git add"}, context.Config.Build.Commit.Files...), " "),
-		fmt.Sprintf(`git commit --allow-empty -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
-		fmt.Sprintf("git push origin HEAD:%s", context.Config.Build.Commit.Branch),
-	}, "\n")
-	//fmt.Printf("Running command:\n%s\n", gitCommand)
-	executor.ExecCommand(gitCommand, opts)
-
 	tmp, err := fs.TempDir("", "build-img")
 	if err != nil {
 		panic(err)
@@ -114,7 +106,17 @@ func Build(version string, fs *afero.Afero, context *G3opsContext, executor Exec
 
 	fmt.Println("image: " + imageMeta.Image)
 
-	//saveBuild(build, context)
+	saveBuild(build, context)
+
+	gitCommand := strings.Join([]string{
+		strings.Join(append([]string{"git add", ".g3ops/builds/catalog.yml"}, context.Config.Build.Commit.Files...), " "),
+		fmt.Sprintf(`git commit --allow-empty -m "%s"`, os.ExpandEnv(context.Config.Build.Commit.Message)),
+	}, "\n")
+	//fmt.Printf("Running command:\n%s\n", gitCommand)
+	executor.ExecCommand(gitCommand, opts)
+
+	pushCommand := fmt.Sprintf("git push origin HEAD:%s", context.Config.Build.Commit.Branch)
+	executor.ExecCommand(pushCommand, opts)
 }
 
 func createBuild(version string, context *G3opsContext) (G3opsBuild, error) {
@@ -125,13 +127,13 @@ func createBuild(version string, context *G3opsContext) (G3opsBuild, error) {
 
 	buildVersion := version
 	buildID := uuid.New().String()
-	buildSha := CurrentSha("")
+	//buildSha := CurrentSha("")
 	buildTimestamp := time.Now().UTC()
 
 	return G3opsBuild{
-		ID:        buildID,
-		Version:   buildVersion,
-		BuildSha:  buildSha,
+		ID:      buildID,
+		Version: buildVersion,
+		//BuildSha:  buildSha,
 		Timestamp: buildTimestamp,
 	}, nil
 }
