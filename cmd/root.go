@@ -54,6 +54,8 @@ to quickly create a Cobra application.`,
 		// Uncomment the following line if your bare application
 		// has an action associated with it:
 		// Run: func(cmd *cobra.Command, args []string) {},
+		SilenceErrors: true,
+		SilenceUsage:  true,
 	}
 	cmd.PersistentFlags().Bool("dry-run", false, "Preview commands before executing")
 	cmd.PersistentFlags().StringP("config", "c", "", "Location of g3ops context config")
