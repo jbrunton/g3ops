@@ -19,3 +19,8 @@ build:
   package:
     image: jbrunton/g3ops-sandbox-config:$BUILD_VERSION
     files: [config/docker-compose.yml]
+
+deploy:
+  command: |
+    echo "Deploying $BUILD_VERSION to $ENVIRONMENT ..."
+    cat config/docker-compose.yml
