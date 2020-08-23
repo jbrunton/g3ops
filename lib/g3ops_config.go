@@ -12,8 +12,11 @@ type G3opsConfig struct {
 	//Environments map[string]g3opsEnvironmentConfig
 	//Services     map[string]g3opsServiceConfig
 	//Ci           g3opsCiConfig
-	Repo  string
-	Build g3opsBuildConfig
+	Repo   string
+	Build  g3opsBuildConfig
+	Deploy struct {
+		Command string
+	}
 	//Releases     g3opsReleasesConfig
 }
 

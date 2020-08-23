@@ -83,4 +83,5 @@ func init() {
 	rootCmd.AddCommand(context.ContextCmd)
 	rootCmd.AddCommand(newManifestCmd(container))
 	rootCmd.AddCommand(newBuildCmd(container))
+	rootCmd.AddCommand(newDeployCmd(container))
 }

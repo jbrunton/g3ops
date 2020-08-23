@@ -10,8 +10,7 @@ func newBuildCmd(container *lib.Container) *cobra.Command {
 		Use:   "build",
 		Short: "Create build for manifest version",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fs := lib.CreateOsFs()
-			context, err := lib.GetContext(fs, cmd)
+			context, err := lib.GetContext(container.FileSystem, cmd)
 			if err != nil {
 				return err
 			}

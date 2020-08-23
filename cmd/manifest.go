@@ -12,7 +12,7 @@ func newManifestCheckCmd(container *lib.Container) *cobra.Command {
 		Use:   "check",
 		Short: "Check manifest status",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fs := lib.CreateOsFs()
+			fs := container.FileSystem
 			context, err := lib.GetContext(fs, cmd)
 			if err != nil {
 				return err
