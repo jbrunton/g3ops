@@ -45,12 +45,12 @@ func newManifestCheckCmd(container *lib.Container) *cobra.Command {
 			}
 
 			type deploymentTask struct {
-				Environment string
-				Version     string
+				Environment string `json:"environment"`
+				Version     string `json:"version"`
 			}
 			deploymentTasks := []deploymentTask{}
 			type deploymentMatrix struct {
-				Include []deploymentTask
+				Include []deploymentTask `json:"include"`
 			}
 
 			for envName, envInfo := range manifest.Environments {

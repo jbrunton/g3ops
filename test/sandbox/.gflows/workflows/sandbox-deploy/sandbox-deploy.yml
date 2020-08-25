@@ -40,4 +40,5 @@ jobs:
       - env:
           ENVIRONMENT: "${{ matrix.environment }}"
           VERSION: "${{ matrix.version }}"
-        run: env
+        run: go run main.go deploy $VERSION $ENVIRONMENT
+
