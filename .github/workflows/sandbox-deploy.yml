@@ -23,7 +23,7 @@ jobs:
     - name: check
       id: check
       run: go run main.go manifest check
-  build:
+  deploy:
     needs: manifest_check
     if: needs.manifest_check.outputs.deploymentsRequired == true
     runs-on: ubuntu-latest
@@ -43,4 +43,4 @@ jobs:
     - env:
         ENVIRONMENT: ${{ matrix.environment }}
         VERSION: ${{ matrix.version }}
-      run: go run main.go deploy $ENVIRONMENT $VERSION
+      run: go run main.go deploy $VERSION $ENVIRONMENT
