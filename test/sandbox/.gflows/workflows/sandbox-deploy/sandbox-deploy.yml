@@ -1,6 +1,6 @@
 #@ load("steps.lib.yml", "setup_git", "checkout_with_token")
 
-name: sandbox-build
+name: sandbox-deploy
 "on":
   workflow_run:
     workflows: ["sandbox-build"]
