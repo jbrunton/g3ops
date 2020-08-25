@@ -13,3 +13,7 @@ workflows:
       checks:
         schema:
           enabled: false
+    sandbox-deploy:
+      checks:
+        schema:
+          enabled: false

@@ -1,0 +1,43 @@
+#@ load("steps.lib.yml", "setup_git", "checkout_with_token")
+
+name: sandbox-build
+"on":
+  workflow_run:
+    workflows: ["sandbox-build"]
+    branches: ["develop"]
+    types:
+      - completed
+
+env:
+  CI: 1
+  G3OPS_CONFIG: test/sandbox/.g3ops/config.yml
+
+jobs:
+  manifest_check:
+    runs-on: ubuntu-latest
+    outputs:
+      deploymentsRequired: ${{ steps.check.outputs.deploymentsRequired }}
+      deploymentMatrix: ${{ steps.check.outputs.deploymentMatrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: check
+        id: check
+        # TODO: use setup-g3ops action
+        run: go run main.go manifest check
+
+  deploy:
+    needs: manifest_check
+    if: needs.manifest_check.outputs.deploymentsRequired == true
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: "${{ fromJson(needs.manifest_check.outputs.deploymentMatrix) }}"
+    steps:
+      - #@ checkout_with_token("G3OPS_ADMIN_ACCESS_TOKEN")
+      - #@ setup_git()
+      - uses: k14s/setup-k14s-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - env:
+          ENVIRONMENT: "${{ matrix.environment }}"
+          VERSION: "${{ matrix.version }}"
+        run: go run main.go deploy $VERSION $ENVIRONMENT
