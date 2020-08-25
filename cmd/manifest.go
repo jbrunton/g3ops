@@ -46,6 +46,7 @@ func newManifestCheckCmd(container *lib.Container) *cobra.Command {
 
 			type deploymentTask struct {
 				Environment string
+				Version     string
 			}
 			deploymentTasks := []deploymentTask{}
 			type deploymentMatrix struct {
@@ -63,7 +64,7 @@ func newManifestCheckCmd(container *lib.Container) *cobra.Command {
 				}
 				if latestDeployment == nil || envInfo.Version != latestDeployment.Version {
 					container.Logger.Println("  Deployment required")
-					deploymentTasks = append(deploymentTasks, deploymentTask{Environment: envName})
+					deploymentTasks = append(deploymentTasks, deploymentTask{Environment: envName, Version: envInfo.Version})
 				} else {
 					container.Logger.Println("  No deployment required")
 				}
