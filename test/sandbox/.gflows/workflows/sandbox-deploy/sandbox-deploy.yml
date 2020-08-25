@@ -31,6 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: "${{ fromJson(needs.manifest_check.outputs.deploymentMatrix) }}"
+      fail-fast: false
     steps:
       - #@ checkout_with_token("G3OPS_ADMIN_ACCESS_TOKEN")
       - #@ setup_git()
