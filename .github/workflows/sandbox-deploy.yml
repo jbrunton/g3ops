@@ -45,4 +45,7 @@ jobs:
         ENVIRONMENT: ${{ matrix.environment }}
         VERSION: ${{ matrix.version }}
       run: go run main.go deploy $VERSION $ENVIRONMENT
-    - run: git push origin HEAD:develop
+    - name: git push
+      run: |
+        git pull origin develop
+        git push origin HEAD:develop
