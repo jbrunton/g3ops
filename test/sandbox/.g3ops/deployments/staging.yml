@@ -1,4 +1,7 @@
 deployments:
+- id: db5026b3-634b-4d88-ae65-f5674933d19b
+  version: "1.5"
+  timestamp: 2020-08-26T15:12:40.234631083Z
 - id: 30f27b39-ddc4-4b60-852b-34161ea54f76
   version: "1.4"
   timestamp: 2020-08-26T12:44:38.806179845Z
