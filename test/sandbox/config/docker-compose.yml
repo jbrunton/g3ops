@@ -1,9 +1,9 @@
 services:
   hello:
-    image: index.docker.io/jbrunton/g3ops-sandbox-hello@sha256:c5709f67f0dd0119a80b8c49390d53100f4497edf53b8376dfbeb6a989e31c21
+    image: index.docker.io/jbrunton/g3ops-sandbox-hello@sha256:cc7b3c3f20f55f08b50e0fdef1c671e3f339787e90ce0b4d325dcc52200d15ce
     ports:
     - published: 3000
       target: 3000
   ping:
-    image: index.docker.io/jbrunton/g3ops-sandbox-ping@sha256:ce1494663df96bdaefebea93213c0d4c7c1f438f2be5d3a38b70f9d9bff068cb
+    image: index.docker.io/jbrunton/g3ops-sandbox-ping@sha256:a10b53de640327ff23a99ede1c021f01ee3274284e4e1b7b05ffc37bb71ece8a
 version: "3.8"
