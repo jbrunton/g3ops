@@ -35,22 +35,8 @@ type G3opsBuildCatalog struct {
 	Builds []G3opsBuild
 }
 
-type G3opsDeployment struct {
-	ID        string
-	Version   string
-	Timestamp time.Time
-}
-
-type G3opsDeploymentCatalog struct {
-	Deployments []G3opsDeployment
-}
-
 func getCatalogFileName(context *G3opsContext) string {
 	return path.Join(context.Dir, "builds/catalog.yml")
-}
-
-func getDeploymentsCatalogFileName(context *G3opsContext, environment string) string {
-	return path.Join(context.Dir, fmt.Sprintf("deployments/%s.yml", environment))
 }
 
 const buildsDir = ".g3ops/builds"
@@ -208,26 +194,6 @@ func LoadBuildCatalog(context *G3opsContext) G3opsBuildCatalog {
 	return catalog
 }
 
-// LoadDeploymentsCatalog - loads deployment catalog for the given environment
-func LoadDeploymentsCatalog(context *G3opsContext, environment string) G3opsDeploymentCatalog {
-	fileName := getDeploymentsCatalogFileName(context, environment)
-	data, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return G3opsDeploymentCatalog{}
-		}
-		panic(err)
-	}
-
-	catalog := G3opsDeploymentCatalog{}
-	err = yaml.Unmarshal(data, &catalog)
-	if err != nil {
-		panic(err)
-	}
-
-	return catalog
-}
-
 func validateVersion(version string, context *G3opsContext) error {
 	_, err := semver.NewVersion(version)
 	if err != nil {
@@ -253,15 +219,6 @@ func FindBuild(version string, context *G3opsContext) *G3opsBuild {
 		if build.Version == version {
 			return &build
 		}
-	}
-	return nil
-}
-
-// GetLatestDeployment - returns the latest deployment (if there is one)
-func GetLatestDeployment(environment string, context *G3opsContext) *G3opsDeployment {
-	catalog := LoadDeploymentsCatalog(context, environment)
-	if len(catalog.Deployments) > 0 {
-		return &catalog.Deployments[0]
 	}
 	return nil
 }
