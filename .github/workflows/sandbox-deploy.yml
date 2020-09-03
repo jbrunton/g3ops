@@ -38,6 +38,7 @@ jobs:
       run: |
         git config --global user.email "jbrunton-ci-minion@outlook.com"
         git config --global user.name "jbrunton-ci-minion"
+        git config pull.rebase false
     - uses: k14s/setup-k14s-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -48,4 +49,4 @@ jobs:
     - name: git push
       run: |
         git pull origin develop
-        git push origin HEAD:develop
+        git push origin develop

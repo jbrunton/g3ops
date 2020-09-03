@@ -45,4 +45,4 @@ jobs:
       - name: git push
         run: |
           git pull origin develop
-          git push origin HEAD:develop
+          git push origin develop

@@ -9,6 +9,7 @@
   run: |
     git config --global user.email "jbrunton-ci-minion@outlook.com"
     git config --global user.name "jbrunton-ci-minion"
+    git config pull.rebase false
 #@ end
 ---
 #@ def checkout_with_token(token):
