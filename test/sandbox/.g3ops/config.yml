@@ -7,8 +7,8 @@ build:
 
   command: |
     echo "$G3OPS_DOCKER_ACCESS_TOKEN" | docker login -u "$G3OPS_DOCKER_USERNAME" --password-stdin
-    docker-compose build $BUILD_SERVICE
-    docker-compose push $BUILD_SERVICE
+    docker-compose build
+    docker-compose push
     docker-compose config | kbld --images-annotation=false -f - | ytt -f - -f config/clean-contexts.yml > config/docker-compose.yml
 
   commit:
