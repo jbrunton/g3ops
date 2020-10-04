@@ -19,7 +19,7 @@ type Container struct {
 
 // NewContainer - creates a new production container instance. Use NewTestContainer for testing.
 func NewContainer() *Container {
-	logger := io.NewLogger(os.Stdout, true)
+	logger := io.NewLogger(os.Stdout, true, false)
 	return &Container{
 		FileSystem:    CreateOsFs(),
 		Executor:      &CommandExecutor{},
