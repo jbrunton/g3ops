@@ -24,7 +24,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/jbrunton/g3ops/cmd/context"
-	"github.com/jbrunton/g3ops/cmd/styles"
 )
 
 var cfgFile string
@@ -59,9 +58,6 @@ to quickly create a Cobra application.`,
 	}
 	cmd.PersistentFlags().Bool("dry-run", false, "Preview commands before executing")
 	cmd.PersistentFlags().StringP("config", "c", "", "Location of g3ops context config")
-
-	styles.ConfigureUsageTemplate(cmd)
-	styles.ConfigureUnknownCommandErrorFunc(cmd)
 
 	return cmd
 }

@@ -2,8 +2,6 @@ module github.com/jbrunton/g3ops
 
 go 1.14
 
-replace github.com/spf13/cobra => github.com/jbrunton/cobra v1.0.1-0.20200626143646-da3402edfcb2
-
 require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/blang/semver v3.5.1+incompatible
