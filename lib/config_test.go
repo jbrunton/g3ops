@@ -24,7 +24,7 @@ ci:
     build:
       env:
         TAG: $BUILD_VERSION-$BUILD_ID
-      command: docker build $BUILD_SERVICE
+      command: docker build
 `
 
 func assertDeepEqual(message string, expected interface{}, actual interface{}, t *testing.T) {
@@ -68,7 +68,7 @@ func assertDeepEqual(message string, expected interface{}, actual interface{}, t
 // 					Env: map[string]string{
 // 						"TAG": "$BUILD_VERSION-$BUILD_ID",
 // 					},
-// 					Command: "docker build $BUILD_SERVICE",
+// 					Command: "docker build
 // 				},
 // 			},
 // 		},
