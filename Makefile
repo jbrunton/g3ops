@@ -1,18 +1,30 @@
 statik:
-	statik -m -src=static-content
+	statik -m -src=static/content -dest=static
 
-compile:
+go-build:
 	go build
 
-compile-release:
+LDFLAGS=-ldflags="-buildid= -X 'github.com/jbrunton/g3ops/cmd.Version=${version}'"
+go-build-release:
+	@test -n "$(version)" || (echo '$$version required' && exit 1)
 	export CGO_ENABLED=0
-	repo_flags="-ldflags=-buildid= -trimpath"
-	GOOS=darwin GOARCH=amd64 go build $$repo_flags -o g3ops-darwin-amd64
-	GOOS=linux GOARCH=amd64 go build $$repo_flags -o g3ops-linux-amd64
-	GOOS=windows GOARCH=amd64 go build $$repo_flags -o g3ops-windows-amd64.exe
+	GOOS=darwin GOARCH=amd64 go build ${LDFLAGS} -trimpath -o g3ops-darwin-amd64
+	GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -trimpath -o g3ops-linux-amd64
 
-build: statik compile
+compile: statik go-build
 
-build-release: statik compile-release
+compile-release: statik go-build-release
 
-.PHONY: statik compile build compile-release build-release
+build: compile test
+
+unit-test:
+	go test -coverprofile c.out $$(go list ./... | grep -v /e2e)
+
+e2e-test:
+	go test ./e2e
+
+test: unit-test e2e-test
+
+.PHONY: statik go-build go-build-release compile compile-release build unit-test e2e-test test
+
+.DEFAULT_GOAL := build
