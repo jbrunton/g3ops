@@ -12,7 +12,7 @@
     "before:init": ["make build"],
     "after:bump": [
       "version=${version} make compile-release",
-      "npx auto-changelog --commit-limit 0 --starting-version 0.1.1"
+      "npx auto-changelog --commit-limit 0 --starting-version 0.2.7"
     ]
   }
 }
