@@ -39,6 +39,21 @@ func Execute() {
 	}
 }
 
+// Version - the build version
+var Version = "development"
+
+func newVersionCmd(container *lib.Container) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "version",
+		Short: "Print version",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			container.Logger.Printfln("g3ops version %s", Version)
+			return nil
+		},
+	}
+	return cmd
+}
+
 // NewRootCommand creates a new root command
 func NewRootCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -80,4 +95,5 @@ func init() {
 	rootCmd.AddCommand(newManifestCmd(container))
 	rootCmd.AddCommand(newBuildCmd(container))
 	rootCmd.AddCommand(newDeployCmd(container))
+	rootCmd.AddCommand(newVersionCmd(container))
 }
