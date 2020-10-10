@@ -16,12 +16,9 @@ jobs:
     - uses: actions/setup-go@v2
       with:
         go-version: ^1.14.4
-    - name: check static content
-      run: |
-        go get github.com/rakyll/statik
-        ./verify-statik-content.sh
-    - name: build
-      run: make build-release
+    - run: go get github.com/rakyll/statik
+    - run: make compile
+    - run: ./check-static-content.sh
     - name: configure environment for pull request
       if: github.event_name == 'pull_request'
       env:
