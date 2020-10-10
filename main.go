@@ -17,7 +17,7 @@ package main
 
 import (
 	"github.com/jbrunton/g3ops/cmd"
-	_ "github.com/jbrunton/g3ops/statik"
+	_ "github.com/jbrunton/g3ops/static/statik"
 )
 
 func main() {
