@@ -75,10 +75,11 @@ func NewGitHubService() *HTTPGitHubService {
 
 // NewGitHubClient - creates a new client using the GITHUB_TOKEN (if set)
 func NewGitHubClient() *github.Client {
+	// TODO: this token may not be needed any more
 	token := os.Getenv("GITHUB_TOKEN")
 
 	if token == "" {
-		fmt.Println("Warning: no GITHUB_TOKEN set. g3ops won't be able to authenticate, and some functionality won't be supported.")
+		//fmt.Println("Warning: no GITHUB_TOKEN set. g3ops won't be able to authenticate, and some functionality won't be supported.")
 		return github.NewClient(nil)
 	}
 
